@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="#0D7377"/>
+
+  <!-- Subtle geometric border ring -->
+  <rect x="24" y="24" width="464" height="464" rx="96" fill="none" stroke="#ffffff" stroke-width="4" stroke-opacity="0.15"/>
+
+  <!-- Kaaba body -->
+  <rect x="156" y="220" width="200" height="180" rx="6" fill="#1a1a2e"/>
+
+  <!-- Kaaba top dark edge -->
+  <rect x="156" y="220" width="200" height="16" rx="4" fill="#0a0a18"/>
+
+  <!-- Kiswah gold band (the black cloth with gold embroidery) -->
+  <rect x="156" y="252" width="200" height="28" fill="#C9A84C"/>
+  <!-- Gold band Quranic script suggestion (simplified lines) -->
+  <rect x="170" y="258" width="172" height="2" rx="1" fill="#fff" opacity="0.4"/>
+  <rect x="170" y="264" width="172" height="2" rx="1" fill="#fff" opacity="0.4"/>
+  <rect x="170" y="270" width="130" height="2" rx="1" fill="#fff" opacity="0.4"/>
+
+  <!-- Kaaba door -->
+  <rect x="221" y="310" width="70" height="90" rx="6" fill="#C9A84C"/>
+  <rect x="226" y="316" width="60" height="78" rx="4" fill="#a07a38"/>
+  <!-- Door handle -->
+  <circle cx="256" cy="360" r="5" fill="#C9A84C"/>
+
+  <!-- Ground/base shadow -->
+  <ellipse cx="256" cy="408" rx="110" ry="12" fill="#000" opacity="0.2"/>
+
+  <!-- Minarets (simplified pillars) -->
+  <!-- Left minaret -->
+  <rect x="120" y="250" width="22" height="140" rx="4" fill="#1a4a4d"/>
+  <polygon points="120,250 142,250 131,224" fill="#C9A84C"/>
+  <!-- Right minaret -->
+  <rect x="370" y="250" width="22" height="140" rx="4" fill="#1a4a4d"/>
+  <polygon points="370,250 392,250 381,224" fill="#C9A84C"/>
+
+  <!-- Arabic text "دليل" -->
+  <text
+    x="256"
+    y="178"
+    font-family="serif"
+    font-size="68"
+    font-weight="bold"
+    fill="#ffffff"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    direction="rtl"
+  >دليل</text>
+
+  <!-- Stars/crescent suggestion at top -->
+  <circle cx="256" cy="108" r="14" fill="none" stroke="#C9A84C" stroke-width="3"/>
+  <circle cx="264" cy="104" r="10" fill="#0D7377"/>
+  <polygon points="278,90 280,102 270,95" fill="#C9A84C"/>
+</svg>

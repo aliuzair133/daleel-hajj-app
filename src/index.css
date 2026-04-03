@@ -1,0 +1,443 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ══════════════════════════════════════════════════════════════
+   DALEEL — Global Stylesheet
+   Design tokens, layout, typography, animations, utilities
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── CSS Custom Properties (Light mode) ──────────────────────── */
+:root {
+  /* Brand palette */
+  --color-teal:        #0D7377;
+  --color-teal-light:  #14A8AE;
+  --color-teal-dark:   #095c5f;
+  --color-gold:        #C9A84C;
+  --color-gold-light:  #dfc06e;
+  --color-sage:        #2D6A4F;
+  --color-sage-light:  #3a8563;
+
+  /* Surface & text */
+  --color-bg:          #FAFAF8;
+  --color-surface:     #FFFFFF;
+  --color-surface-2:   #F3F4F2;
+  --color-text:        #1A1A2E;
+  --color-text-muted:  #6B7280;
+  --color-border:      #E8EAE6;
+  --color-border-soft: #F0F1EE;
+
+  /* Shadows */
+  --shadow-card:       0 2px 12px rgba(0, 0, 0, 0.07);
+  --shadow-elevated:   0 4px 24px rgba(0, 0, 0, 0.10);
+
+  /* Transitions */
+  --transition-fast:   150ms ease;
+  --transition-base:   220ms ease;
+  --transition-slow:   350ms ease;
+
+  /* Bottom nav height (accounts for safe area at runtime via padding) */
+  --nav-height: 64px;
+}
+
+/* ── Dark mode via class (set by Settings) ──────────────────── */
+.dark {
+  --color-bg:          #0F1117;
+  --color-surface:     #1A1D27;
+  --color-surface-2:   #22263A;
+  --color-text:        #F3F4F6;
+  --color-text-muted:  #9CA3AF;
+  --color-border:      #2D3148;
+  --color-border-soft: #252840;
+  --shadow-card:       0 2px 12px rgba(0, 0, 0, 0.35);
+  --shadow-elevated:   0 4px 24px rgba(0, 0, 0, 0.50);
+}
+
+/* ── Dark mode via OS preference (when not overridden) ────────── */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --color-bg:          #0F1117;
+    --color-surface:     #1A1D27;
+    --color-surface-2:   #22263A;
+    --color-text:        #F3F4F6;
+    --color-text-muted:  #9CA3AF;
+    --color-border:      #2D3148;
+    --color-border-soft: #252840;
+    --shadow-card:       0 2px 12px rgba(0, 0, 0, 0.35);
+    --shadow-elevated:   0 4px 24px rgba(0, 0, 0, 0.50);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BASE RESETS & GLOBAL STYLES
+   ══════════════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* Enable momentum scrolling in iOS */
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Noto Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  /* Prevent layout shift from scrollbar appearing */
+  overflow-y: scroll;
+  /* Prevent body from bouncing on iOS overscroll */
+  overscroll-behavior-y: none;
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  /* Pull-to-refresh guard on iOS */
+  overscroll-behavior-y: none;
+}
+
+/* Remove tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TYPOGRAPHY
+   ══════════════════════════════════════════════════════════════ */
+
+/* Arabic text utility */
+.arabic-text {
+  font-family: 'Noto Naskh Arabic', 'Arial Arabic', serif;
+  direction: rtl;
+  text-align: right;
+  font-size: 1.2rem;
+  line-height: 2;
+  letter-spacing: 0;
+  unicode-bidi: embed;
+}
+
+.arabic-large {
+  font-family: 'Noto Naskh Arabic', 'Arial Arabic', serif;
+  direction: rtl;
+  text-align: right;
+  font-size: 1.5rem;
+  line-height: 2.25;
+  letter-spacing: 0;
+  unicode-bidi: embed;
+}
+
+.arabic-xlarge {
+  font-family: 'Noto Naskh Arabic', 'Arial Arabic', serif;
+  direction: rtl;
+  text-align: right;
+  font-size: 1.85rem;
+  line-height: 2.4;
+  letter-spacing: 0;
+  unicode-bidi: embed;
+}
+
+/* RTL page direction (for full Arabic UI) */
+[dir="rtl"] {
+  font-family: 'Noto Naskh Arabic', 'Arial Arabic', serif;
+}
+
+/* Text-size scale controlled by Settings (applied to html via JS) */
+.text-size-small  { font-size: 14px; }
+.text-size-medium { font-size: 16px; }
+.text-size-large  { font-size: 18px; }
+.text-size-xlarge { font-size: 21px; }
+
+/* ══════════════════════════════════════════════════════════════
+   LAYOUT COMPONENTS
+   ══════════════════════════════════════════════════════════════ */
+
+/* App shell main area — room for BottomNav */
+.main-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  /* pad bottom so content clears BottomNav including safe area */
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
+}
+
+/* Centered content wrapper */
+.page-container {
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 16px 16px 8px;
+}
+
+@media (min-width: 640px) {
+  .page-container {
+    max-width: 560px;
+    padding: 24px 20px 8px;
+  }
+}
+
+/* ── Card component ──────────────────────────────────────────── */
+.card {
+  background: var(--color-surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  padding: 16px;
+  border: 1px solid var(--color-border-soft);
+}
+
+.card-elevated {
+  background: var(--color-surface);
+  border-radius: 20px;
+  box-shadow: var(--shadow-elevated);
+  padding: 20px;
+}
+
+/* ── Bottom Navigation ───────────────────────────────────────── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: stretch;
+  /* Safe area padding for iPhone home indicator */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  /* Blurred glass effect */
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background-color: color-mix(in srgb, var(--color-surface) 90%, transparent);
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px 10px;
+  min-height: 56px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+  gap: 2px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+
+.bottom-nav-item.active,
+.bottom-nav-item[data-active="true"] {
+  color: var(--color-teal);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INTERACTIVE ELEMENTS
+   ══════════════════════════════════════════════════════════════ */
+
+/* Ensure large tap targets on all interactive elements */
+button,
+a,
+[role="button"],
+[role="tab"],
+[role="checkbox"],
+select {
+  min-height: 44px;
+  cursor: pointer;
+}
+
+/* Focus ring — visible on keyboard nav, hidden on touch */
+:focus-visible {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PAGE TRANSITIONS
+   ══════════════════════════════════════════════════════════════ */
+
+/* Route wrapper — re-keyed on navigation to trigger animation */
+.route-wrapper {
+  animation: pageEnter 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, transform;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Legacy fade-in used by individual components */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 180ms ease-out both;
+}
+
+/* Slide up (for modals and bottom sheets) */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.slide-up {
+  animation: slideUp 250ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Scale in (for buttons / badges that pop in) */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.scale-in {
+  animation: scaleIn 180ms ease-out both;
+}
+
+/* Shimmer (loading skeleton effect) */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-2) 25%,
+    var(--color-border) 50%,
+    var(--color-surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* Pulse ring (for the Talbiyah audio button) */
+@keyframes pulseRing {
+  0%   { transform: scale(1);    opacity: 0.6; }
+  70%  { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+.pulse-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-teal);
+  animation: pulseRing 1.8s ease-out infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCROLLBAR UTILITIES
+   ══════════════════════════════════════════════════════════════ */
+
+/* Thin branded scrollbar on desktop */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* Utility class to hide scrollbar (Tailwind-compatible) */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;             /* Chrome/Safari/Opera */
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SAFE AREA UTILITIES
+   ══════════════════════════════════════════════════════════════ */
+
+/* Top safe area (notch on older iPhones) */
+.pt-safe  { padding-top:    env(safe-area-inset-top,    0px); }
+.pb-safe  { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.pl-safe  { padding-left:   env(safe-area-inset-left,   0px); }
+.pr-safe  { padding-right:  env(safe-area-inset-right,  0px); }
+
+.mt-safe  { margin-top:    env(safe-area-inset-top,    0px); }
+.mb-safe  { margin-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* ══════════════════════════════════════════════════════════════
+   SPECIAL COMPONENTS
+   ══════════════════════════════════════════════════════════════ */
+
+/* Glassmorphism surface (used by offline banner, sticky headers) */
+.glass {
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+}
+
+/* Teal gradient (used by hero cards) */
+.teal-gradient {
+  background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-teal-light) 100%);
+}
+
+/* Gold gradient accent */
+.gold-gradient {
+  background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-light) 100%);
+}
+
+/* Alert severity colours */
+.alert-red    { --alert-color: #DC2626; --alert-bg: #FEF2F2; --alert-border: #FECACA; }
+.alert-amber  { --alert-color: #D97706; --alert-bg: #FFFBEB; --alert-border: #FDE68A; }
+.alert-green  { --alert-color: #059669; --alert-bg: #ECFDF5; --alert-border: #A7F3D0; }
+.alert-blue   { --alert-color: #2563EB; --alert-bg: #EFF6FF; --alert-border: #BFDBFE; }
+
+.dark .alert-red    { --alert-bg: rgba(220,38,38,0.12); --alert-border: rgba(220,38,38,0.3); }
+.dark .alert-amber  { --alert-bg: rgba(217,119,6,0.12);  --alert-border: rgba(217,119,6,0.3); }
+.dark .alert-green  { --alert-bg: rgba(5,150,105,0.12);  --alert-border: rgba(5,150,105,0.3); }
+.dark .alert-blue   { --alert-bg: rgba(37,99,235,0.12);  --alert-border: rgba(37,99,235,0.3); }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE HELPERS
+   ══════════════════════════════════════════════════════════════ */
+
+/* Stretch to fill parent on small screens */
+@media (max-width: 480px) {
+  .card { border-radius: 12px; }
+}
+
+/* Desktop sidebar offset (if we ever add a sidebar) */
+@media (min-width: 768px) {
+  .main-scroll {
+    padding-bottom: 24px;
+  }
+}

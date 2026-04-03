@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Daleel",
+    "tagline": "Votre compagnon de confiance pour le Hajj",
+    "disclaimer": "Cette application est un guide uniquement. Consultez le responsable de votre groupe de Hajj ou un érudit qualifié pour des décisions religieuses contraignantes."
+  },
+  "nav": {
+    "home": "Accueil",
+    "rituals": "Rituels",
+    "prayers": "Prières",
+    "contacts": "Contacts",
+    "more": "Plus"
+  },
+  "home": {
+    "greeting_morning": "As-salamu alaykum",
+    "greeting_afternoon": "As-salamu alaykum",
+    "today_in_hajj": "Hajj du jour",
+    "days_until_hajj": "Jours avant le Hajj",
+    "next_prayer": "Prochaine prière",
+    "current_prayer": "Prière actuelle",
+    "time_remaining": "Temps restant",
+    "quick_actions": "Actions rapides",
+    "talbiyah": "Talbiyah",
+    "todays_dua": "Du'a du jour",
+    "emergency": "Urgence"
+  },
+  "rituals": {
+    "title": "Rituels du Hajj",
+    "progress": "Votre progression",
+    "steps_completed": "{{completed}} sur {{total}} étapes complétées",
+    "mark_complete": "Marquer comme terminé",
+    "completed": "Terminé",
+    "common_mistakes": "Erreurs courantes",
+    "tip": "Conseil",
+    "source": "Source",
+    "related_dua": "Du'a associé"
+  },
+  "prayers": {
+    "title": "Prières et Du'as",
+    "daily_prayers": "Prières quotidiennes",
+    "hajj_duas": "Du'as du Hajj",
+    "arabic": "Arabe",
+    "transliteration": "Translittération",
+    "translation": "Traduction",
+    "when_to_recite": "Quand réciter",
+    "bookmark": "Marquer",
+    "bookmarked": "Marqué",
+    "play_audio": "Écouter l'audio",
+    "search_duas": "Rechercher des du'as...",
+    "all_categories": "Tous",
+    "rakaat": "Rak'a"
+  },
+  "contacts": {
+    "title": "Contacts d'urgence",
+    "saudi_emergency": "Numéros d'urgence saoudiens",
+    "your_embassy": "Votre ambassade",
+    "select_country": "Sélectionnez votre pays",
+    "call": "Appeler",
+    "copy": "Copier",
+    "embassy_riyadh": "Ambassade (Riyad)",
+    "consulate_jeddah": "Consulat (Djeddah)"
+  },
+  "safety": {
+    "title": "Santé et sécurité",
+    "heat_safety": "Protection contre la chaleur",
+    "crowd_safety": "Sécurité dans la foule",
+    "health_requirements": "Exigences sanitaires",
+    "lost_pilgrim": "Protocole pèlerin perdu",
+    "emergency": "URGENCE",
+    "caution": "ATTENTION",
+    "tip": "CONSEIL"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "language": "Langue",
+    "country": "Pays",
+    "text_size": "Taille du texte",
+    "dark_mode": "Mode sombre",
+    "about": "À propos de Daleel",
+    "disclaimer": "Avertissement"
+  },
+  "offline": {
+    "banner": "📴 Mode hors ligne — toutes les fonctions principales disponibles",
+    "online": "🌐 De retour en ligne"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "next": "Suivant",
+    "done": "Terminé",
+    "all": "Tous"
+  }
+}

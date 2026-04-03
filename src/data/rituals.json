@@ -1,0 +1,332 @@
+{
+  "days": [
+    {
+      "id": "day-1",
+      "hijri_date": "8 Dhul Hijjah",
+      "title": "Day of Tarwiyah — Journey to Mina",
+      "location": "Mina",
+      "location_ar": "منى",
+      "description": "The 8th of Dhul Hijjah is called Yawm al-Tarwiyah (Day of Watering). Pilgrims enter the state of Ihram and proceed to Mina, where they spend the day and night in worship.",
+      "steps": [
+        {
+          "id": "step-1-1",
+          "order": 1,
+          "title": "Enter State of Ihram",
+          "title_ar": "الإحرام",
+          "description": "Perform ghusl (ritual bath), apply unscented items if needed, and put on white ihram garments (two unstitched white cloths for men; regular modest clothing for women). Make intention (niyyah) for Hajj and recite the Talbiyah continuously. If performing Hajj al-Ifrad or Hajj al-Qiran, you are already in Ihram; if Tamattu', enter a fresh Ihram from your current location (within Makkah's boundaries).",
+          "dua_id": "talbiyah",
+          "common_mistakes": [
+            "Forgetting to make a clear niyyah (intention) before crossing the Miqat",
+            "Wearing stitched garments or covering the head (for men)",
+            "Using scented soap or perfumed products after entering Ihram"
+          ],
+          "tip": "Clip your nails and trim your mustache before entering Ihram — these are prohibited once you are in the sacred state.",
+          "source": "Sahih Bukhari 1524"
+        },
+        {
+          "id": "step-1-2",
+          "order": 2,
+          "title": "Proceed to Mina",
+          "title_ar": "التوجه إلى منى",
+          "description": "After Fajr prayer on 8 Dhul Hijjah, travel to Mina (approximately 5 km from Masjid al-Haram). Stay in your designated tent camp. Spend the day and night in Mina performing prayers — shorten (Qasr) the four-rakaat prayers to two rakaat but do not combine them. Engage in dhikr, Quran recitation, and supplication.",
+          "dua_id": null,
+          "common_mistakes": [
+            "Combining prayers in Mina — the Sunnah is to shorten but not combine",
+            "Leaving Mina before spending the night there"
+          ],
+          "tip": "The time in Mina is a spiritual preparation for the Day of Arafat. Use it for istighfar (seeking forgiveness) and focusing your heart on the purpose of Hajj.",
+          "source": "Sahih Muslim 1218"
+        },
+        {
+          "id": "step-1-3",
+          "order": 3,
+          "title": "Pray Five Daily Prayers in Mina",
+          "title_ar": "الصلاة في منى",
+          "description": "Pray Dhuhr, Asr, Maghrib, and Isha on 8 Dhul Hijjah in Mina, and Fajr of 9 Dhul Hijjah in Mina before departing for Arafat. Shorten all four-rakaat prayers to two rakaat. Continue reciting Talbiyah throughout.",
+          "dua_id": "talbiyah",
+          "common_mistakes": [
+            "Leaving for Arafat before praying Fajr in Mina"
+          ],
+          "tip": "Mina has a mosque — Masjid al-Khayf — which dates to the time of the Prophet ﷺ. It is a blessed place to pray.",
+          "source": "Sahih Bukhari 1566"
+        }
+      ]
+    },
+    {
+      "id": "day-2",
+      "hijri_date": "9 Dhul Hijjah",
+      "title": "Day of Arafat — The Pinnacle of Hajj",
+      "location": "Arafat",
+      "location_ar": "عرفات",
+      "description": "Yawm Arafat is the most important day of Hajj. The Prophet ﷺ said: 'Hajj is Arafat.' Pilgrims must be present at Arafat between Dhuhr and sunset. This is the day of greatest forgiveness.",
+      "steps": [
+        {
+          "id": "step-2-1",
+          "order": 1,
+          "title": "Depart for Arafat after Fajr",
+          "title_ar": "السير إلى عرفات",
+          "description": "After Fajr prayer in Mina, proceed to Arafat (approximately 14 km from Makkah). Move with calm and dignity, reciting the Talbiyah. Arafat is a plain surrounded by mountains — the central area has the Masjid al-Nimra and Mount Arafat (Jabal al-Rahmah).",
+          "dua_id": "talbiyah",
+          "common_mistakes": [
+            "Standing outside the boundaries of Arafat — must be within the marked zone",
+            "Arriving after sunset — standing at Arafat must occur before sunset, though one who arrives after sunset and before Fajr of the 10th has still performed the wuquf"
+          ],
+          "tip": "Know the boundaries of Arafat. The valley of Uranah is NOT part of Arafat. Stay within the marked boundaries.",
+          "source": "Sunan Abu Dawud 1949"
+        },
+        {
+          "id": "step-2-2",
+          "order": 2,
+          "title": "Wuquf at Arafat — The Standing",
+          "title_ar": "الوقوف بعرفة",
+          "description": "The wuquf (standing) at Arafat is the essential pillar of Hajj. From Dhuhr time until sunset, remain at Arafat facing the Qiblah, raising your hands in supplication. Pray Dhuhr and Asr combined and shortened (two rakaat each, combined at Dhuhr time). Spend this time in du'a, dhikr, istighfar, and recitation of Quran. The Prophet ﷺ spent this day in intense supplication.",
+          "dua_id": "dua_arafat",
+          "common_mistakes": [
+            "Spending time in idle talk or on phones instead of supplication",
+            "Leaving before sunset — this is not permitted",
+            "Not facing the Qiblah during supplication"
+          ],
+          "tip": "The Prophet ﷺ said the best du'a is the du'a of Arafat: 'La ilaha illallahu wahdahu la sharika lah, lahul mulku walahul hamdu wahuwa ala kulli shay'in qadir.' Repeat this abundantly.",
+          "source": "Tirmidhi 3585 — Hasan"
+        },
+        {
+          "id": "step-2-3",
+          "order": 3,
+          "title": "Depart for Muzdalifah after Sunset",
+          "title_ar": "المسير إلى مزدلفة",
+          "description": "After sunset, depart calmly from Arafat towards Muzdalifah. Do NOT rush or push — move in an orderly manner. The Prophet ﷺ departed walking his camel at a normal pace. Upon arriving at Muzdalifah, pray Maghrib and Isha combined and shortened (Maghrib 3 rakaat, Isha 2 rakaat).",
+          "dua_id": null,
+          "common_mistakes": [
+            "Leaving Arafat before sunset — this is a violation that requires a fidyah",
+            "Rushing and causing danger in the crowds"
+          ],
+          "tip": "Stop reciting Talbiyah when you throw the first Jamarat stone on Day 3. But continue reciting it throughout the journey to Muzdalifah.",
+          "source": "Sahih Muslim 1218"
+        },
+        {
+          "id": "step-2-4",
+          "order": 4,
+          "title": "Collect Pebbles at Muzdalifah",
+          "title_ar": "المبيت في مزدلفة وجمع الحصى",
+          "description": "Spend the night at Muzdalifah under the open sky. Collect 70 pebbles (chickpea-sized) for the rami (stoning) ritual. Some scholars say you only need 49 pebbles. Pray Fajr here. The elderly, sick, and women may leave after midnight if necessary. Otherwise, stay until Fajr and the time between Fajr and sunrise.",
+          "dua_id": "dua_muzdalifah",
+          "common_mistakes": [
+            "Collecting pebbles from the Jamarat area — this is disliked",
+            "Leaving Muzdalifah before midnight (for those who are not exempt)",
+            "Not performing Fajr prayer before leaving"
+          ],
+          "tip": "The pebbles do not need to be washed. They can be collected anywhere in Muzdalifah.",
+          "source": "Sahih Bukhari 1675"
+        }
+      ]
+    },
+    {
+      "id": "day-3",
+      "hijri_date": "10 Dhul Hijjah",
+      "title": "Eid al-Adha — Day of Sacrifice",
+      "location": "Mina → Makkah → Mina",
+      "location_ar": "منى ← مكة ← منى",
+      "description": "The 10th of Dhul Hijjah is Eid al-Adha — the Day of Sacrifice. It is one of the busiest days of Hajj with four major acts to perform, ideally in order.",
+      "steps": [
+        {
+          "id": "step-3-1",
+          "order": 1,
+          "title": "Rami al-Aqabah — Stoning the Large Pillar",
+          "title_ar": "رمي جمرة العقبة",
+          "description": "After sunrise, go to the Jamarat bridge and throw 7 consecutive pebbles at the largest pillar (Jamarat al-Aqabah). Say 'Allahu Akbar' with each throw. Pebbles should land within the basin — aim carefully. Stop reciting Talbiyah when you throw the first pebble.",
+          "dua_id": "dua_rami",
+          "common_mistakes": [
+            "Throwing all 7 pebbles at once — must throw one by one",
+            "Throwing shoes, large stones, or other objects",
+            "Stopping Talbiyah before this moment"
+          ],
+          "tip": "The best time for Rami al-Aqabah is after sunrise until Dhuhr. The elderly and weak may appoint a proxy (niyabah) to stone on their behalf.",
+          "source": "Sahih Bukhari 1747"
+        },
+        {
+          "id": "step-3-2",
+          "order": 2,
+          "title": "Hady — Animal Sacrifice",
+          "title_ar": "الهدي",
+          "description": "Perform the animal sacrifice (hady). Most pilgrims purchase a sacrifice voucher from the Hajj authorities which handles the slaughter on their behalf. The sacrifice may be performed any time on 10th, 11th, or 12th Dhul Hijjah. After the sacrifice is confirmed, proceed to shave or cut your hair.",
+          "dua_id": "dua_dhabh",
+          "common_mistakes": [
+            "Cutting hair before the sacrifice is complete",
+            "Not verifying the sacrifice was completed if using a voucher system"
+          ],
+          "tip": "The sacrifice can be delegated. Nusuk and official Hajj channels provide verified sacrifice services. Keep your voucher confirmation.",
+          "source": "Sahih Bukhari 5569"
+        },
+        {
+          "id": "step-3-3",
+          "order": 3,
+          "title": "Halq or Taqsir — Shaving or Cutting Hair",
+          "title_ar": "الحلق أو التقصير",
+          "description": "Men should shave their entire head (halq), which is more virtuous, or cut hair from all parts of the head (taqsir). Women should cut a fingertip's length from their hair — shaving is not required or recommended for women. After this, partial release from Ihram (al-tahallul al-asghar) occurs — stitched clothes, perfume, and most normal activities become permissible again, except sexual relations.",
+          "dua_id": null,
+          "common_mistakes": [
+            "Only cutting a few strands of hair — must cut from all parts of the head",
+            "Women shaving their heads — this is prohibited",
+            "Engaging in sexual relations before Tawaf al-Ifadah"
+          ],
+          "tip": "The Prophet ﷺ made du'a three times for those who shave and once for those who cut. Shaving is preferred.",
+          "source": "Sahih Bukhari 1728"
+        },
+        {
+          "id": "step-3-4",
+          "order": 4,
+          "title": "Tawaf al-Ifadah — Circumambulation of the Kaaba",
+          "title_ar": "طواف الإفاضة",
+          "description": "Go to Masjid al-Haram and perform Tawaf al-Ifadah (also called Tawaf al-Ziyarah) — 7 circuits around the Kaaba in a counter-clockwise direction, starting and ending at the Black Stone. Men do raml (brisk walk with swagger) in the first 3 circuits if physically able. After Tawaf, pray 2 rakaat behind Maqam Ibrahim. Then drink Zamzam water.",
+          "dua_id": "dua_tawaf",
+          "common_mistakes": [
+            "Performing Tawaf al-Ifadah in an unclean state (without wudu)",
+            "Going in the wrong direction (clockwise)",
+            "Not completing all 7 circuits"
+          ],
+          "tip": "Tawaf al-Ifadah is a pillar (rukn) of Hajj — it is obligatory and Hajj is incomplete without it. It may be performed any time after midnight of 10 Dhul Hijjah.",
+          "source": "Quran 22:29"
+        },
+        {
+          "id": "step-3-5",
+          "order": 5,
+          "title": "Sa'i — Walking between Safa and Marwah",
+          "title_ar": "السعي بين الصفا والمروة",
+          "description": "After Tawaf al-Ifadah, perform Sa'i — walking 7 times between the hills of Safa and Marwah (one way = one circuit). Start at Safa and end at Marwah. Men jog between the green markers. Recite du'a and dhikr throughout. Sa'i does not require wudu but it is recommended. Note: Pilgrims performing Hajj al-Tamattu' must perform Sa'i; others may have done Sa'i after Tawaf al-Qudum.",
+          "dua_id": "dua_sai",
+          "common_mistakes": [
+            "Starting Sa'i at Marwah instead of Safa",
+            "Counting 7 one-way trips as 7 circuits — must be 7 one-way trips (Safa to Marwah = 1, Marwah to Safa = 2, etc.)"
+          ],
+          "tip": "Recall the story of Hajar (Hagar) ﻋﻠﻴﻬﺎ ﺍﻟﺴﻼﻡ as you perform Sa'i — her trust in Allah was the origin of this rite.",
+          "source": "Sahih Bukhari 1643"
+        },
+        {
+          "id": "step-3-6",
+          "order": 6,
+          "title": "Return to Mina for Tashreeq Nights",
+          "title_ar": "العودة إلى منى",
+          "description": "After Tawaf and Sa'i, return to Mina before sunset. It is obligatory to spend the nights of 11th and 12th (and 13th if staying for the full Tashreeq days) in Mina. Full release from Ihram (al-tahallul al-akbar) now takes effect — all prohibitions are lifted.",
+          "dua_id": null,
+          "common_mistakes": [
+            "Not returning to Mina and spending the nights outside — this requires fidyah"
+          ],
+          "tip": "The nights in Mina are a blessed time for worship. The Prophet ﷺ would spend these nights in remembrance of Allah.",
+          "source": "Quran 2:203"
+        }
+      ]
+    },
+    {
+      "id": "day-4",
+      "hijri_date": "11 Dhul Hijjah",
+      "title": "Days of Tashreeq — First Day",
+      "location": "Mina",
+      "location_ar": "منى",
+      "description": "The 11th, 12th, and 13th of Dhul Hijjah are called Ayyam al-Tashreeq (Days of Drying Meat). Pilgrims remain in Mina, worshipping Allah and performing the daily Rami of all three Jamaraat.",
+      "steps": [
+        {
+          "id": "step-4-1",
+          "order": 1,
+          "title": "Rami of All Three Jamaraat",
+          "title_ar": "رمي الجمرات الثلاث",
+          "description": "After Dhuhr on 11 Dhul Hijjah, stone all three pillars in order: first the Jamarat al-Sughra (small), then Jamarat al-Wusta (middle), then Jamarat al-Aqabah (large) — 7 pebbles each = 21 total. Say 'Allahu Akbar' with each throw. After stoning the Sughra, move to the side facing Makkah and make a long supplication. Do the same after the Wusta. No supplication after the Aqabah.",
+          "dua_id": "dua_rami",
+          "common_mistakes": [
+            "Stoning before Dhuhr on the 11th — not valid according to the majority",
+            "Not making du'a after the Sughra and Wusta",
+            "Going out of order — must stone Sughra → Wusta → Aqabah"
+          ],
+          "tip": "The rami can be done at any time between Dhuhr and midnight. Choose a less crowded time for safety.",
+          "source": "Sahih Bukhari 1746"
+        },
+        {
+          "id": "step-4-2",
+          "order": 2,
+          "title": "Spend the Night in Mina",
+          "title_ar": "المبيت في منى",
+          "description": "Spend the night of 11th-12th Dhul Hijjah in Mina. This is obligatory. Use this time for worship, reading Quran, and making dhikr and du'a. The Tashreeq nights are nights of feasting and gratitude alongside worship.",
+          "dua_id": null,
+          "common_mistakes": [
+            "Leaving Mina to sleep in Makkah hotels — this requires fidyah"
+          ],
+          "tip": "Allah says: 'Remember Allah during the appointed days' (2:203). These are those days.",
+          "source": "Quran 2:203"
+        }
+      ]
+    },
+    {
+      "id": "day-5",
+      "hijri_date": "12 Dhul Hijjah",
+      "title": "Days of Tashreeq — Second Day",
+      "location": "Mina",
+      "location_ar": "منى",
+      "description": "The second day of Tashreeq. Pilgrims may depart from Mina on this day (early departure — Nafar Awal) before sunset, after completing the Rami, or they may stay for the 13th.",
+      "steps": [
+        {
+          "id": "step-5-1",
+          "order": 1,
+          "title": "Rami of All Three Jamaraat",
+          "title_ar": "رمي الجمرات الثلاث",
+          "description": "After Dhuhr, stone all three Jamaraat again in order — 7 pebbles each, 21 total. Follow the same order as the 11th.",
+          "dua_id": "dua_rami",
+          "common_mistakes": [
+            "Stoning before Dhuhr",
+            "Leaving before completing the Rami"
+          ],
+          "tip": "If you plan to depart today (Nafar Awal), complete your Rami before sunset. You must leave Mina before sunset — if sunset arrives before you leave, you must stay for the 13th.",
+          "source": "Quran 2:203"
+        },
+        {
+          "id": "step-5-2",
+          "order": 2,
+          "title": "Nafar Awal — Early Departure (Optional) or Stay for 13th",
+          "title_ar": "النفر الأول أو البقاء",
+          "description": "After completing Rami, if you wish to depart, leave Mina before sunset — this is the Nafar Awal (early departure) which is permitted. It is better to stay for the 13th (Nafar Thani) for additional blessing. If you depart early, proceed to Makkah for Tawaf al-Wada' before leaving Saudi Arabia.",
+          "dua_id": null,
+          "common_mistakes": [
+            "Departing after sunset on 12th — this means you must stay for 13th"
+          ],
+          "tip": "The early departure is an allowance (rukhsah) from Allah. Both are valid. Staying for the 13th earns greater reward.",
+          "source": "Quran 2:203"
+        }
+      ]
+    },
+    {
+      "id": "day-6",
+      "hijri_date": "13 Dhul Hijjah",
+      "title": "Days of Tashreeq — Third Day & Farewell",
+      "location": "Mina → Makkah",
+      "location_ar": "منى ← مكة",
+      "description": "The final day of Tashreeq for those who stayed. After Rami, pilgrims depart Mina and perform the Farewell Tawaf (Tawaf al-Wada') before leaving Makkah.",
+      "steps": [
+        {
+          "id": "step-6-1",
+          "order": 1,
+          "title": "Final Rami of All Three Jamaraat",
+          "title_ar": "رمي الجمرات الثلاث",
+          "description": "After Dhuhr (or from Fajr according to some scholars), stone all three Jamaraat for the final time — 7 pebbles each, 21 total. After this final Rami, your Hajj rituals are complete.",
+          "dua_id": "dua_rami",
+          "common_mistakes": [
+            "Missing the 13th Rami for those who stayed"
+          ],
+          "tip": "This is your final act at the Jamaraat. Make heartfelt du'a after the Sughra and Wusta.",
+          "source": "Sahih Bukhari 1746"
+        },
+        {
+          "id": "step-6-2",
+          "order": 2,
+          "title": "Tawaf al-Wada' — Farewell Tawaf",
+          "title_ar": "طواف الوداع",
+          "description": "Before leaving Makkah, perform the Farewell Tawaf — 7 circuits around the Kaaba. This is obligatory for those from outside the Miqat. The last thing you do before leaving should be Tawaf. After completing Tawaf al-Wada', do not linger in Makkah — proceed directly to your departure. Women who are menstruating are exempt from Tawaf al-Wada'.",
+          "dua_id": "dua_wada",
+          "common_mistakes": [
+            "Performing Tawaf al-Wada' then shopping extensively or lingering",
+            "Forgetting Tawaf al-Wada' — this requires a dam (compensation sacrifice) if omitted"
+          ],
+          "tip": "Say farewell to the Kaaba with a full heart. Many pilgrims weep at this moment — it is natural and a sign of love for the house of Allah.",
+          "source": "Sahih Bukhari 1755"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "دلیل",
+    "tagline": "آپ کا قابل اعتماد حج ساتھی",
+    "disclaimer": "یہ ایپ صرف رہنمائی کے لیے ہے۔ لازمی احکام کے لیے اپنے حج گروپ کے رہنما یا کسی قابل عالم سے رجوع کریں۔"
+  },
+  "nav": {
+    "home": "ہوم",
+    "rituals": "مناسک",
+    "prayers": "نمازیں",
+    "contacts": "رابطے",
+    "more": "مزید"
+  },
+  "home": {
+    "greeting_morning": "السلام علیکم",
+    "greeting_afternoon": "السلام علیکم",
+    "today_in_hajj": "آج کا حج",
+    "days_until_hajj": "حج تک کے دن",
+    "next_prayer": "اگلی نماز",
+    "current_prayer": "موجودہ نماز",
+    "time_remaining": "باقی وقت",
+    "quick_actions": "فوری اقدامات",
+    "talbiyah": "تلبیہ",
+    "todays_dua": "آج کی دعا",
+    "emergency": "ہنگامی"
+  },
+  "rituals": {
+    "title": "حج کے مناسک",
+    "progress": "آپ کی پیشرفت",
+    "steps_completed": "{{total}} میں سے {{completed}} مراحل مکمل",
+    "mark_complete": "مکمل نشان کریں",
+    "completed": "مکمل",
+    "common_mistakes": "عام غلطیاں",
+    "tip": "مشورہ",
+    "source": "ماخذ",
+    "related_dua": "متعلقہ دعا"
+  },
+  "prayers": {
+    "title": "نمازیں اور دعائیں",
+    "daily_prayers": "روزانہ کی نمازیں",
+    "hajj_duas": "حج کی دعائیں",
+    "arabic": "عربی",
+    "transliteration": "تحریری ادائیگی",
+    "translation": "ترجمہ",
+    "when_to_recite": "کب پڑھیں",
+    "bookmark": "بُک مارک",
+    "bookmarked": "بُک مارک شدہ",
+    "play_audio": "آڈیو چلائیں",
+    "search_duas": "دعائیں تلاش کریں...",
+    "all_categories": "سب",
+    "rakaat": "رکعت"
+  },
+  "contacts": {
+    "title": "ہنگامی رابطے",
+    "saudi_emergency": "سعودی ہنگامی نمبر",
+    "your_embassy": "آپ کا سفارتخانہ",
+    "select_country": "اپنا ملک منتخب کریں",
+    "call": "کال کریں",
+    "copy": "کاپی کریں",
+    "embassy_riyadh": "سفارتخانہ (ریاض)",
+    "consulate_jeddah": "قونصل خانہ (جدہ)"
+  },
+  "safety": {
+    "title": "صحت اور حفاظت",
+    "heat_safety": "گرمی سے حفاظت",
+    "crowd_safety": "ہجوم سے حفاظت",
+    "health_requirements": "صحت کی ضروریات",
+    "lost_pilgrim": "گم ہوئے حاجی کا طریقہ کار",
+    "emergency": "ہنگامی",
+    "caution": "احتیاط",
+    "tip": "مشورہ"
+  },
+  "settings": {
+    "title": "ترتیبات",
+    "language": "زبان",
+    "country": "ملک",
+    "text_size": "متن کا حجم",
+    "dark_mode": "ڈارک موڈ",
+    "about": "دلیل کے بارے میں",
+    "disclaimer": "اعلان دستبرداری"
+  },
+  "offline": {
+    "banner": "📴 آف لائن موڈ — تمام بنیادی خصوصیات دستیاب ہیں",
+    "online": "🌐 واپس آن لائن"
+  },
+  "common": {
+    "loading": "لوڈ ہو رہا ہے...",
+    "error": "کچھ غلط ہو گیا",
+    "retry": "دوبارہ کوشش کریں",
+    "close": "بند کریں",
+    "save": "محفوظ کریں",
+    "cancel": "منسوخ کریں",
+    "back": "واپس",
+    "next": "اگلا",
+    "done": "مکمل",
+    "all": "سب"
+  }
+}

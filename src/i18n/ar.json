@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "دليل",
+    "tagline": "رفيقك الموثوق في رحلة الحج",
+    "disclaimer": "هذا التطبيق دليل إرشادي فقط. استشر قائد مجموعة حجك أو عالماً مؤهلاً للحصول على الأحكام الملزمة."
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "rituals": "المناسك",
+    "prayers": "الأدعية",
+    "contacts": "الاتصالات",
+    "more": "المزيد"
+  },
+  "home": {
+    "greeting_morning": "السلام عليكم",
+    "greeting_afternoon": "السلام عليكم",
+    "today_in_hajj": "اليوم في الحج",
+    "days_until_hajj": "الأيام المتبقية للحج",
+    "next_prayer": "الصلاة القادمة",
+    "current_prayer": "الصلاة الحالية",
+    "time_remaining": "الوقت المتبقي",
+    "quick_actions": "إجراءات سريعة",
+    "talbiyah": "التلبية",
+    "todays_dua": "دعاء اليوم",
+    "emergency": "طوارئ"
+  },
+  "rituals": {
+    "title": "مناسك الحج",
+    "progress": "تقدمك",
+    "steps_completed": "{{completed}} من {{total}} خطوة مكتملة",
+    "mark_complete": "تمت",
+    "completed": "مكتمل",
+    "common_mistakes": "الأخطاء الشائعة",
+    "tip": "نصيحة",
+    "source": "المصدر",
+    "related_dua": "الدعاء ذو الصلة"
+  },
+  "prayers": {
+    "title": "الصلاة والدعاء",
+    "daily_prayers": "الصلوات اليومية",
+    "hajj_duas": "أدعية الحج",
+    "arabic": "العربية",
+    "transliteration": "النقحرة",
+    "translation": "الترجمة",
+    "when_to_recite": "متى تقرأ",
+    "bookmark": "إشارة مرجعية",
+    "bookmarked": "تم الحفظ",
+    "play_audio": "تشغيل",
+    "search_duas": "ابحث في الأدعية...",
+    "all_categories": "الكل",
+    "rakaat": "ركعة"
+  },
+  "contacts": {
+    "title": "جهات الاتصال الطارئة",
+    "saudi_emergency": "أرقام الطوارئ السعودية",
+    "your_embassy": "سفارتك",
+    "select_country": "اختر بلدك",
+    "call": "اتصال",
+    "copy": "نسخ",
+    "embassy_riyadh": "السفارة (الرياض)",
+    "consulate_jeddah": "القنصلية (جدة)"
+  },
+  "safety": {
+    "title": "الصحة والسلامة",
+    "heat_safety": "السلامة من الحر",
+    "crowd_safety": "سلامة الحشود",
+    "health_requirements": "المتطلبات الصحية",
+    "lost_pilgrim": "بروتوكول الحاج المفقود",
+    "emergency": "طارئ",
+    "caution": "تنبيه",
+    "tip": "نصيحة"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "language": "اللغة",
+    "country": "البلد",
+    "text_size": "حجم الخط",
+    "dark_mode": "الوضع الداكن",
+    "about": "عن دليل",
+    "disclaimer": "إخلاء المسؤولية"
+  },
+  "offline": {
+    "banner": "📴 وضع عدم الاتصال — جميع الميزات الأساسية متاحة",
+    "online": "🌐 متصل بالإنترنت مجدداً"
+  },
+  "common": {
+    "loading": "جارٍ التحميل...",
+    "error": "حدث خطأ ما",
+    "retry": "إعادة المحاولة",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "back": "رجوع",
+    "next": "التالي",
+    "done": "تم",
+    "all": "الكل"
+  }
+}

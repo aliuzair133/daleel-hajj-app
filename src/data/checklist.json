@@ -1,0 +1,113 @@
+{
+  "categories": [
+    {
+      "id": "documents",
+      "title": "Documents & Identification",
+      "title_ar": "الوثائق والهوية",
+      "icon": "📄",
+      "items": [
+        { "id": "cl-001", "text": "Valid passport (6+ months validity beyond Hajj)", "required": true },
+        { "id": "cl-002", "text": "Hajj visa (stamped in passport)", "required": true },
+        { "id": "cl-003", "text": "Hajj permit / Nusuk confirmation", "required": true },
+        { "id": "cl-004", "text": "Meningococcal vaccination certificate", "required": true },
+        { "id": "cl-005", "text": "COVID-19 vaccination proof (if required)", "required": true },
+        { "id": "cl-006", "text": "Travel insurance documents", "required": false },
+        { "id": "cl-007", "text": "Hotel / accommodation booking confirmation", "required": true },
+        { "id": "cl-008", "text": "Flight tickets (both ways)", "required": true },
+        { "id": "cl-009", "text": "Emergency contact list (stored offline)", "required": true },
+        { "id": "cl-010", "text": "Passport photos (minimum 6 copies)", "required": false },
+        { "id": "cl-011", "text": "Photo copies of all documents (keep separate from originals)", "required": false },
+        { "id": "cl-012", "text": "Medical summary in Arabic (if you have chronic conditions)", "required": false }
+      ]
+    },
+    {
+      "id": "ihram",
+      "title": "Ihram & Clothing",
+      "title_ar": "الإحرام والملابس",
+      "icon": "👘",
+      "items": [
+        { "id": "cl-020", "text": "Ihram garments (2 sets for men)", "required": true },
+        { "id": "cl-021", "text": "Ihram belt/money belt", "required": false },
+        { "id": "cl-022", "text": "Modest long clothing for women (multiple sets)", "required": true },
+        { "id": "cl-023", "text": "Light, breathable clothing (loose-fitting)", "required": true },
+        { "id": "cl-024", "text": "Comfortable sandals/flip-flops (heel must be uncovered for Ihram)", "required": true },
+        { "id": "cl-025", "text": "Second pair of comfortable walking shoes", "required": false },
+        { "id": "cl-026", "text": "Sun hat or umbrella (white)", "required": true },
+        { "id": "cl-027", "text": "Warm layer for air-conditioned tents at night", "required": false },
+        { "id": "cl-028", "text": "Prayer mat (lightweight, compact)", "required": false }
+      ]
+    },
+    {
+      "id": "health",
+      "title": "Health & Medications",
+      "title_ar": "الصحة والأدوية",
+      "icon": "💊",
+      "items": [
+        { "id": "cl-030", "text": "All personal prescription medications (2x supply)", "required": true },
+        { "id": "cl-031", "text": "Paracetamol/ibuprofen (pain & fever)", "required": true },
+        { "id": "cl-032", "text": "Oral Rehydration Salts (ORS) packets", "required": true },
+        { "id": "cl-033", "text": "Antidiarrheal medication", "required": true },
+        { "id": "cl-034", "text": "Antihistamines", "required": false },
+        { "id": "cl-035", "text": "Sunscreen SPF 50+", "required": true },
+        { "id": "cl-036", "text": "Lip balm with SPF", "required": false },
+        { "id": "cl-037", "text": "First aid kit (bandages, antiseptic, blister pads)", "required": true },
+        { "id": "cl-038", "text": "Athlete's foot spray or powder", "required": false },
+        { "id": "cl-039", "text": "Hand sanitizer (unscented)", "required": true },
+        { "id": "cl-040", "text": "Face masks (respiratory protection in crowds)", "required": false },
+        { "id": "cl-041", "text": "Cooling towels or cooling spray", "required": false }
+      ]
+    },
+    {
+      "id": "spiritual",
+      "title": "Spiritual Essentials",
+      "title_ar": "الضروريات الروحية",
+      "icon": "📿",
+      "items": [
+        { "id": "cl-050", "text": "Quran (physical copy or downloaded app)", "required": true },
+        { "id": "cl-051", "text": "Hajj guide book", "required": false },
+        { "id": "cl-052", "text": "Tasbih (prayer beads)", "required": false },
+        { "id": "cl-053", "text": "Small notebook for personal du'a and reflections", "required": false },
+        { "id": "cl-054", "text": "Downloaded offline content (this app fully cached)", "required": true }
+      ]
+    },
+    {
+      "id": "practical",
+      "title": "Practical Items",
+      "title_ar": "الأغراض العملية",
+      "icon": "🎒",
+      "items": [
+        { "id": "cl-060", "text": "Small lightweight backpack/waist pouch", "required": true },
+        { "id": "cl-061", "text": "Portable power bank (20,000+ mAh)", "required": true },
+        { "id": "cl-062", "text": "Charging cables and universal adapter (Saudi Arabia: Type G/A)", "required": true },
+        { "id": "cl-063", "text": "Water bottle (insulated, min 1L)", "required": true },
+        { "id": "cl-064", "text": "Water spray bottle for cooling", "required": false },
+        { "id": "cl-065", "text": "Reusable shopping bags", "required": false },
+        { "id": "cl-066", "text": "Scissors or nail clippers (for cutting hair post-Ihram)", "required": true },
+        { "id": "cl-067", "text": "Unscented soap, shampoo, and toiletries", "required": true },
+        { "id": "cl-068", "text": "Unscented deodorant (for Ihram period)", "required": true },
+        { "id": "cl-069", "text": "Tissues and wet wipes (unscented)", "required": true },
+        { "id": "cl-070", "text": "Padlock for luggage", "required": false },
+        { "id": "cl-071", "text": "Hajj ID wristband (from your Hajj group)", "required": true },
+        { "id": "cl-072", "text": "Local Saudi SIM card (buy at airport)", "required": false },
+        { "id": "cl-073", "text": "Cash in Saudi Riyals (SAR) — cards may not work everywhere", "required": true }
+      ]
+    },
+    {
+      "id": "pre_departure",
+      "title": "Before You Leave Home",
+      "title_ar": "قبل المغادرة",
+      "icon": "🏠",
+      "items": [
+        { "id": "cl-080", "text": "Inform family of your itinerary and group leader contact", "required": true },
+        { "id": "cl-081", "text": "Write/update your will (wasiyyah) — Sunnah before major journey", "required": false },
+        { "id": "cl-082", "text": "Settle all debts if possible", "required": false },
+        { "id": "cl-083", "text": "Ask for forgiveness from those you may have wronged", "required": false },
+        { "id": "cl-084", "text": "Notify employer of absence", "required": false },
+        { "id": "cl-085", "text": "Arrange for home and family care during absence", "required": false },
+        { "id": "cl-086", "text": "Clip nails and remove unwanted hair before entering Ihram", "required": true },
+        { "id": "cl-087", "text": "Perform ghusl before entering Ihram", "required": true },
+        { "id": "cl-088", "text": "Apply unscented moisturizer before Ihram if needed", "required": false }
+      ]
+    }
+  ]
+}

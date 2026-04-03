@@ -1,0 +1,162 @@
+{
+  "prohibitions": [
+    {
+      "id": "ihrm-001",
+      "category": "clothing",
+      "rule": "Stitched / Tailored Clothing (Men)",
+      "rule_ar": "لبس المخيط",
+      "applies_to": "men",
+      "description": "Men must not wear any clothing that is sewn to fit the body — no shirts, trousers, underwear, or sewn garments. Wear the two unsewn white sheets (izar and rida').",
+      "fidyah": "Dam (sacrifice of one sheep)",
+      "source": "Sahih Bukhari 1542"
+    },
+    {
+      "id": "ihrm-002",
+      "category": "clothing",
+      "rule": "Covering the Head (Men)",
+      "rule_ar": "تغطية الرأس",
+      "applies_to": "men",
+      "description": "Men must not cover their head with anything that rests on it — no hats, caps, or hoods. An umbrella held above the head is permissible.",
+      "fidyah": "Dam (sacrifice of one sheep) if done intentionally; fidyah of choice if by forgetting",
+      "source": "Sahih Bukhari 1838"
+    },
+    {
+      "id": "ihrm-003",
+      "category": "clothing",
+      "rule": "Covering the Face (Women)",
+      "rule_ar": "تغطية الوجه",
+      "applies_to": "women",
+      "description": "Women in Ihram must not cover their face with a niqab or burqa. However, if men are nearby, they may lower their scarf over their face. Women cover their hair normally.",
+      "fidyah": "Dam if done without need",
+      "source": "Sahih Bukhari 1838"
+    },
+    {
+      "id": "ihrm-004",
+      "category": "grooming",
+      "rule": "Cutting Hair or Nails",
+      "rule_ar": "قص الشعر أو الأظافر",
+      "applies_to": "all",
+      "description": "Cutting, shaving, or removing any hair from any part of the body is prohibited, as is clipping nails. This applies to all pilgrims throughout the Ihram state.",
+      "fidyah": "Fidyah: fast 3 days OR feed 6 poor persons (half saa' each) OR sacrifice one sheep",
+      "source": "Quran 2:196"
+    },
+    {
+      "id": "ihrm-005",
+      "category": "grooming",
+      "rule": "Using Perfume or Scented Products",
+      "rule_ar": "استخدام العطر",
+      "applies_to": "all",
+      "description": "Applying perfume, cologne, or scented products to the body or clothing is prohibited. This includes scented soaps, shampoos, and deodorants. Unscented products are permissible.",
+      "fidyah": "Dam (sacrifice of one sheep)",
+      "source": "Sahih Bukhari 1542"
+    },
+    {
+      "id": "ihrm-006",
+      "category": "hunting",
+      "rule": "Hunting Land Animals",
+      "rule_ar": "الصيد",
+      "applies_to": "all",
+      "description": "Hunting or helping to hunt land animals is prohibited while in Ihram. Sea creatures are permissible.",
+      "fidyah": "Equivalent sacrifice or food donation to the poor",
+      "source": "Quran 5:95"
+    },
+    {
+      "id": "ihrm-007",
+      "category": "intimacy",
+      "rule": "Sexual Intercourse (Jima')",
+      "rule_ar": "الجماع",
+      "applies_to": "all",
+      "description": "Sexual intercourse invalidates Hajj if it occurs before the first partial release from Ihram (tahallul asghar — after Rami, shaving, and Tawaf al-Ifadah). It is the most serious prohibition.",
+      "fidyah": "If before tahallul: Hajj is invalid; must continue and repeat next year. Plus: sacrifice one camel. If after tahallul but before tahallul akbar: sacrifice one sheep.",
+      "source": "Quran 2:197"
+    },
+    {
+      "id": "ihrm-008",
+      "category": "intimacy",
+      "rule": "Intimate Touching with Desire (Mubashara)",
+      "rule_ar": "المباشرة بشهوة",
+      "applies_to": "all",
+      "description": "Intimate touching of a spouse with desire (even without intercourse) is prohibited. This includes kissing, caressing, and similar acts.",
+      "fidyah": "Dam if done before tahallul asghar",
+      "source": "Quran 2:197"
+    },
+    {
+      "id": "ihrm-009",
+      "category": "conduct",
+      "rule": "Marriage Contract (Aqd al-Nikah)",
+      "rule_ar": "عقد النكاح",
+      "applies_to": "all",
+      "description": "Conducting or witnessing a marriage contract is prohibited while in the state of Ihram.",
+      "fidyah": "No fidyah; the marriage contract is void",
+      "source": "Sahih Muslim 1409"
+    },
+    {
+      "id": "ihrm-010",
+      "category": "conduct",
+      "rule": "Argumentation and Obscenity",
+      "rule_ar": "الجدال والفسوق",
+      "applies_to": "all",
+      "description": "Quarreling, arguing, using obscene language, or engaging in sinful behavior is forbidden. Allah says: 'There is to be no sexual relations, no disobedience, and no disputing during Hajj.' (2:197)",
+      "fidyah": "Sincere repentance (tawbah)",
+      "source": "Quran 2:197"
+    }
+  ],
+  "fidyah_table": [
+    {
+      "id": "fid-001",
+      "violation": "Clipping nails / removing hair",
+      "options": [
+        "Fast for 3 days",
+        "Feed 6 poor persons (half saa' = ~1.5 kg of staple food each)",
+        "Sacrifice one sheep in Makkah"
+      ],
+      "choice": true,
+      "notes": "Perform in Makkah or anywhere in the Haram boundary. Can be done during or after Hajj."
+    },
+    {
+      "id": "fid-002",
+      "violation": "Using perfume / wearing stitched clothing",
+      "options": [
+        "Sacrifice one sheep in Makkah"
+      ],
+      "choice": false,
+      "notes": "For the three violations of: wearing stitched clothes (men), covering head (men), using perfume."
+    },
+    {
+      "id": "fid-003",
+      "violation": "Missing a Wajib of Hajj (e.g., missing overnight in Mina/Muzdalifah, missing Tawaf al-Wada')",
+      "options": [
+        "Dam: sacrifice one sheep in the Haram boundary"
+      ],
+      "choice": false,
+      "notes": "The Dam (blood) must be shed in Makkah and the meat distributed to the poor there."
+    },
+    {
+      "id": "fid-004",
+      "violation": "Jima' (intercourse) before tahallul asghar",
+      "options": [
+        "Hajj is invalidated — continue and repeat next year, plus sacrifice one camel"
+      ],
+      "choice": false,
+      "notes": "Most serious violation. Consult a scholar immediately."
+    }
+  ],
+  "partial_release_stages": [
+    {
+      "stage": 1,
+      "name": "Al-Tahallul al-Asghar (First / Partial Release)",
+      "name_ar": "التحلل الأصغر",
+      "achieved_after": "Three acts on 10 Dhul Hijjah: Rami al-Aqabah + Shaving/Cutting Hair + Tawaf al-Ifadah (any two of these according to some scholars)",
+      "what_becomes_permissible": "All Ihram prohibitions are lifted EXCEPT sexual relations",
+      "notes": "Most scholars: performing any two of the three acts achieves partial release."
+    },
+    {
+      "stage": 2,
+      "name": "Al-Tahallul al-Akbar (Second / Full Release)",
+      "name_ar": "التحلل الأكبر",
+      "achieved_after": "Completing all three acts: Rami + Shaving + Tawaf al-Ifadah (including Sa'i if not done after Tawaf al-Qudum)",
+      "what_becomes_permissible": "All restrictions lifted including sexual relations",
+      "notes": "Hajj is now fully complete regarding Ihram restrictions."
+    }
+  ]
+}

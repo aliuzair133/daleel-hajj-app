@@ -1,0 +1,124 @@
+{
+  "heat_safety": {
+    "title": "Heat Safety",
+    "title_ar": "السلامة من الحر",
+    "overview": "Makkah temperatures during Hajj can exceed 45°C (113°F). Heat-related illness is a leading cause of Hajj hospitalizations. Protect yourself proactively.",
+    "hydration": {
+      "rule": "Drink at least 250ml (1 cup) of water every 15–20 minutes while outdoors — even if you don't feel thirsty.",
+      "tips": [
+        "Carry a spray bottle with water — misting skin reduces body temperature",
+        "Drink electrolyte solutions or oral rehydration salts (ORS) to replace lost salts",
+        "Avoid sugary drinks and caffeine — they increase dehydration",
+        "Zamzam water is available throughout Masjid al-Haram — use it freely"
+      ]
+    },
+    "prevention": [
+      "Wear a white umbrella or use a hat — direct sun exposure dramatically increases heat risk",
+      "Wear lightweight, breathable white or light-colored clothing over Ihram in hot conditions",
+      "Stay in shaded or air-conditioned areas during midday (10 AM – 4 PM) whenever possible",
+      "Use cooling towels or pour cool water on your head and neck",
+      "Wear sandals that protect feet from hot pavement — burns are common",
+      "Rest frequently — do not push yourself in extreme heat"
+    ],
+    "heat_exhaustion": {
+      "title": "Heat Exhaustion — Warning Signs",
+      "severity": "caution",
+      "symptoms": ["Heavy sweating", "Cool, pale, clammy skin", "Rapid, weak pulse", "Nausea or vomiting", "Muscle cramps", "Fatigue and weakness", "Dizziness and fainting"],
+      "action": "Move to a cool shaded area immediately. Remove excess clothing. Drink cool water slowly. Apply cool wet cloths to skin. If not improving within 30 minutes, seek medical help."
+    },
+    "heatstroke": {
+      "title": "Heatstroke — Medical Emergency",
+      "severity": "emergency",
+      "symptoms": ["High body temperature (40°C / 104°F or higher)", "Hot, red, dry or damp skin", "Rapid, strong pulse", "Confusion, slurred speech, or unconsciousness", "NOT sweating despite the heat"],
+      "action": "CALL 997 (Ambulance) IMMEDIATELY. This is a life-threatening emergency. While waiting: move to cool area, remove clothing, apply ice packs to neck/armpits/groin, fan the person, do NOT give water to an unconscious person."
+    }
+  },
+  "crowd_safety": {
+    "title": "Crowd Safety",
+    "title_ar": "سلامة الحشود",
+    "overview": "Hajj is the world's largest annual gathering with up to 3 million pilgrims. Understanding crowd dynamics can save your life.",
+    "rules": [
+      "Never go against the flow of crowd movement — always move in the same direction as the crowd",
+      "If caught in a crowd surge: turn sideways, protect your chest with crossed arms, move diagonally to the edge",
+      "Stay with your group — designate a meeting point in case of separation",
+      "Wear your Hajj ID wristband and keep emergency contact information on your person",
+      "Move during off-peak hours (after midnight, early morning) for rituals like Rami if your health permits",
+      "If you fall: curl into a ball protecting your head, and call for help loudly",
+      "Do not stop to pick up items in dense crowds",
+      "Keep children and elderly close — use physical contact (holding hands/arm)"
+    ],
+    "emergency_exits": "Learn the emergency exits of your tent camp and the Jamarat bridge before you need them.",
+    "communication": "Saudi authorities use colored wristbands and designated nationality zones — follow your group leader's instructions always."
+  },
+  "health_requirements": {
+    "title": "Health Requirements & Vaccinations",
+    "title_ar": "المتطلبات الصحية",
+    "mandatory_vaccinations": [
+      {
+        "name": "Meningococcal Meningitis (ACYW135)",
+        "requirement": "Mandatory for all pilgrims",
+        "timing": "Must be received at least 10 days before arrival in Saudi Arabia",
+        "notes": "Required for visa — ensure your vaccination certificate is signed and stamped"
+      },
+      {
+        "name": "COVID-19 Vaccine",
+        "requirement": "Per current Saudi Ministry requirements — check Nusuk platform for updates",
+        "timing": "As per national guidelines",
+        "notes": "Requirements may change — always verify before departure"
+      }
+    ],
+    "recommended_vaccinations": [
+      { "name": "Influenza (Flu)", "notes": "Highly recommended due to close contact with pilgrims worldwide" },
+      { "name": "Pneumococcal", "notes": "Recommended for elderly and those with chronic conditions" },
+      { "name": "Hepatitis A & B", "notes": "Recommended if not previously vaccinated" },
+      { "name": "Typhoid", "notes": "Recommended for food safety" }
+    ],
+    "chronic_conditions": "If you have diabetes, heart disease, asthma, or other chronic conditions: consult your physician before Hajj. Carry sufficient medication (extra supply recommended). Carry a medical summary in Arabic if possible.",
+    "medications_to_carry": [
+      "Oral rehydration salts (ORS)",
+      "Pain relievers (paracetamol/ibuprofen)",
+      "Antidiarrheal medication",
+      "Antihistamines",
+      "Blister treatment and first-aid kit",
+      "Personal prescription medications (2x supply)",
+      "Sunscreen SPF 50+"
+    ]
+  },
+  "lost_pilgrim": {
+    "title": "Lost Pilgrim Protocol",
+    "title_ar": "بروتوكول الحاج المفقود",
+    "if_you_are_lost": [
+      "Stay calm — Saudi authorities have robust systems to reunite pilgrims",
+      "Do not wander — stay in one place if possible",
+      "Look for Saudi police officers (white uniforms) or Hajj mission staff",
+      "Go to the nearest Hajj Mission office — each country has one in Makkah",
+      "Call your group leader's number (save it before leaving)",
+      "Call the Lost Pilgrim Hotline: 920000776",
+      "Show your Hajj wristband — it contains your nationality and group information",
+      "Go to Masjid al-Haram if in Makkah — Hajj authorities maintain coordination centers there"
+    ],
+    "if_someone_is_missing": [
+      "Contact your group leader immediately",
+      "Contact the Lost Pilgrim Hotline: 920000776",
+      "Contact your country's Hajj Mission office",
+      "File a report with Saudi police at the nearest station if needed",
+      "Provide: full name, nationality, passport number, photograph, last known location and time"
+    ],
+    "prevention": [
+      "Memorize your tent camp number and zone",
+      "Save your group leader's number OFFLINE",
+      "Write your hotel and camp address on a card — keep it on your person",
+      "Take a photo of your group at the start of each major ritual",
+      "Agree on a landmark meeting point before each crowd event",
+      "Elderly and disabled pilgrims should always have a companion"
+    ]
+  },
+  "general_tips": [
+    { "type": "tip", "title": "Footwear", "body": "Wear comfortable, well-fitted sandals. Ground temperatures can exceed 70°C and cause severe burns to bare feet. Never walk barefoot on tarmac." },
+    { "type": "tip", "title": "Phone Charging", "body": "Carry a portable power bank. Staying charged is essential for navigation, emergency calls, and group coordination." },
+    { "type": "tip", "title": "Respiratory Hygiene", "body": "Wear a mask in crowded areas if you have a respiratory condition. Respiratory infections spread easily in large gatherings." },
+    { "type": "caution", "title": "Overexertion", "body": "Hajj is physically demanding. Rest when needed — pushing through illness is dangerous. Missing a non-obligatory act is better than collapsing." },
+    { "type": "tip", "title": "Food Safety", "body": "Eat freshly prepared food from established vendors. Avoid foods left in heat. Traveler's diarrhea is common — stay hydrated and carry ORS." },
+    { "type": "tip", "title": "Sleep", "body": "Aim for 6+ hours of sleep each night despite the spiritual energy. Fatigue causes accidents and impairs judgment in crowds." }
+  ]
+}

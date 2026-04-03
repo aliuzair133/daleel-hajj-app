@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Daleel",
+    "tagline": "Your trusted Hajj companion",
+    "disclaimer": "This app is a guide only. Consult your Hajj group leader or a qualified scholar for binding rulings."
+  },
+  "nav": {
+    "home": "Home",
+    "rituals": "Rituals",
+    "prayers": "Prayers",
+    "contacts": "Contacts",
+    "more": "More"
+  },
+  "home": {
+    "greeting_morning": "As-salamu alaykum",
+    "greeting_afternoon": "As-salamu alaykum",
+    "today_in_hajj": "Today in Hajj",
+    "days_until_hajj": "Days Until Hajj",
+    "next_prayer": "Next Prayer",
+    "current_prayer": "Current Prayer",
+    "time_remaining": "Time remaining",
+    "quick_actions": "Quick Actions",
+    "talbiyah": "Talbiyah",
+    "todays_dua": "Today's Du'a",
+    "emergency": "Emergency"
+  },
+  "rituals": {
+    "title": "Hajj Rituals",
+    "progress": "Your Progress",
+    "steps_completed": "{{completed}} of {{total}} steps completed",
+    "mark_complete": "Mark Complete",
+    "completed": "Completed",
+    "common_mistakes": "Common Mistakes",
+    "tip": "Tip",
+    "source": "Source",
+    "related_dua": "Related Du'a"
+  },
+  "prayers": {
+    "title": "Prayers & Du'a",
+    "daily_prayers": "Daily Prayers",
+    "hajj_duas": "Hajj Du'as",
+    "arabic": "Arabic",
+    "transliteration": "Transliteration",
+    "translation": "Translation",
+    "when_to_recite": "When to Recite",
+    "bookmark": "Bookmark",
+    "bookmarked": "Bookmarked",
+    "play_audio": "Play Audio",
+    "search_duas": "Search du'as...",
+    "all_categories": "All",
+    "rakaat": "Rak'ah"
+  },
+  "contacts": {
+    "title": "Emergency Contacts",
+    "saudi_emergency": "Saudi Emergency Numbers",
+    "your_embassy": "Your Embassy",
+    "select_country": "Select your country",
+    "call": "Call",
+    "copy": "Copy",
+    "embassy_riyadh": "Embassy (Riyadh)",
+    "consulate_jeddah": "Consulate (Jeddah)"
+  },
+  "safety": {
+    "title": "Health & Safety",
+    "heat_safety": "Heat Safety",
+    "crowd_safety": "Crowd Safety",
+    "health_requirements": "Health Requirements",
+    "lost_pilgrim": "Lost Pilgrim Protocol",
+    "emergency": "EMERGENCY",
+    "caution": "CAUTION",
+    "tip": "TIP"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "country": "Country",
+    "text_size": "Text Size",
+    "dark_mode": "Dark Mode",
+    "about": "About Daleel",
+    "disclaimer": "Disclaimer"
+  },
+  "offline": {
+    "banner": "📴 Offline mode — all core features available",
+    "online": "🌐 Back online"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "all": "All"
+  }
+}

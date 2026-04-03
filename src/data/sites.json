@@ -1,0 +1,125 @@
+{
+  "sites": [
+    {
+      "id": "masjid-haram",
+      "name": "Masjid al-Haram",
+      "name_ar": "المسجد الحرام",
+      "location": "Makkah al-Mukarramah",
+      "coordinates": { "lat": 21.4225, "lng": 39.8262 },
+      "significance": "The Great Mosque of Makkah is the largest mosque in the world and surrounds the holy Kaaba. It is the holiest site in Islam. Every Muslim who is physically and financially able must perform Hajj here at least once in their lifetime.",
+      "rituals_performed": ["Tawaf (circumambulation of the Kaaba)", "Sa'i (between Safa and Marwah)", "Tawaf al-Qudum (Arrival Tawaf)", "Tawaf al-Ifadah", "Tawaf al-Wada'"],
+      "notes": "Prayer here is worth 100,000 prayers compared to elsewhere (Sahih Bukhari 1190).",
+      "category": "essential"
+    },
+    {
+      "id": "kaaba",
+      "name": "The Holy Kaaba",
+      "name_ar": "الكعبة المشرفة",
+      "location": "Centre of Masjid al-Haram",
+      "coordinates": { "lat": 21.4225, "lng": 39.8262 },
+      "significance": "The Kaaba is the cube-shaped structure at the center of Masjid al-Haram, considered the House of Allah. Built originally by Prophet Ibrahim (AS) and his son Ismail (AS), it is the direction of prayer (Qiblah) for all Muslims worldwide.",
+      "rituals_performed": ["Tawaf (circumambulation)", "Facing it in prayer"],
+      "notes": "The Black Stone (Hajar al-Aswad) is embedded in the eastern corner. The Hijr Ismail (Hateem) semicircle is part of the original Kaaba structure.",
+      "category": "essential"
+    },
+    {
+      "id": "mina",
+      "name": "Mina",
+      "name_ar": "منى",
+      "location": "5 km east of Makkah",
+      "coordinates": { "lat": 21.4133, "lng": 39.8930 },
+      "significance": "Mina is the tent city where pilgrims spend most of Hajj. It is where the Jamarat (stoning pillars) are located, representing the stones Ibrahim (AS) threw at Shaytan. The valley holds over 160,000 air-conditioned tents.",
+      "rituals_performed": ["Overnight stay on 8, 10, 11, 12 (and 13) Dhul Hijjah", "Rami al-Jamarat (stoning)", "Animal sacrifice"],
+      "notes": "Masjid al-Khayf in Mina is one of the blessed mosques where the Prophet ﷺ prayed.",
+      "category": "essential"
+    },
+    {
+      "id": "arafat",
+      "name": "Plain of Arafat",
+      "name_ar": "عرفات",
+      "location": "20 km east of Makkah",
+      "coordinates": { "lat": 21.3549, "lng": 39.9845 },
+      "significance": "The most important site in Hajj. The Prophet ﷺ said: 'Hajj is Arafat.' This is where Adam and Hawwa (Eve) (AS) are said to have reunited after their descent. Allah descends (in a manner befitting His Majesty) on the day of Arafat and boasts to the angels about those gathered.",
+      "rituals_performed": ["Wuquf (Standing) — the central pillar of Hajj", "Dhuhr and Asr prayers combined"],
+      "notes": "Jabal al-Rahmah (Mountain of Mercy) is the hill in Arafat where the Prophet ﷺ delivered his Farewell Sermon.",
+      "category": "essential"
+    },
+    {
+      "id": "muzdalifah",
+      "name": "Muzdalifah",
+      "name_ar": "مزدلفة",
+      "location": "Between Arafat and Mina",
+      "coordinates": { "lat": 21.3833, "lng": 39.9333 },
+      "significance": "An open plain where pilgrims spend the night between Arafat and Mina. Maghrib and Isha are combined and shortened here. Pebbles for Rami are collected here.",
+      "rituals_performed": ["Overnight stay", "Maghrib + Isha combined prayer", "Collecting pebbles for Rami"],
+      "notes": "Masjid al-Mash'ar al-Haram is the mosque in Muzdalifah where the Prophet ﷺ prayed Fajr and made du'a.",
+      "category": "essential"
+    },
+    {
+      "id": "jamarat",
+      "name": "Jamarat Bridge",
+      "name_ar": "جسر الجمرات",
+      "location": "Mina",
+      "coordinates": { "lat": 21.4206, "lng": 39.8735 },
+      "significance": "The Jamarat are three pillars representing the three places where Shaytan appeared to Ibrahim (AS) to dissuade him from sacrificing his son Ismail. Ibrahim (AS) pelted him with stones at each location. Pilgrims stone the pillars to symbolize rejection of evil.",
+      "rituals_performed": ["Rami al-Jamarat — stoning of three pillars on 10th, 11th, 12th (and 13th) Dhul Hijjah"],
+      "notes": "The multi-level bridge was rebuilt to accommodate millions of pilgrims safely. Follow official crowd management directions.",
+      "category": "essential"
+    },
+    {
+      "id": "safa-marwa",
+      "name": "Safa and Marwah",
+      "name_ar": "الصفا والمروة",
+      "location": "Inside Masjid al-Haram",
+      "coordinates": { "lat": 21.4228, "lng": 39.8274 },
+      "significance": "The two hills between which Hajar (Hagar, AS), the wife of Ibrahim and mother of Ismail, ran desperately searching for water for her infant son. Allah honored her patience by causing Zamzam to spring up. Sa'i commemorates her unwavering trust in Allah.",
+      "rituals_performed": ["Sa'i — 7 circuits (Safa to Marwah and back)"],
+      "notes": "The covered walkway between Safa and Marwah is called the Mas'a. Green lights mark the section where men should jog.",
+      "category": "essential"
+    },
+    {
+      "id": "zamzam",
+      "name": "Well of Zamzam",
+      "name_ar": "بئر زمزم",
+      "location": "Inside Masjid al-Haram (below ground)",
+      "coordinates": { "lat": 21.4225, "lng": 39.8265 },
+      "significance": "The miraculous well that sprang beneath the feet of infant Ismail (AS) in response to Hajar's desperate search for water. It has flowed continuously for over 4,000 years. The Prophet ﷺ said: 'The best water on the face of the earth is Zamzam water.'",
+      "rituals_performed": ["Drinking Zamzam after Tawaf and Sa'i"],
+      "notes": "Zamzam water is distributed throughout Masjid al-Haram. It is Sunnah to drink standing, facing the Qiblah, in three sips.",
+      "category": "essential"
+    },
+    {
+      "id": "masjid-nimra",
+      "name": "Masjid al-Nimra",
+      "name_ar": "مسجد النمرة",
+      "location": "On the edge of Arafat",
+      "coordinates": { "lat": 21.3559, "lng": 39.9857 },
+      "significance": "The mosque at the border of Arafat plain where the Prophet ﷺ delivered his historic Farewell Sermon (Khutbat al-Wada') during his final Hajj. Dhuhr and Asr prayers are combined and shortened here on the Day of Arafat.",
+      "rituals_performed": ["Combined Dhuhr and Asr prayer on the Day of Arafat"],
+      "notes": "Part of Masjid al-Nimra is not within the Arafat boundary — the actual Wuquf must be performed in the confirmed Arafat zone.",
+      "category": "important"
+    },
+    {
+      "id": "masjid-khayf",
+      "name": "Masjid al-Khayf",
+      "name_ar": "مسجد الخيف",
+      "location": "Mina",
+      "coordinates": { "lat": 21.4128, "lng": 39.8955 },
+      "significance": "One of the great mosques of Islam, located in Mina. According to tradition, 70 Prophets prayed in this location. The Prophet ﷺ prayed here during Hajj.",
+      "rituals_performed": ["Daily prayers during the Mina stay"],
+      "notes": "It is a great blessing to pray in Masjid al-Khayf.",
+      "category": "blessed"
+    },
+    {
+      "id": "maqam-ibrahim",
+      "name": "Maqam Ibrahim",
+      "name_ar": "مقام إبراهيم",
+      "location": "Inside Masjid al-Haram",
+      "coordinates": { "lat": 21.4226, "lng": 39.8264 },
+      "significance": "A stone bearing the footprints of Prophet Ibrahim (AS), preserved where he stood to call people to Hajj and while building the Kaaba. Allah commanded: 'And take the station of Ibrahim as a place of prayer.' (2:125)",
+      "rituals_performed": ["Two rakaat after every Tawaf"],
+      "notes": "After Tawaf, move toward Maqam Ibrahim and recite Surah al-Kafirun in the first rakaat and Surah al-Ikhlas in the second.",
+      "category": "essential"
+    }
+  ]
+}
