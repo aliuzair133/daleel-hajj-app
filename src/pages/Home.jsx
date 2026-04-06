@@ -112,6 +112,74 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ── Quick Actions ── */}
+      <div>
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">{t('home.quick_actions')}</h3>
+        <div className="grid grid-cols-3 gap-3">
+          {/* Talbiyah audio */}
+          <button
+            onClick={toggleTalbiyah}
+            className={[
+              'card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all',
+              playing ? 'bg-[#0D7377] border-[#0D7377]' : '',
+            ].join(' ')}
+          >
+            {playing
+              ? <VolumeX size={22} className="text-white" />
+              : <Volume2 size={22} className="text-[#0D7377]" />}
+            <span className={['text-xs font-semibold text-center', playing ? 'text-white' : 'text-gray-700 dark:text-gray-300'].join(' ')}>
+              {playing ? t('home.stop') : t('home.talbiyah')}
+            </span>
+          </button>
+
+          {/* Emergency */}
+          <Link
+            to="/contacts"
+            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
+          >
+            <Phone size={22} className="text-red-500" />
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">{t('home.emergency')}</span>
+          </Link>
+
+          {/* Duas */}
+          <Link
+            to="/prayers"
+            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
+          >
+            <BookOpen size={22} className="text-[#C9A84C]" />
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">{t('home.duas')}</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* ── Essential Resources ── */}
+      <div>
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">{t('home.essential_resources')}</h3>
+        <div className="grid grid-cols-3 gap-3">
+          <Link
+            to="/ihram-rules"
+            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
+          >
+            <Scroll size={22} className="text-[#0D7377]" />
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.ihram_rules')}</span>
+          </Link>
+          <Link
+            to="/map"
+            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
+          >
+            <MapPin size={22} className="text-[#C9A84C]" />
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.holy_sites')}</span>
+          </Link>
+          <Link
+            to="/checklist"
+            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
+          >
+            <CheckSquare size={22} className="text-[#2D6A4F]" />
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.checklist')}</span>
+          </Link>
+        </div>
+      </div>
+
       {/* ── Today in Hajj / Countdown ── */}
       {hajjDay ? (
         <div className="rounded-2xl bg-gradient-to-br from-[#0D7377] to-[#095C5F] text-white p-5 shadow-md">
@@ -186,74 +254,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      {/* ── Quick Actions ── */}
-      <div>
-        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">{t('home.quick_actions')}</h3>
-        <div className="grid grid-cols-3 gap-3">
-          {/* Talbiyah audio */}
-          <button
-            onClick={toggleTalbiyah}
-            className={[
-              'card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all',
-              playing ? 'bg-[#0D7377] border-[#0D7377]' : '',
-            ].join(' ')}
-          >
-            {playing
-              ? <VolumeX size={22} className="text-white" />
-              : <Volume2 size={22} className="text-[#0D7377]" />}
-            <span className={['text-xs font-semibold text-center', playing ? 'text-white' : 'text-gray-700 dark:text-gray-300'].join(' ')}>
-              {playing ? t('home.stop') : t('home.talbiyah')}
-            </span>
-          </button>
-
-          {/* Emergency */}
-          <Link
-            to="/contacts"
-            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
-          >
-            <Phone size={22} className="text-red-500" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">{t('home.emergency')}</span>
-          </Link>
-
-          {/* Duas */}
-          <Link
-            to="/prayers"
-            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
-          >
-            <BookOpen size={22} className="text-[#C9A84C]" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">{t('home.duas')}</span>
-          </Link>
-        </div>
-      </div>
-
-      {/* ── Essential Resources ── */}
-      <div>
-        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">{t('home.essential_resources')}</h3>
-        <div className="grid grid-cols-3 gap-3">
-          <Link
-            to="/ihram-rules"
-            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
-          >
-            <Scroll size={22} className="text-[#0D7377]" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.ihram_rules')}</span>
-          </Link>
-          <Link
-            to="/map"
-            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
-          >
-            <MapPin size={22} className="text-[#C9A84C]" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.holy_sites')}</span>
-          </Link>
-          <Link
-            to="/checklist"
-            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
-          >
-            <CheckSquare size={22} className="text-[#2D6A4F]" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.checklist')}</span>
-          </Link>
-        </div>
-      </div>
 
       {/* ── Talbiyah Card ── */}
       {talbiyahDua && (
