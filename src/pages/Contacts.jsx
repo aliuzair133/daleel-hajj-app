@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSettings } from '../hooks/useSettings';
 import { ContactCard } from '../components/ContactCard';
 import contactsData from '../data/contacts.json';
 
 export default function Contacts() {
+  const { t } = useTranslation();
   const { settings } = useSettings();
   const [selectedCountry, setSelectedCountry] = useState(settings.country || 'US');
   const countryData = contactsData.by_country[selectedCountry];
@@ -13,15 +15,15 @@ export default function Contacts() {
 
   return (
     <div className="px-4 pt-4 pb-8 fade-in max-w-lg mx-auto">
-      <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-0.5">Emergency Contacts</h1>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Save these numbers before you travel</p>
+      <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-0.5">{t('contacts.title')}</h1>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('contacts.save_before_travel')}</p>
 
       {/* Universal Saudi Emergency */}
       <div className="rounded-2xl border-2 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/10 mb-4 overflow-hidden">
         <div className="flex items-center gap-2 px-4 py-3 border-b border-red-200 dark:border-red-800">
           <span className="text-base">🚨</span>
           <h2 className="font-black text-red-700 dark:text-red-400 text-sm uppercase tracking-wide">
-            Saudi Emergency Numbers
+            {t('contacts.saudi_emergency')}
           </h2>
         </div>
         <div className="divide-y divide-red-100 dark:divide-red-900/40">
@@ -33,7 +35,7 @@ export default function Contacts() {
 
       {/* Embassy Selector */}
       <div className="card mb-4">
-        <h2 className="font-bold text-gray-800 dark:text-gray-100 text-sm mb-3">Your Embassy / Consulate</h2>
+        <h2 className="font-bold text-gray-800 dark:text-gray-100 text-sm mb-3">{t('contacts.your_embassy')}</h2>
         <select
           value={selectedCountry}
           onChange={e => setSelectedCountry(e.target.value)}
@@ -48,7 +50,7 @@ export default function Contacts() {
           <div className="mt-3 divide-y divide-gray-100 dark:divide-gray-800">
             {countryData.embassy_riyadh && (
               <ContactCard
-                label={`${countryData.name} Embassy (Riyadh)`}
+                label={`${countryData.name} ${t('contacts.embassy_riyadh')}`}
                 number={countryData.embassy_riyadh}
                 type="embassy"
                 compact
@@ -56,7 +58,7 @@ export default function Contacts() {
             )}
             {countryData.consulate_jeddah && (
               <ContactCard
-                label={`${countryData.name} Consulate (Jeddah)`}
+                label={`${countryData.name} ${t('contacts.consulate_jeddah')}`}
                 number={countryData.consulate_jeddah}
                 type="consulate"
                 compact
@@ -67,7 +69,7 @@ export default function Contacts() {
       </div>
 
       <div className="text-xs text-center text-gray-400 pb-2">
-        📞 Tap any number to call. Numbers verified for Hajj 2026 (1447 AH).
+        📞 {t('contacts.tap_to_call')}
       </div>
     </div>
   );

@@ -1,15 +1,18 @@
 import { NavLink } from 'react-router-dom';
 import { Home, BookOpen, BookMarked, Phone, Grid3X3 } from 'lucide-react';
-
-const NAV_ITEMS = [
-  { to: '/',         icon: Home,       label: 'Home'     },
-  { to: '/rituals',  icon: BookOpen,   label: 'Rituals'  },
-  { to: '/prayers',  icon: BookMarked, label: 'Prayers'  },
-  { to: '/contacts', icon: Phone,      label: 'Contacts' },
-  { to: '/more',     icon: Grid3X3,    label: 'More'     },
-];
+import { useTranslation } from 'react-i18next';
 
 export function BottomNav() {
+  const { t } = useTranslation();
+
+  const NAV_ITEMS = [
+    { to: '/',         icon: Home,       label: t('nav.home')     },
+    { to: '/rituals',  icon: BookOpen,   label: t('nav.rituals')  },
+    { to: '/prayers',  icon: BookMarked, label: t('nav.prayers')  },
+    { to: '/contacts', icon: Phone,      label: t('nav.contacts') },
+    { to: '/more',     icon: Grid3X3,    label: t('nav.more')     },
+  ];
+
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-100 dark:border-gray-800 flex items-stretch"

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { User, Globe, Type, Moon, RotateCcw, ChevronRight, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useSettings } from '../hooks/useSettings';
 import { db } from '../utils/db';
 import contactsData from '../data/contacts.json';
@@ -43,6 +44,7 @@ function SettingSection({ icon: Icon, title, children }) {
 }
 
 export default function Settings() {
+  const { t } = useTranslation();
   const { settings, updateSetting } = useSettings();
   const [resetConfirm, setResetConfirm] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -67,29 +69,29 @@ export default function Settings() {
 
   return (
     <div className="px-4 pt-4 pb-8 fade-in max-w-lg mx-auto">
-      <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-1">Settings</h1>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">Personalise your Hajj companion</p>
+      <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-1">{t('settings.title')}</h1>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">{t('settings.personalise')}</p>
 
       {/* ── Name ── */}
-      <SettingSection icon={User} title="Your Name">
+      <SettingSection icon={User} title={t('settings.your_name')}>
         <div className="relative">
           <input
             type="text"
             defaultValue={settings.userName}
             onBlur={handleNameBlur}
-            placeholder="Enter your name…"
+            placeholder={t('settings.name_placeholder')}
             className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0D7377]/30 text-gray-900 dark:text-white"
           />
           {saved && (
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#2D6A4F] font-semibold">
-              Saved ✓
+              {t('settings.saved')}
             </span>
           )}
         </div>
       </SettingSection>
 
       {/* ── Country ── */}
-      <SettingSection icon={Globe} title="Your Country">
+      <SettingSection icon={Globe} title={t('settings.your_country')}>
         <select
           value={settings.country}
           onChange={e => updateSetting('country', e.target.value)}
@@ -99,13 +101,11 @@ export default function Settings() {
             <option key={code} value={code}>{name}</option>
           ))}
         </select>
-        <p className="text-xs text-gray-400 mt-2">
-          Determines which embassy contacts are shown on the Contacts page.
-        </p>
+        <p className="text-xs text-gray-400 mt-2">{t('settings.country_desc')}</p>
       </SettingSection>
 
       {/* ── Language ── */}
-      <SettingSection icon={Globe} title="Language">
+      <SettingSection icon={Globe} title={t('settings.language')}>
         <div className="grid grid-cols-2 gap-2">
           {LANGUAGES.map(lang => (
             <button
@@ -127,7 +127,7 @@ export default function Settings() {
       </SettingSection>
 
       {/* ── Text Size ── */}
-      <SettingSection icon={Type} title="Text Size">
+      <SettingSection icon={Type} title={t('settings.text_size')}>
         <div className="flex gap-2">
           {TEXT_SIZES.map((size, idx) => (
             <button
@@ -149,7 +149,7 @@ export default function Settings() {
       </SettingSection>
 
       {/* ── Dark Mode ── */}
-      <SettingSection icon={Moon} title="Appearance">
+      <SettingSection icon={Moon} title={t('settings.appearance')}>
         <div className="flex gap-2">
           {DARK_MODES.map(mode => (
             <button
@@ -172,8 +172,8 @@ export default function Settings() {
       <div className="card mb-3">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-bold text-gray-800 dark:text-gray-100">Travelling with Mahram</p>
-            <p className="text-xs text-gray-400 mt-0.5">Male guardian / family member</p>
+            <p className="text-sm font-bold text-gray-800 dark:text-gray-100">{t('settings.mahram')}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{t('settings.mahram_desc')}</p>
           </div>
           <button
             onClick={() => updateSetting('isMahram', !settings.isMahram)}
@@ -181,7 +181,7 @@ export default function Settings() {
               'w-12 h-6 rounded-full transition-colors relative flex-shrink-0',
               settings.isMahram ? 'bg-[#0D7377]' : 'bg-gray-200 dark:bg-gray-700',
             ].join(' ')}
-            aria-label="Toggle mahram status"
+            aria-label={t('settings.mahram')}
           >
             <span
               className={[
@@ -197,10 +197,10 @@ export default function Settings() {
       <div className="card mb-3 text-center py-6 bg-gradient-to-br from-teal-50 to-amber-50/50 dark:from-teal-900/20 dark:to-amber-900/10">
         <p className="text-3xl mb-2">🕋</p>
         <p className="font-black text-[#0D7377] text-xl">Daleel · دليل</p>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Your trusted Hajj companion</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{t('app.tagline')}</p>
         <p className="text-xs text-gray-400 mt-3 leading-relaxed">
-          Version 1.0<br />
-          Content verified for Hajj 1447 / 2026
+          {t('settings.version')}<br />
+          {t('settings.content_verified')}
         </p>
       </div>
 
@@ -209,7 +209,7 @@ export default function Settings() {
         <div className="flex items-start gap-2">
           <Info size={14} className="text-amber-600 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
-            This app is a guide only. Consult your Hajj group leader or a qualified scholar for binding rulings. May Allah accept your Hajj. 🤲
+            {t('app.disclaimer')} 🤲
           </p>
         </div>
       </div>
@@ -226,9 +226,7 @@ export default function Settings() {
       >
         <div className="flex items-center gap-2">
           <RotateCcw size={16} />
-          {resetConfirm
-            ? 'Tap again to confirm — clears ALL data'
-            : 'Reset app & restart onboarding'}
+          {resetConfirm ? t('settings.reset_confirm') : t('settings.reset')}
         </div>
         <ChevronRight size={16} className={resetConfirm ? 'text-white' : 'text-gray-300'} />
       </button>

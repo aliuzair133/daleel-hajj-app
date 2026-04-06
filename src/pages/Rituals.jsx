@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useProgress } from '../hooks/useProgress';
 import { RitualStep } from '../components/RitualStep';
 import ritualsData from '../data/rituals.json';
@@ -8,6 +9,7 @@ import duasData from '../data/duas.json';
 const duaMap = Object.fromEntries(duasData.duas.map(d => [d.id, d]));
 
 export default function Rituals() {
+  const { t } = useTranslation();
   const { completedIds, toggleStep, completedCount, totalSteps } = useProgress();
   const [expandedDay, setExpandedDay] = useState(0);
   const progressPct = totalSteps ? Math.round((completedCount / totalSteps) * 100) : 0;
@@ -16,14 +18,16 @@ export default function Rituals() {
     <div className="px-4 pt-4 pb-6 fade-in max-w-lg mx-auto">
       {/* Header */}
       <div className="mb-4">
-        <h1 className="text-2xl font-black text-gray-900 dark:text-white">Hajj Rituals</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Day-by-day guide · 6 days · {totalSteps} steps</p>
+        <h1 className="text-2xl font-black text-gray-900 dark:text-white">{t('rituals.title')}</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          {t('rituals.subtitle')} · {totalSteps} {t('rituals.steps')}
+        </p>
       </div>
 
       {/* Progress bar */}
       <div className="card mb-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-bold text-gray-700 dark:text-gray-300">Overall Progress</span>
+          <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{t('rituals.overall_progress')}</span>
           <span className="text-sm text-[#0D7377] dark:text-teal-400 font-black tabular-nums">
             {completedCount}/{totalSteps}
           </span>
@@ -38,8 +42,8 @@ export default function Rituals() {
         </div>
         <p className="text-xs text-gray-400 mt-1.5">
           {progressPct === 100
-            ? '🎉 All steps complete — may Allah accept your Hajj!'
-            : `${progressPct}% of Hajj steps completed`}
+            ? t('rituals.all_complete')
+            : `${progressPct}${t('rituals.pct_complete')}`}
         </p>
       </div>
 
@@ -77,7 +81,7 @@ export default function Rituals() {
                   {day.title}
                 </h3>
                 <p className={['text-xs mt-1', isOpen ? 'text-teal-200' : 'text-gray-400'].join(' ')}>
-                  📍 {day.location} · {dayCompleted}/{day.steps.length} steps
+                  📍 {day.location} · {dayCompleted}/{day.steps.length} {t('rituals.steps')}
                 </p>
               </div>
               <div className={['flex-shrink-0', isOpen ? 'text-white' : 'text-gray-300'].join(' ')}>
@@ -103,7 +107,7 @@ export default function Rituals() {
       })}
 
       <p className="text-xs text-center text-gray-400 pb-2 mt-4 px-4">
-        🕌 Consult your Hajj group leader or a qualified scholar for binding rulings.
+        {t('rituals.consult')}
       </p>
     </div>
   );

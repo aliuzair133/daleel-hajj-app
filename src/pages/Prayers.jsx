@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, BookmarkCheck, X, ChevronLeft, ChevronRight, Volume2, Square, Bookmark, Navigation } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
 import { useSettings } from '../hooks/useSettings';
 import { useAudio } from '../hooks/useAudio';
@@ -17,6 +18,8 @@ const CATEGORY_BADGE = {
 
 /* ── Full-screen Dua Modal ─────────────────────────────────────── */
 function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBookmark, onPlay, isAudioPlaying }) {
+  const { t } = useTranslation();
+
   // Close on backdrop click
   useEffect(() => {
     const onKey = e => { if (e.key === 'Escape') onClose(); };
@@ -36,7 +39,7 @@ function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBo
         <button
           onClick={onClose}
           className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 active:scale-95 transition-all"
-          aria-label="Close"
+          aria-label={t('common.close')}
         >
           <X size={18} />
         </button>
@@ -47,7 +50,7 @@ function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBo
           {dua.audio_file && (
             <button
               onClick={() => onPlay?.(`/audio/${dua.audio_file}`)}
-              aria-label={isAudioPlaying ? 'Stop audio' : 'Play audio'}
+              aria-label={isAudioPlaying ? t('prayers.stop_audio') : t('prayers.play_audio')}
               className={[
                 'w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95',
                 isAudioPlaying ? 'bg-[#0D7377] text-white' : 'bg-teal-50 dark:bg-teal-900/30 text-[#0D7377]',
@@ -58,7 +61,7 @@ function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBo
           )}
           <button
             onClick={() => onBookmark?.(dua.id)}
-            aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark'}
+            aria-label={isBookmarked ? t('prayers.bookmarked') : t('prayers.bookmark')}
             className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 active:scale-95 transition-all"
           >
             {isBookmarked
@@ -92,13 +95,13 @@ function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBo
 
         {/* Transliteration */}
         <div className="rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 p-4">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Transliteration</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">{t('prayers.transliteration')}</p>
           <p className="text-base italic text-gray-700 dark:text-gray-300 leading-relaxed">{dua.transliteration}</p>
         </div>
 
         {/* Translation */}
         <div className="rounded-2xl bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 p-4">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#0D7377] mb-2">Translation</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#0D7377] mb-2">{t('prayers.translation')}</p>
           <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">{dua.translation}</p>
         </div>
 
@@ -122,14 +125,14 @@ function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBo
           disabled={idx === 0}
           className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98] transition-all"
         >
-          <ChevronLeft size={18} /> Previous
+          <ChevronLeft size={18} /> {t('prayers.previous')}
         </button>
         <button
           onClick={onNext}
           disabled={idx === total - 1}
           className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#0D7377] text-white font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98] transition-all"
         >
-          Next <ChevronRight size={18} />
+          {t('common.next')} <ChevronRight size={18} />
         </button>
       </div>
     </div>
@@ -138,6 +141,7 @@ function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBo
 
 /* ── Main Prayers page ─────────────────────────────────────────── */
 export default function Prayers() {
+  const { t } = useTranslation();
   const { settings, detectLocation } = useSettings();
   const [activeTab, setActiveTab]         = useState('duas');
   const [locating, setLocating]           = useState(false);
@@ -201,11 +205,14 @@ export default function Prayers() {
 
       {/* ── List view ── */}
       <div className="px-4 pt-4 pb-6 fade-in max-w-lg mx-auto">
-        <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-4">Prayers & Du'as</h1>
+        <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-4">{t('prayers.title')}</h1>
 
         {/* Tabs */}
         <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 mb-4">
-          {[{ id: 'duas', label: "Hajj Du'as" }, { id: 'prayers', label: 'Prayer Times' }].map(tab => (
+          {[
+            { id: 'duas',    label: t('prayers.hajj_duas')    },
+            { id: 'prayers', label: t('prayers.daily_prayers') },
+          ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -230,7 +237,7 @@ export default function Prayers() {
                 <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="search"
-                  placeholder="Search du'as…"
+                  placeholder={t('prayers.search_duas')}
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0D7377]/30 text-gray-900 dark:text-white"
@@ -238,7 +245,7 @@ export default function Prayers() {
               </div>
               <button
                 onClick={() => setShowBookmarks(b => !b)}
-                aria-label="Show bookmarked du'as"
+                aria-label={t('prayers.show_bookmarks')}
                 className={[
                   'w-11 h-11 flex items-center justify-center rounded-xl border transition-colors flex-shrink-0',
                   showBookmarks
@@ -252,7 +259,7 @@ export default function Prayers() {
 
             {/* Category filter chips */}
             <div className="flex gap-2 overflow-x-auto pb-2 mb-4 -mx-1 px-1 scrollbar-hide">
-              {[{ id: 'all', icon: '📿', label: 'All' }, ...duasData.categories].map(cat => (
+              {[{ id: 'all', icon: '📿', label: t('prayers.all_categories') }, ...duasData.categories].map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
@@ -273,13 +280,13 @@ export default function Prayers() {
               <div className="text-center py-16 text-gray-400">
                 <p className="text-4xl mb-3">🔍</p>
                 <p className="text-sm font-medium">
-                  {showBookmarks ? "No bookmarked du'as yet" : "No du'as found"}
+                  {showBookmarks ? t('prayers.no_bookmarks') : t('prayers.no_duas')}
                 </p>
               </div>
             ) : (
               <>
                 <p className="text-xs text-gray-400 mb-3 px-1">
-                  {filteredDuas.length} du'a{filteredDuas.length !== 1 ? 's' : ''} — tap any to read in full
+                  {filteredDuas.length} {t('prayers.dua_count_suffix')} — {t('prayers.tap_to_read')}
                 </p>
 
                 {/* 2-column tile grid */}
@@ -323,14 +330,14 @@ export default function Prayers() {
         {activeTab === 'prayers' && (
           <div className="space-y-2.5">
             <div className="flex items-center justify-between mb-1">
-              <p className="text-xs text-gray-500">Umm al-Qura method</p>
+              <p className="text-xs text-gray-500">{t('prayers.uma_qura')}</p>
               <button
                 onClick={handleDetectLocation}
                 disabled={locating}
                 className="flex items-center gap-1 text-[11px] font-semibold text-[#0D7377] disabled:opacity-50 active:scale-95 transition-all"
               >
                 <Navigation size={11} className={locating ? 'animate-pulse' : ''} />
-                {locating ? 'Detecting…' : 'Use my location'}
+                {locating ? t('home.detecting') : t('home.use_my_location')}
               </button>
             </div>
             {PRAYER_NAMES.map(name => (

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Volume2, VolumeX, Phone, BookOpen, Shield, MapPin, CheckSquare, Scroll, Navigation } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
 import { useProgress } from '../hooks/useProgress';
 import { useSettings } from '../hooks/useSettings';
@@ -25,14 +26,14 @@ function getCurrentHajjDay() {
   return HAJJ_DAYS[Math.floor((now - HAJJ_START) / 86400000)] ?? null;
 }
 
-function getGreeting(name) {
+function getGreeting(name, t) {
   const h = new Date().getHours();
   const base =
-    h < 5  ? 'As-salamu alaykum 🌙' :
-    h < 12 ? 'Good morning ☀️' :
-    h < 17 ? 'As-salamu alaykum 🌤' :
-    h < 20 ? 'Good evening 🌅' :
-             'Good night 🌃';
+    h < 5  ? `${t('home.greeting_morning')} 🌙` :
+    h < 12 ? `${t('home.greeting_morning')} ☀️` :
+    h < 17 ? `${t('home.greeting_afternoon')} 🌤` :
+    h < 20 ? `${t('home.greeting_afternoon')} 🌅` :
+             `${t('home.greeting_morning')} 🌃`;
   return name ? `${base}, ${name}` : base;
 }
 
@@ -41,6 +42,7 @@ const arafatDua   = duasData.duas.find(d => d.id === 'dua_arafat') ??
                     duasData.duas.find(d => d.category === 'arafat');
 
 export default function Home() {
+  const { t } = useTranslation();
   const { settings, detectLocation } = useSettings();
   const [locating, setLocating] = useState(false);
   const [locError, setLocError] = useState(null);
@@ -54,7 +56,7 @@ export default function Home() {
     try {
       await detectLocation();
     } catch {
-      setLocError('Could not detect location. Using Makkah times.');
+      setLocError(t('home.location_error'));
     } finally {
       setLocating(false);
     }
@@ -101,37 +103,37 @@ export default function Home() {
         <div className="flex-1 min-w-0">
           <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">{hijriDate}</p>
           <h1 className="text-xl font-bold text-gray-900 dark:text-white mt-0.5 leading-snug">
-            {getGreeting(settings.userName)}
+            {getGreeting(settings.userName, t)}
           </h1>
         </div>
         <div className="flex flex-col items-end ml-3 flex-shrink-0">
           <span className="text-2xl font-arabic text-[#0D7377] leading-none">دليل</span>
-          <span className="text-[10px] text-gray-400 mt-0.5">Your Hajj Companion</span>
+          <span className="text-[10px] text-gray-400 mt-0.5">{t('app.tagline')}</span>
         </div>
       </div>
 
       {/* ── Today in Hajj / Countdown ── */}
       {hajjDay ? (
         <div className="rounded-2xl bg-gradient-to-br from-[#0D7377] to-[#095C5F] text-white p-5 shadow-md">
-          <p className="text-teal-200 text-xs font-semibold uppercase tracking-widest mb-1">Today in Hajj</p>
+          <p className="text-teal-200 text-xs font-semibold uppercase tracking-widest mb-1">{t('home.today_in_hajj')}</p>
           <h2 className="text-lg font-black leading-tight mb-0.5">{hajjDay.title}</h2>
           <p className="text-teal-200 text-sm">{hajjDay.hijri_date} · 📍 {hajjDay.location}</p>
           <Link
             to="/rituals"
             className="mt-3 inline-flex items-center text-sm text-teal-100 hover:text-white transition-colors font-medium"
           >
-            View Today's Rituals <ChevronRight size={16} className="ml-0.5" />
+            {t('home.view_today_rituals')} <ChevronRight size={16} className="ml-0.5" />
           </Link>
         </div>
       ) : (
         <div className="rounded-2xl bg-gradient-to-br from-[#0D7377] to-[#095C5F] text-white p-5 shadow-md">
-          <p className="text-teal-200 text-xs font-semibold uppercase tracking-widest mb-2">Hajj 2026 · 1447 AH</p>
+          <p className="text-teal-200 text-xs font-semibold uppercase tracking-widest mb-2">{t('home.hajj_year')}</p>
           <div className="flex items-center gap-4">
             <span className="text-5xl">🕋</span>
             <div>
               <p className="text-4xl font-black tabular-nums leading-none">{daysUntil}</p>
-              <p className="text-teal-200 text-sm mt-1">days until Hajj begins</p>
-              <p className="text-teal-300 text-xs mt-0.5">8 Dhul Hijjah 1447 · May 25, 2026</p>
+              <p className="text-teal-200 text-sm mt-1">{t('home.days_until_text')}</p>
+              <p className="text-teal-300 text-xs mt-0.5">{t('home.hajj_start_date')}</p>
             </div>
           </div>
         </div>
@@ -141,7 +143,7 @@ export default function Home() {
       {hajjDay && totalSteps > 0 && (
         <div className="card">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Hajj Progress</span>
+            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('home.progress_title')}</span>
             <span className="text-sm text-[#0D7377] dark:text-teal-400 font-bold tabular-nums">
               {completedCount}/{totalSteps}
             </span>
@@ -152,7 +154,7 @@ export default function Home() {
               style={{ width: `${progressPct}%` }}
             />
           </div>
-          <p className="text-xs text-gray-400 mt-1.5">{progressPct}% of ritual steps completed</p>
+          <p className="text-xs text-gray-400 mt-1.5">{progressPct}{t('home.pct_steps_completed')}</p>
         </div>
       )}
 
@@ -160,14 +162,14 @@ export default function Home() {
       {prayerTimes && currentNext?.next && (
         <div>
           <div className="flex items-center justify-between mb-2 px-1">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Prayer Times</h3>
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('home.prayer_times')}</h3>
             <button
               onClick={handleDetectLocation}
               disabled={locating}
               className="flex items-center gap-1 text-[11px] font-semibold text-[#0D7377] disabled:opacity-50 active:scale-95 transition-all"
             >
               <Navigation size={11} className={locating ? 'animate-pulse' : ''} />
-              {locating ? 'Detecting…' : 'Use my location'}
+              {locating ? t('home.detecting') : t('home.use_my_location')}
             </button>
           </div>
           {locError && <p className="text-xs text-amber-600 mb-2 px-1">{locError}</p>}
@@ -187,7 +189,7 @@ export default function Home() {
 
       {/* ── Quick Actions ── */}
       <div>
-        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Quick Actions</h3>
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">{t('home.quick_actions')}</h3>
         <div className="grid grid-cols-3 gap-3">
           {/* Talbiyah audio */}
           <button
@@ -201,7 +203,7 @@ export default function Home() {
               ? <VolumeX size={22} className="text-white" />
               : <Volume2 size={22} className="text-[#0D7377]" />}
             <span className={['text-xs font-semibold text-center', playing ? 'text-white' : 'text-gray-700 dark:text-gray-300'].join(' ')}>
-              {playing ? 'Stop' : 'Talbiyah'}
+              {playing ? t('home.stop') : t('home.talbiyah')}
             </span>
           </button>
 
@@ -211,7 +213,7 @@ export default function Home() {
             className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
           >
             <Phone size={22} className="text-red-500" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">Emergency</span>
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">{t('home.emergency')}</span>
           </Link>
 
           {/* Duas */}
@@ -220,35 +222,35 @@ export default function Home() {
             className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
           >
             <BookOpen size={22} className="text-[#C9A84C]" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">Du'as</span>
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">{t('home.duas')}</span>
           </Link>
         </div>
       </div>
 
       {/* ── Essential Resources ── */}
       <div>
-        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Essential Resources</h3>
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">{t('home.essential_resources')}</h3>
         <div className="grid grid-cols-3 gap-3">
           <Link
             to="/ihram-rules"
             className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
           >
             <Scroll size={22} className="text-[#0D7377]" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">Ihram Rules</span>
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.ihram_rules')}</span>
           </Link>
           <Link
             to="/map"
             className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
           >
             <MapPin size={22} className="text-[#C9A84C]" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">Holy Sites</span>
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.holy_sites')}</span>
           </Link>
           <Link
             to="/checklist"
             className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
           >
             <CheckSquare size={22} className="text-[#2D6A4F]" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">Checklist</span>
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.checklist')}</span>
           </Link>
         </div>
       </div>
@@ -258,7 +260,7 @@ export default function Home() {
         <div className="rounded-2xl border border-[#C9A84C]/30 bg-amber-50/60 dark:bg-amber-900/10 p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold text-[#C9A84C] uppercase tracking-widest">
-              📿 Talbiyah — Recite Often
+              {t('home.talbiyah_label')}
             </span>
             <span className="text-xs text-gray-400">{talbiyahDua.source}</span>
           </div>
@@ -274,7 +276,7 @@ export default function Home() {
       {arafatDua && (
         <div className="card">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-[#0D7377] uppercase tracking-widest">Today's Du'a</span>
+            <span className="text-xs font-bold text-[#0D7377] uppercase tracking-widest">{t('home.todays_dua')}</span>
             <span className="text-xs text-gray-400">{arafatDua.source}</span>
           </div>
           <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-2 text-sm">{arafatDua.title}</h4>
@@ -283,7 +285,7 @@ export default function Home() {
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{arafatDua.translation}</p>
           <Link to="/prayers" className="mt-3 text-xs text-[#0D7377] font-semibold flex justify-end">
-            View all du'as →
+            {t('common.view_all_duas')}
           </Link>
         </div>
       )}
@@ -293,9 +295,9 @@ export default function Home() {
         <div className="rounded-2xl bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 p-4 flex items-center gap-3 active:scale-[0.98] transition-all">
           <Shield size={20} className="text-red-500 flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-red-700 dark:text-red-400">Stay Safe in the Heat</p>
+            <p className="text-sm font-bold text-red-700 dark:text-red-400">{t('home.safety_reminder_title')}</p>
             <p className="text-xs text-red-600/70 dark:text-red-400/70 mt-0.5">
-              Drink water every 15 min · Read our heat safety guide
+              {t('home.safety_reminder_body')}
             </p>
           </div>
           <ChevronRight size={16} className="text-red-400 flex-shrink-0" />
@@ -304,7 +306,7 @@ export default function Home() {
 
       {/* ── Disclaimer ── */}
       <p className="text-xs text-center text-gray-400 px-4 pb-2">
-        🕌 This app is a guide only. Consult your Hajj group leader or a qualified scholar for binding rulings.
+        🕌 {t('app.disclaimer')}
       </p>
     </div>
   );

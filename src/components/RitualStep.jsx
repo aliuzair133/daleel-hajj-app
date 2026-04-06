@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { CheckCircle2, Circle, ChevronDown, ChevronUp, AlertTriangle, Lightbulb, BookOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function RitualStep({ step, isCompleted, onToggle, duaMap = {} }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const relatedDua = step.dua_id ? duaMap[step.dua_id] : null;
 
@@ -16,7 +18,7 @@ export function RitualStep({ step, isCompleted, onToggle, duaMap = {} }) {
         {/* Completion toggle */}
         <button
           onClick={() => onToggle(step.id)}
-          aria-label={isCompleted ? 'Mark incomplete' : 'Mark complete'}
+          aria-label={isCompleted ? 'Mark incomplete' : t('rituals.mark_complete')}
           className="mt-0.5 flex-shrink-0 transition-transform active:scale-90"
         >
           {isCompleted
@@ -34,7 +36,7 @@ export function RitualStep({ step, isCompleted, onToggle, duaMap = {} }) {
                 </span>
                 {isCompleted && (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#2D6A4F] bg-[#2D6A4F]/10 px-2 py-0.5 rounded-full">
-                    ✓ Completed
+                    ✓ {t('rituals.completed')}
                   </span>
                 )}
               </div>
@@ -67,7 +69,7 @@ export function RitualStep({ step, isCompleted, onToggle, duaMap = {} }) {
                   <div className="flex items-center gap-1.5 mb-2">
                     <BookOpen size={12} className="text-amber-700 dark:text-amber-400" />
                     <p className="text-xs font-bold text-amber-700 dark:text-amber-400">
-                      Du'a: {relatedDua.title}
+                      {t('rituals.related_dua')}: {relatedDua.title}
                     </p>
                   </div>
                   <p className="text-base font-arabic text-gray-800 dark:text-gray-200 leading-loose" dir="rtl">
@@ -82,7 +84,7 @@ export function RitualStep({ step, isCompleted, onToggle, duaMap = {} }) {
                 <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-xl p-3">
                   <div className="flex items-center gap-1.5 mb-2">
                     <AlertTriangle size={12} className="text-red-600 dark:text-red-400" />
-                    <p className="text-xs font-bold text-red-700 dark:text-red-400">Common Mistakes</p>
+                    <p className="text-xs font-bold text-red-700 dark:text-red-400">{t('rituals.common_mistakes')}</p>
                   </div>
                   <ul className="space-y-1.5">
                     {step.common_mistakes.map((m, i) => (
@@ -100,7 +102,7 @@ export function RitualStep({ step, isCompleted, onToggle, duaMap = {} }) {
                 <div className="bg-teal-50 dark:bg-teal-900/10 border border-teal-200 dark:border-teal-800 rounded-xl p-3">
                   <div className="flex items-center gap-1.5 mb-1">
                     <Lightbulb size={12} className="text-[#0D7377]" />
-                    <p className="text-xs font-bold text-[#0D7377]">Tip</p>
+                    <p className="text-xs font-bold text-[#0D7377]">{t('rituals.tip')}</p>
                   </div>
                   <p className="text-xs text-teal-700 dark:text-teal-300 leading-relaxed">{step.tip}</p>
                 </div>
@@ -123,7 +125,7 @@ export function RitualStep({ step, isCompleted, onToggle, duaMap = {} }) {
                 : 'bg-[#0D7377] text-white hover:bg-[#095C5F]',
             ].join(' ')}
           >
-            {isCompleted ? '✓ Completed' : 'Mark Complete'}
+            {isCompleted ? `✓ ${t('rituals.completed')}` : t('rituals.mark_complete')}
           </button>
         </div>
       </div>
