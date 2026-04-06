@@ -86,5 +86,20 @@ export function useSettings() {
     });
   }
 
-  return { settings, loaded, updateSetting, updateSettings };
+  async function detectLocation() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) return reject(new Error('Geolocation not supported'));
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const { latitude, longitude } = pos.coords;
+          updateSettings({ latitude, longitude });
+          resolve({ latitude, longitude });
+        },
+        err => reject(err),
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    });
+  }
+
+  return { settings, loaded, updateSetting, updateSettings, detectLocation };
 }

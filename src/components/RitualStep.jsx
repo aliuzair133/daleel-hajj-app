@@ -7,10 +7,10 @@ export function RitualStep({ step, isCompleted, onToggle, duaMap = {} }) {
 
   return (
     <article className={[
-      'bg-white dark:bg-gray-900 rounded-2xl shadow-card border transition-all duration-200',
+      'rounded-2xl shadow-card border transition-all duration-200',
       isCompleted
-        ? 'border-[#2D6A4F]/30 dark:border-[#2D6A4F]/40'
-        : 'border-gray-100 dark:border-gray-800',
+        ? 'bg-[#2D6A4F]/5 dark:bg-[#2D6A4F]/10 border-[#2D6A4F]/25 dark:border-[#2D6A4F]/30'
+        : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800',
     ].join(' ')}>
       <div className="flex items-start gap-3 p-4">
         {/* Completion toggle */}
@@ -20,21 +20,25 @@ export function RitualStep({ step, isCompleted, onToggle, duaMap = {} }) {
           className="mt-0.5 flex-shrink-0 transition-transform active:scale-90"
         >
           {isCompleted
-            ? <CheckCircle2 size={24} className="text-[#2D6A4F]" fill="rgba(45,106,79,0.15)" />
-            : <Circle size={24} className="text-gray-300 dark:text-gray-600" />}
+            ? <CheckCircle2 size={26} className="text-[#2D6A4F]" fill="rgba(45,106,79,0.2)" />
+            : <Circle size={26} className="text-gray-300 dark:text-gray-600" />}
         </button>
 
         <div className="flex-1 min-w-0">
           {/* Step label */}
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#0D7377]">
-                Step {step.order}
-              </span>
-              <h3 className={[
-                'font-bold text-sm mt-0.5 leading-snug',
-                isCompleted ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white',
-              ].join(' ')}>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#0D7377]">
+                  Step {step.order}
+                </span>
+                {isCompleted && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#2D6A4F] bg-[#2D6A4F]/10 px-2 py-0.5 rounded-full">
+                    ✓ Completed
+                  </span>
+                )}
+              </div>
+              <h3 className="font-bold text-sm mt-0.5 leading-snug text-gray-900 dark:text-white">
                 {step.title}
               </h3>
               {step.title_ar && (

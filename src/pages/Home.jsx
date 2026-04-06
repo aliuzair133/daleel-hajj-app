@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Volume2, VolumeX, Phone, BookOpen, Shield } from 'lucide-react';
+import { ChevronRight, Volume2, VolumeX, Phone, BookOpen, Shield, MapPin, CheckSquare, Scroll, Navigation } from 'lucide-react';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
 import { useProgress } from '../hooks/useProgress';
 import { useSettings } from '../hooks/useSettings';
@@ -41,10 +41,24 @@ const arafatDua   = duasData.duas.find(d => d.id === 'dua_arafat') ??
                     duasData.duas.find(d => d.category === 'arafat');
 
 export default function Home() {
-  const { settings } = useSettings();
+  const { settings, detectLocation } = useSettings();
+  const [locating, setLocating] = useState(false);
+  const [locError, setLocError] = useState(null);
   const { prayerTimes, currentNext, countdown } = usePrayerTimes(
     settings.latitude, settings.longitude
   );
+
+  async function handleDetectLocation() {
+    setLocating(true);
+    setLocError(null);
+    try {
+      await detectLocation();
+    } catch {
+      setLocError('Could not detect location. Using Makkah times.');
+    } finally {
+      setLocating(false);
+    }
+  }
   const { completedCount, totalSteps } = useProgress();
   const hajjDay   = getCurrentHajjDay();
   const daysUntil = getDaysUntilHajj();
@@ -145,9 +159,18 @@ export default function Home() {
       {/* ── Next Prayer ── */}
       {prayerTimes && currentNext?.next && (
         <div>
-          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">
-            Prayer Times · Makkah
-          </h3>
+          <div className="flex items-center justify-between mb-2 px-1">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Prayer Times</h3>
+            <button
+              onClick={handleDetectLocation}
+              disabled={locating}
+              className="flex items-center gap-1 text-[11px] font-semibold text-[#0D7377] disabled:opacity-50 active:scale-95 transition-all"
+            >
+              <Navigation size={11} className={locating ? 'animate-pulse' : ''} />
+              {locating ? 'Detecting…' : 'Use my location'}
+            </button>
+          </div>
+          {locError && <p className="text-xs text-amber-600 mb-2 px-1">{locError}</p>}
           <div className="space-y-2">
             {prayers.map(name => (
               <PrayerTimeCard
@@ -198,6 +221,34 @@ export default function Home() {
           >
             <BookOpen size={22} className="text-[#C9A84C]" />
             <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">Du'as</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* ── Essential Resources ── */}
+      <div>
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Essential Resources</h3>
+        <div className="grid grid-cols-3 gap-3">
+          <Link
+            to="/ihram-rules"
+            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
+          >
+            <Scroll size={22} className="text-[#0D7377]" />
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">Ihram Rules</span>
+          </Link>
+          <Link
+            to="/map"
+            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
+          >
+            <MapPin size={22} className="text-[#C9A84C]" />
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">Holy Sites</span>
+          </Link>
+          <Link
+            to="/checklist"
+            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
+          >
+            <CheckSquare size={22} className="text-[#2D6A4F]" />
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">Checklist</span>
           </Link>
         </div>
       </div>

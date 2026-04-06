@@ -12,7 +12,7 @@ const MORE_ITEMS = [
 
 export default function More() {
   return (
-    <div className="page-container px-4 py-4 fade-in">
+    <div className="px-4 pt-4 pb-6 fade-in max-w-lg mx-auto">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">More</h1>
 
       <div className="space-y-3">
