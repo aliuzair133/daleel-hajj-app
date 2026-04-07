@@ -3,6 +3,7 @@ import { Suspense, lazy, useState, useEffect } from 'react';
 import { BottomNav } from './components/ui/BottomNav';
 import { OfflineBanner } from './components/ui/OfflineBanner';
 import { db } from './utils/db';
+import FeatureTour from './components/FeatureTour';
 
 // Pages — lazy-loaded for code splitting & faster initial load
 const Home       = lazy(() => import('./pages/Home'));
@@ -33,12 +34,6 @@ function LoadingFallback() {
 }
 
 /* ── Animated route wrapper ────────────────────────────────────── */
-/*
- * Re-keyed on every location change so React unmounts the old tree
- * and mounts the new one, triggering the `pageEnter` CSS animation.
- * We key on `pathname` only (not search/hash) so scroll-position
- * restores don't re-animate the current page.
- */
 function AnimatedRoutes() {
   const location = useLocation();
 
@@ -64,20 +59,45 @@ function AnimatedRoutes() {
 /* ── Root app component ────────────────────────────────────────── */
 export default function App() {
   const [onboardingDone, setOnboardingDone] = useState(null); // null = still checking
+  const [showTour, setShowTour]             = useState(false);
 
   useEffect(() => {
     db.settings
       .get('onboardingComplete')
-      .then(row => setOnboardingDone(!!row?.value))
+      .then(row => {
+        const done = !!row?.value;
+        setOnboardingDone(done);
+
+        // If onboarding is already done, check whether the tour has been seen
+        if (done) {
+          db.settings.get('tourComplete').then(tr => {
+            if (!tr?.value) setShowTour(true);
+          });
+        }
+      })
       .catch(() => setOnboardingDone(false));
   }, []);
+
+  async function handleTourComplete() {
+    await db.settings.put({ key: 'tourComplete', value: true });
+    setShowTour(false);
+  }
 
   // Still checking IndexedDB — show loading screen
   if (onboardingDone === null) return <LoadingFallback />;
 
   // First launch — show Onboarding (no nav, no shell)
   if (!onboardingDone) {
-    return <Onboarding onComplete={() => setOnboardingDone(true)} />;
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <Onboarding
+          onComplete={() => {
+            setOnboardingDone(true);
+            setShowTour(true); // trigger tour immediately after onboarding
+          }}
+        />
+      </Suspense>
+    );
   }
 
   return (
@@ -92,9 +112,11 @@ export default function App() {
             <AnimatedRoutes />
           </Suspense>
         </main>
-
         <BottomNav />
       </div>
+
+      {/* Feature tour overlay — shown once after first onboarding */}
+      {showTour && <FeatureTour onComplete={handleTourComplete} />}
     </BrowserRouter>
   );
 }

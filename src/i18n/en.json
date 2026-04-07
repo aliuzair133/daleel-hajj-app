@@ -12,6 +12,7 @@
     "more": "More"
   },
   "home": {
+    "value_tagline": "Ritual guides · Duas · Map · Safety — all offline",
     "greeting_morning": "As-salamu alaykum",
     "greeting_afternoon": "As-salamu alaykum",
     "today_in_hajj": "Today in Hajj",
@@ -148,6 +149,40 @@
     "banner": "📴 Offline mode — all core features available",
     "online": "🌐 Back online"
   },
+  "tour": {
+    "skip": "Skip",
+    "begin": "Begin My Journey",
+    "of": "of",
+    "step_home_title": "Your Hajj Dashboard",
+    "step_home_desc": "See today's rituals, next prayer countdown, and quick links — everything at a glance.",
+    "step_rituals_title": "Day-by-Day Rituals",
+    "step_rituals_desc": "Follow each Hajj stage step by step. Mark steps complete and track your progress across all 6 days.",
+    "step_prayers_title": "Du'as & Prayer Times",
+    "step_prayers_desc": "20+ authentic Hajj duas with Arabic, transliteration & translation. Save your own personal duas with tags for loved ones.",
+    "step_map_title": "Interactive Holy Sites Map",
+    "step_map_desc": "Explore Makkah, Mina, Arafat & Muzdalifah. Enable Journey Mode during Hajj to see exactly where to go next.",
+    "step_more_title": "Safety, Checklist & AI Guide",
+    "step_more_desc": "Health & safety guidelines, pre-Hajj checklist, emergency contacts, and an AI-powered Hajj scholar — most features fully offline."
+  },
+  "personal_duas": {
+    "tab": "My Du'as",
+    "add": "Add Personal Du'a",
+    "add_title": "Add Your Du'a",
+    "edit_title": "Edit Du'a",
+    "title_label": "Title",
+    "title_placeholder": "e.g. Du'a for my family's health",
+    "body_label": "Your Du'a",
+    "body_placeholder": "Write your personal supplication here…",
+    "arabic_label": "Arabic text (optional)",
+    "arabic_placeholder": "Add Arabic text if known…",
+    "tags_label": "Tags (optional)",
+    "tags_placeholder": "e.g. family, health, gratitude, Mum",
+    "tags_hint": "Separate tags with commas",
+    "empty_title": "Your personal du'as",
+    "empty_desc": "Save supplications for loved ones, personal needs, or any du'a you want to remember during Hajj.",
+    "no_results": "No personal du'as found",
+    "delete_confirm": "Delete this du'a? Tap again to confirm."
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",
@@ -165,6 +200,8 @@
     "copied": "Copied!",
     "previous": "Previous",
     "search": "Search",
-    "view_all_duas": "View all du'as →"
+    "view_all_duas": "View all du'as →",
+    "tap_again": "Tap again to confirm.",
+    "delete": "Delete"
   }
 }

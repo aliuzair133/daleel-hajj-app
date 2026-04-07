@@ -2,12 +2,26 @@ import Dexie from 'dexie';
 
 export const db = new Dexie('DaleelDB');
 
+// Version 1 — original schema
 db.version(1).stores({
-  progress:   '++id, stepId, completedAt',
-  bookmarks:  '++id, duaId, createdAt',
-  notes:      '++id, title, body, createdAt',
-  documents:  '++id, type, imageData, createdAt',
-  settings:   'key',
+  progress:      '++id, stepId, completedAt',
+  bookmarks:     '++id, duaId, createdAt',
+  notes:         '++id, title, body, createdAt',
+  documents:     '++id, type, imageData, createdAt',
+  settings:      'key',
+});
+
+// Version 2 — adds personal duas
+// NATIVE MIGRATION NOTE: Replace with SQLite table:
+//   CREATE TABLE personal_duas (id INTEGER PRIMARY KEY AUTOINCREMENT,
+//     title TEXT, body TEXT, arabic TEXT, tags TEXT, created_at TEXT);
+db.version(2).stores({
+  progress:      '++id, stepId, completedAt',
+  bookmarks:     '++id, duaId, createdAt',
+  notes:         '++id, title, body, createdAt',
+  documents:     '++id, type, imageData, createdAt',
+  settings:      'key',
+  personal_duas: '++id, title, createdAt',
 });
 
 // --- Settings helpers ---
@@ -52,4 +66,28 @@ export async function toggleBookmark(duaId) {
 export async function getBookmarkedDuaIds() {
   const rows = await db.bookmarks.toArray();
   return new Set(rows.map(r => r.duaId));
+}
+
+// --- Personal Duas helpers ---
+// NATIVE MIGRATION NOTE: Wrap these with SQLite async queries via expo-sqlite or react-native-sqlite-storage
+export async function addPersonalDua({ title, body, arabic = '', tags = [] }) {
+  return db.personal_duas.add({
+    title:     title.trim(),
+    body:      body.trim(),
+    arabic:    arabic.trim(),
+    tags:      Array.isArray(tags) ? tags : [],
+    createdAt: new Date().toISOString(),
+  });
+}
+
+export async function updatePersonalDua(id, updates) {
+  return db.personal_duas.update(id, updates);
+}
+
+export async function deletePersonalDua(id) {
+  return db.personal_duas.delete(id);
+}
+
+export async function getAllPersonalDuas() {
+  return db.personal_duas.orderBy('createdAt').reverse().toArray();
 }

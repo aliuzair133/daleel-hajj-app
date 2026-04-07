@@ -105,6 +105,9 @@ export default function Home() {
           <h1 className="text-xl font-bold text-gray-900 dark:text-white mt-0.5 leading-snug">
             {getGreeting(settings.userName, t)}
           </h1>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+            {t('home.value_tagline')}
+          </p>
         </div>
         <div className="flex flex-col items-end ml-3 flex-shrink-0">
           <span className="text-2xl font-arabic text-[#0D7377] leading-none">دليل</span>

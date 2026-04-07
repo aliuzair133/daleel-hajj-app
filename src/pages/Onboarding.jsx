@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronRight, ChevronLeft, Check } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, MapPin, BookOpen, ScrollText, Shield } from 'lucide-react';
 import { useSettings } from '../hooks/useSettings';
 
 const COUNTRIES = [
@@ -39,36 +39,60 @@ const LANGUAGES = [
   { code: 'fr', label: 'French', native: 'Français' },
 ];
 
+// ── Value proposition pill list shown on welcome screen ──────────────────────
+const VALUE_PROPS = [
+  { icon: <ScrollText size={13} />, label: 'Ritual guides' },
+  { icon: <BookOpen    size={13} />, label: 'Duas library'  },
+  { icon: <MapPin      size={13} />, label: 'Holy sites map' },
+  { icon: <Shield      size={13} />, label: 'Safety guides'  },
+];
+
 // ─── Screen 1: Welcome + Name ───────────────────────────────────────────────
 function ScreenWelcome({ name, setName, onNext }) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-6 pb-8 pt-16 text-center">
-      {/* Islamic geometric decoration */}
-      <div className="w-24 h-24 rounded-3xl bg-[#0D7377] flex items-center justify-center mb-6 shadow-lg">
+    <div className="flex flex-col items-center justify-center min-h-screen px-6 pb-8 pt-12 text-center">
+      {/* App icon */}
+      <div className="w-24 h-24 rounded-3xl bg-[#0D7377] flex items-center justify-center mb-5 shadow-lg">
         <span className="text-5xl">🕋</span>
       </div>
 
       <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-1">
         Daleel
       </h1>
-      <p className="text-lg font-arabic text-[#C9A84C] mb-2" dir="rtl">دليل</p>
-      <p className="text-base text-gray-500 dark:text-gray-400 mb-8">
+      <p className="text-lg font-arabic text-[#C9A84C] mb-1" dir="rtl">دليل</p>
+      <p className="text-base text-gray-500 dark:text-gray-400 mb-4">
         Your trusted Hajj companion
       </p>
 
+      {/* Value proposition pills */}
+      <div className="flex flex-wrap justify-center gap-2 mb-6 max-w-xs">
+        {VALUE_PROPS.map(vp => (
+          <span
+            key={vp.label}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 dark:bg-teal-900/20 text-[#0D7377] dark:text-teal-400 rounded-full text-xs font-semibold border border-teal-100 dark:border-teal-800"
+          >
+            {vp.icon}
+            {vp.label}
+          </span>
+        ))}
+      </div>
+
       {/* Bismillah */}
-      <div className="bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-2xl px-6 py-4 mb-8 w-full max-w-xs">
+      <div className="bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-2xl px-6 py-4 mb-6 w-full max-w-xs">
         <p className="text-xl font-arabic text-[#0D7377] leading-loose text-center" dir="rtl">
           بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
         </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           In the name of Allah, the Most Gracious, the Most Merciful
         </p>
       </div>
 
-      {/* Name input */}
-      <div className="w-full max-w-xs mb-8">
-        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 text-left">
+      {/* Setup intro context */}
+      <div className="w-full max-w-xs mb-5 text-left">
+        <p className="text-xs font-semibold text-[#0D7377] uppercase tracking-widest mb-3">
+          Let's personalise your experience
+        </p>
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
           What's your name?
         </label>
         <input
@@ -79,6 +103,9 @@ function ScreenWelcome({ name, setName, onNext }) {
           className="w-full px-4 py-3.5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#0D7377] focus:border-transparent transition-all"
           autoFocus
         />
+        <p className="text-xs text-gray-400 mt-1.5">
+          Used to greet you throughout your journey.
+        </p>
       </div>
 
       <button
@@ -86,7 +113,7 @@ function ScreenWelcome({ name, setName, onNext }) {
         disabled={!name.trim()}
         className="w-full max-w-xs flex items-center justify-center gap-2 bg-[#0D7377] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#095C5F] transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed shadow-md"
       >
-        Get Started <ChevronRight size={18} />
+        Continue <ChevronRight size={18} />
       </button>
 
       <p className="text-xs text-gray-400 mt-4 max-w-xs">
@@ -113,16 +140,24 @@ function ScreenCountry({ country, setCountry, onNext, onBack }) {
         >
           <ChevronLeft size={16} /> Back
         </button>
+
         <h2 className="text-xl font-black text-gray-900 dark:text-white">Your Country</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-          We'll show your embassy contacts automatically
-        </p>
+
+        {/* Context hint */}
+        <div className="flex items-start gap-2 mt-1.5 mb-2">
+          <MapPin size={14} className="text-[#0D7377] flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            We'll automatically show your embassy & consulate contacts in case of emergencies.
+          </p>
+        </div>
+
         {/* Progress dots */}
         <div className="flex gap-2 mt-3">
           <div className="w-6 h-1.5 rounded-full bg-[#0D7377]/30" />
           <div className="w-6 h-1.5 rounded-full bg-[#0D7377]" />
           <div className="w-6 h-1.5 rounded-full bg-[#0D7377]/30" />
         </div>
+
         {/* Search */}
         <input
           type="search"
@@ -177,7 +212,7 @@ function ScreenPreferences({ language, setLanguage, isMahram, setIsMahram, onFin
       >
         <ChevronLeft size={16} /> Back
       </button>
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-5">
         <div className="w-6 h-1.5 rounded-full bg-[#0D7377]/30" />
         <div className="w-6 h-1.5 rounded-full bg-[#0D7377]/30" />
         <div className="w-6 h-1.5 rounded-full bg-[#0D7377]" />
@@ -186,57 +221,63 @@ function ScreenPreferences({ language, setLanguage, isMahram, setIsMahram, onFin
       <h2 className="text-xl font-black text-gray-900 dark:text-white mb-1">
         Almost there, {userName}!
       </h2>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-        A few final preferences to personalise your experience.
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+        A few final preferences so all content is tailored for you.
       </p>
 
       {/* Language */}
-      <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Language</p>
-      <div className="grid grid-cols-2 gap-3 mb-8">
-        {LANGUAGES.map(l => (
-          <button
-            key={l.code}
-            onClick={() => setLanguage(l.code)}
-            className={[
-              'flex flex-col items-center py-4 rounded-2xl border transition-all active:scale-[0.98]',
-              language === l.code
-                ? 'bg-[#0D7377] border-[#0D7377] text-white shadow-sm'
-                : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 text-gray-800 dark:text-gray-200 hover:border-[#0D7377]/40',
-            ].join(' ')}
-          >
-            <span className={['font-bold text-base', l.code === 'ar' || l.code === 'ur' ? 'font-arabic' : ''].join(' ')}>
-              {l.native}
-            </span>
-            <span className={['text-xs mt-0.5', language === l.code ? 'text-white/70' : 'text-gray-400'].join(' ')}>
-              {l.label}
-            </span>
-          </button>
-        ))}
+      <div className="mb-6">
+        <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-0.5">Language</p>
+        <p className="text-xs text-gray-400 mb-3">Navigation, labels and UI will appear in your chosen language.</p>
+        <div className="grid grid-cols-2 gap-3">
+          {LANGUAGES.map(l => (
+            <button
+              key={l.code}
+              onClick={() => setLanguage(l.code)}
+              className={[
+                'flex flex-col items-center py-4 rounded-2xl border transition-all active:scale-[0.98]',
+                language === l.code
+                  ? 'bg-[#0D7377] border-[#0D7377] text-white shadow-sm'
+                  : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 text-gray-800 dark:text-gray-200 hover:border-[#0D7377]/40',
+              ].join(' ')}
+            >
+              <span className={['font-bold text-base', l.code === 'ar' || l.code === 'ur' ? 'font-arabic' : ''].join(' ')}>
+                {l.native}
+              </span>
+              <span className={['text-xs mt-0.5', language === l.code ? 'text-white/70' : 'text-gray-400'].join(' ')}>
+                {l.label}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Mahram status */}
-      <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
-        Are you performing Hajj with a mahram (guardian)?
-      </p>
-      <div className="flex gap-3 mb-8">
-        {[{ val: true, label: 'Yes, with mahram' }, { val: false, label: 'No / N/A' }].map(opt => (
-          <button
-            key={String(opt.val)}
-            onClick={() => setIsMahram(opt.val)}
-            className={[
-              'flex-1 py-3.5 rounded-2xl border font-semibold text-sm transition-all active:scale-[0.98]',
-              isMahram === opt.val
-                ? 'bg-[#0D7377] border-[#0D7377] text-white shadow-sm'
-                : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 text-gray-700 dark:text-gray-300',
-            ].join(' ')}
-          >
-            {opt.label}
-          </button>
-        ))}
+      <div className="mb-6">
+        <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-0.5">
+          Are you performing Hajj with a mahram (guardian)?
+        </p>
+        <p className="text-xs text-gray-400 mb-3">Helps us show relevant guidance for women pilgrims.</p>
+        <div className="flex gap-3">
+          {[{ val: true, label: 'Yes, with mahram' }, { val: false, label: 'No / N/A' }].map(opt => (
+            <button
+              key={String(opt.val)}
+              onClick={() => setIsMahram(opt.val)}
+              className={[
+                'flex-1 py-3.5 rounded-2xl border font-semibold text-sm transition-all active:scale-[0.98]',
+                isMahram === opt.val
+                  ? 'bg-[#0D7377] border-[#0D7377] text-white shadow-sm'
+                  : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 text-gray-700 dark:text-gray-300',
+              ].join(' ')}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Disclaimer */}
-      <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 mb-8">
+      <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 mb-6">
         <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
           <strong>Disclaimer:</strong> This app is a guide only. Consult your Hajj group leader or a qualified scholar for binding rulings. May Allah accept your Hajj. 🤲
         </p>
@@ -260,17 +301,17 @@ export default function Onboarding({ onComplete }) {
   const { updateSetting } = useSettings();
   const [screen, setScreen] = useState(0);
 
-  const [name, setName] = useState('');
-  const [country, setCountry] = useState('');
+  const [name, setName]         = useState('');
+  const [country, setCountry]   = useState('');
   const [language, setLanguage] = useState('en');
   const [isMahram, setIsMahram] = useState(null);
 
   async function handleFinish() {
     await Promise.all([
-      updateSetting('userName', name.trim()),
-      updateSetting('country', country),
-      updateSetting('language', language),
-      updateSetting('isMahram', isMahram ?? false),
+      updateSetting('userName',           name.trim()),
+      updateSetting('country',            country),
+      updateSetting('language',           language),
+      updateSetting('isMahram',           isMahram ?? false),
       updateSetting('onboardingComplete', true),
     ]);
     onComplete?.();

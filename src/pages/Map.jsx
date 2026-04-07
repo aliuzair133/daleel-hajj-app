@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { MapPin, X, Navigation, Layers, ChevronDown, ChevronUp } from 'lucide-react';
+import { MapPin, X, Navigation, Layers, ChevronDown, ChevronUp, Route, ChevronRight } from 'lucide-react';
 import sitesData from '../data/sites.json';
-import 'leaflet/dist/leaflet.css'; // Bundled with Map chunk via lazy loading — available offline
+import 'leaflet/dist/leaflet.css';
 
 /* ── Site categories ─────────────────────────────────────────── */
 const CATEGORY_CONFIG = {
   essential: { label: 'Essential',  color: '#0D7377', bg: '#E8F4F4', emoji: '🕋' },
-  important:  { label: 'Important', color: '#B45309', bg: '#FEF3C7', emoji: '🕌' },
-  blessed:    { label: 'Blessed',   color: '#2D6A4F', bg: '#D1FAE5', emoji: '✨' },
+  important: { label: 'Important',  color: '#B45309', bg: '#FEF3C7', emoji: '🕌' },
+  blessed:   { label: 'Blessed',    color: '#2D6A4F', bg: '#D1FAE5', emoji: '✨' },
 };
 
 /* ── Hajj route polyline (geo-ordered journey) ───────────────── */
@@ -20,22 +20,113 @@ const HAJJ_ROUTE = [
   [21.4225, 39.8262],  // Masjid al-Haram (Tawaf al-Ifadah)
 ];
 
+/* ── Journey stages — map each Hajj day to guidance ─────────────
+   NATIVE MIGRATION NOTE: This data is pure JS — fully portable.
+   Replace the map pan calls with react-native-maps animateToRegion().
+   ────────────────────────────────────────────────────────────── */
+// Hajj 2026: 8 Dhul Hijjah ≈ May 25 2026 (subject to moon sighting)
+const HAJJ_START_MS = new Date('2026-05-25T00:00:00').getTime();
+const MS_PER_DAY    = 86400000;
+
+const JOURNEY_STAGES = [
+  {
+    day:       8,
+    dayName:   'Day of Tarwiyah',
+    location:  'Makkah → Mina',
+    siteId:    'mina',
+    coords:    [21.4133, 39.8930],
+    zoom:      14,
+    icon:      '🕋',
+    action:    'Travel to Mina after Fajr. Perform 5 prayers in Mina.',
+    nextLoc:   'Arafat',
+  },
+  {
+    day:       9,
+    dayName:   'Day of Arafat',
+    location:  'Arafat',
+    siteId:    'arafat',
+    coords:    [21.3549, 39.9845],
+    zoom:      13,
+    icon:      '🤲',
+    action:    'Stand at Arafat from Dhuhr until sunset. This is the pillar of Hajj.',
+    nextLoc:   'Muzdalifah',
+  },
+  {
+    day:       10,
+    dayName:   "Eid al-Adha — Day of Sacrifice",
+    location:  'Muzdalifah → Mina',
+    siteId:    'muzdalifah',
+    coords:    [21.3833, 39.9333],
+    zoom:      13,
+    icon:      '🌙',
+    action:    'Collect 49 pebbles. Proceed to Mina at dawn for Rami, sacrifice, shaving, then Tawaf al-Ifadah.',
+    nextLoc:   'Masjid al-Haram',
+  },
+  {
+    day:       11,
+    dayName:   'Day of Tashreeq (1)',
+    location:  'Mina',
+    siteId:    'mina',
+    coords:    [21.4206, 39.8735],
+    zoom:      14,
+    icon:      '🪨',
+    action:    'Stone all three Jamarat after Dhuhr. Spend the night in Mina.',
+    nextLoc:   'Mina (Day 12)',
+  },
+  {
+    day:       12,
+    dayName:   'Day of Tashreeq (2)',
+    location:  'Mina',
+    siteId:    'mina',
+    coords:    [21.4206, 39.8735],
+    zoom:      14,
+    icon:      '🪨',
+    action:    'Stone all three Jamarat after Dhuhr. You may depart before sunset or stay for Day 13.',
+    nextLoc:   'Makkah (Farewell Tawaf)',
+  },
+  {
+    day:       13,
+    dayName:   'Day of Tashreeq (3) & Farewell',
+    location:  'Mina → Makkah',
+    siteId:    'masjid_al_haram',
+    coords:    [21.4225, 39.8262],
+    zoom:      15,
+    icon:      '🕋',
+    action:    'Stone Jamarat if still in Mina. Perform Tawaf al-Wada (Farewell Tawaf) before departing.',
+    nextLoc:   null,
+  },
+];
+
+function getCurrentStage() {
+  const nowMs  = Date.now();
+  const dayNum = Math.floor((nowMs - HAJJ_START_MS) / MS_PER_DAY) + 8; // Hajj starts day 8
+  return JOURNEY_STAGES.find(s => s.day === dayNum) ?? null;
+}
+
 /* ── Map centre / initial zoom ───────────────────────────────── */
 const MAP_CENTER = [21.395, 39.910];
 const MAP_ZOOM   = 12;
 
 /* ── Build a custom DivIcon for each site ─────────────────────── */
-function makeIcon(site, isSelected, L) {
-  const cfg = CATEGORY_CONFIG[site.category] || CATEGORY_CONFIG.essential;
-  const size = isSelected ? 44 : 36;
-  const border = isSelected ? `3px solid ${cfg.color}` : `2px solid ${cfg.color}`;
-  const shadow = isSelected ? `0 4px 16px rgba(0,0,0,0.35)` : `0 2px 8px rgba(0,0,0,0.2)`;
+function makeIcon(site, isSelected, isCurrentStage, L) {
+  const cfg    = CATEGORY_CONFIG[site.category] || CATEGORY_CONFIG.essential;
+  const size   = isSelected ? 44 : isCurrentStage ? 40 : 36;
+  const border = isSelected
+    ? `3px solid ${cfg.color}`
+    : isCurrentStage
+    ? `3px solid #C9A84C`
+    : `2px solid ${cfg.color}`;
+  const shadow = isSelected || isCurrentStage
+    ? `0 4px 16px rgba(0,0,0,0.35)`
+    : `0 2px 8px rgba(0,0,0,0.2)`;
+  const bg     = isCurrentStage && !isSelected ? '#FEF3C7' : cfg.bg;
+
   return L.divIcon({
     className: '',
     html: `
       <div style="
         width:${size}px; height:${size}px;
-        background:${cfg.bg};
+        background:${bg};
         border:${border};
         border-radius:50%;
         display:flex; align-items:center; justify-content:center;
@@ -48,48 +139,65 @@ function makeIcon(site, isSelected, L) {
         width:0; height:0;
         border-left:6px solid transparent;
         border-right:6px solid transparent;
-        border-top:8px solid ${cfg.color};
+        border-top:8px solid ${isCurrentStage && !isSelected ? '#C9A84C' : cfg.color};
         margin:0 auto;
         margin-top:-2px;
       "></div>`,
-    iconSize:   [size, size + 8],
-    iconAnchor: [size / 2, size + 8],
+    iconSize:    [size, size + 8],
+    iconAnchor:  [size / 2, size + 8],
     popupAnchor: [0, -(size + 8)],
   });
 }
 
 /* ════════════════════════════════════════════════════════════════
    Map Page Component
+   NATIVE MIGRATION NOTE: Swap Leaflet for react-native-maps MapView.
+   The component state/logic (journey mode, filters, site selection)
+   is fully portable — only the map rendering section needs changing.
    ════════════════════════════════════════════════════════════════ */
 export default function Map() {
-  const mapRef       = useRef(null);   // Leaflet map instance
-  const containerRef = useRef(null);   // DOM div for the map
-  const markersRef   = useRef({});     // { siteId: L.marker }
-  const leafletRef   = useRef(null);   // L (Leaflet module)
+  const mapRef       = useRef(null);
+  const containerRef = useRef(null);
+  const markersRef   = useRef({});
+  const leafletRef   = useRef(null);
 
-  const [selectedSite, setSelectedSite] = useState(null);
-  const [drawerOpen,   setDrawerOpen]   = useState(false);
-  const [filter,       setFilter]       = useState('all');
-  const [showRoute,    setShowRoute]    = useState(true);
-  const [mapReady,     setMapReady]     = useState(false);
+  const [selectedSite,  setSelectedSite]  = useState(null);
+  const [drawerOpen,    setDrawerOpen]    = useState(false);
+  const [filter,        setFilter]        = useState('all');
+  const [showRoute,     setShowRoute]     = useState(true);
+  const [mapReady,      setMapReady]      = useState(false);
+  const [journeyMode,   setJourneyMode]   = useState(false);
+  const [currentStage,  setCurrentStage]  = useState(null);
+
+  /* ── Determine current journey stage when mode is toggled ── */
+  useEffect(() => {
+    if (journeyMode) {
+      const stage = getCurrentStage();
+      setCurrentStage(stage);
+      // Pan to the current stage location if active
+      if (stage && mapRef.current) {
+        mapRef.current.flyTo(stage.coords, stage.zoom, { duration: 1.5 });
+      }
+    } else {
+      setCurrentStage(null);
+    }
+  }, [journeyMode]);
 
   /* ── Initialize Leaflet map ─────────────────────────────────── */
   useEffect(() => {
-    // Dynamic import keeps Leaflet out of the SSR/pre-render path
     import('leaflet').then(L => {
-      if (mapRef.current || !containerRef.current) return; // already initialized
+      if (mapRef.current || !containerRef.current) return;
 
       leafletRef.current = L;
 
       const map = L.map(containerRef.current, {
         center: MAP_CENTER,
         zoom:   MAP_ZOOM,
-        zoomControl: false,           // we render our own
+        zoomControl: false,
         attributionControl: true,
       });
       mapRef.current = map;
 
-      // OpenStreetMap tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 19,
@@ -109,20 +217,18 @@ export default function Map() {
       sitesData.sites.forEach(site => {
         const marker = L.marker(
           [site.coordinates.lat, site.coordinates.lng],
-          { icon: makeIcon(site, false, L) }
+          { icon: makeIcon(site, false, false, L) }
         ).addTo(map);
 
         marker.on('click', () => {
           setSelectedSite(site);
           setDrawerOpen(true);
-          // Re-center map on marker
           map.panTo([site.coordinates.lat, site.coordinates.lng], { animate: true });
         });
 
         markersRef.current[site.id] = { marker, site };
       });
 
-      // Force re-paint so tiles load correctly inside the flex container
       setTimeout(() => { map.invalidateSize(); setMapReady(true); }, 100);
     });
 
@@ -135,15 +241,16 @@ export default function Map() {
     };
   }, []);
 
-  /* ── Update marker icons when selection changes ─────────────── */
+  /* ── Update marker icons when selection / journey stage changes ── */
   useEffect(() => {
     const L = leafletRef.current;
     if (!L) return;
     Object.values(markersRef.current).forEach(({ marker, site }) => {
-      const isSelected = selectedSite?.id === site.id;
-      marker.setIcon(makeIcon(site, isSelected, L));
+      const isSelected     = selectedSite?.id === site.id;
+      const isCurrentStage = journeyMode && currentStage?.siteId === site.id;
+      marker.setIcon(makeIcon(site, isSelected, isCurrentStage, L));
     });
-  }, [selectedSite]);
+  }, [selectedSite, currentStage, journeyMode]);
 
   /* ── Show/hide markers based on category filter ─────────────── */
   useEffect(() => {
@@ -163,7 +270,7 @@ export default function Map() {
     map.eachLayer(layer => {
       if (layer._isRoute) {
         if (showRoute) { if (!map.hasLayer(layer)) map.addLayer(layer); }
-        else            { map.removeLayer(layer); }
+        else           { map.removeLayer(layer); }
       }
     });
   }, [showRoute]);
@@ -181,6 +288,10 @@ export default function Map() {
   function recenter() {
     const map = mapRef.current;
     if (!map) return;
+    if (journeyMode && currentStage) {
+      map.flyTo(currentStage.coords, currentStage.zoom, { duration: 1.2 });
+      return;
+    }
     const bounds = Object.values(markersRef.current)
       .filter(({ site }) => filter === 'all' || site.category === filter)
       .map(({ site }) => [site.coordinates.lat, site.coordinates.lng]);
@@ -191,7 +302,6 @@ export default function Map() {
     s => filter === 'all' || s.category === filter
   );
 
-  /* ── Category filter buttons ─────────────────────────────────── */
   const FILTERS = [
     { key: 'all',       label: 'All Sites' },
     { key: 'essential', label: '🕋 Essential' },
@@ -207,8 +317,64 @@ export default function Map() {
 
       {/* ── Header ────────────────────────────────────────────── */}
       <div className="flex-shrink-0 px-4 pt-4 pb-2 bg-[var(--color-bg)]">
-        <h1 className="text-xl font-bold text-[var(--color-text)]">Holy Sites Map</h1>
-        <p className="text-xs text-[var(--color-text-muted)] mb-3">Interactive guide to the Hajj journey</p>
+        <div className="flex items-center justify-between mb-1">
+          <div>
+            <h1 className="text-xl font-bold text-[var(--color-text)]">Holy Sites Map</h1>
+            <p className="text-xs text-[var(--color-text-muted)]">Interactive guide to the Hajj journey</p>
+          </div>
+
+          {/* Journey Mode toggle */}
+          <button
+            onClick={() => setJourneyMode(m => !m)}
+            className={[
+              'flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all',
+              journeyMode
+                ? 'bg-[#C9A84C] border-[#C9A84C] text-white shadow-sm'
+                : 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-muted)]',
+            ].join(' ')}
+          >
+            <Route size={13} />
+            Journey
+          </button>
+        </div>
+
+        {/* ── Journey Mode banner ── */}
+        {journeyMode && (
+          <div className="mb-2">
+            {currentStage ? (
+              <div className="rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/40 px-3 py-2.5">
+                <div className="flex items-start gap-2">
+                  <span className="text-xl flex-shrink-0">{currentStage.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-[#A8873A]">
+                        Day {currentStage.day} · {currentStage.dayName}
+                      </span>
+                    </div>
+                    <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-0.5">
+                      📍 {currentStage.location}
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {currentStage.action}
+                    </p>
+                    {currentStage.nextLoc && (
+                      <p className="text-[11px] text-[#A8873A] font-semibold mt-1 flex items-center gap-1">
+                        Next: {currentStage.nextLoc} <ChevronRight size={12} />
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-xl bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-700 px-3 py-2.5">
+                <p className="text-xs text-[#0D7377] font-semibold flex items-center gap-1.5">
+                  <Route size={13} />
+                  Journey Mode is active during Hajj (8–13 Dhul Hijjah 1447 · May 25–30, 2026)
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Category filter chips */}
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
@@ -244,14 +410,12 @@ export default function Map() {
 
       {/* ── Map area ──────────────────────────────────────────── */}
       <div className="relative flex-1 min-h-0">
-        {/* Leaflet container — takes full height */}
         <div
           ref={containerRef}
           className="w-full h-full"
           style={{ zIndex: 0 }}
         />
 
-        {/* Loading overlay while map tiles load */}
         {!mapReady && (
           <div className="absolute inset-0 bg-[#E8F4F4] dark:bg-teal-900/30 flex items-center justify-center z-10">
             <div className="text-center">
@@ -263,26 +427,23 @@ export default function Map() {
 
         {/* ── Map controls (top-right) ───────────────────────── */}
         <div className="absolute top-3 right-3 z-[1000] flex flex-col gap-2">
-          {/* Zoom in */}
           <button
             onClick={() => mapRef.current?.zoomIn()}
             className="w-10 h-10 bg-white dark:bg-gray-800 rounded-xl shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-200 font-bold text-lg border border-gray-100 dark:border-gray-700"
             aria-label="Zoom in"
           >+</button>
-          {/* Zoom out */}
           <button
             onClick={() => mapRef.current?.zoomOut()}
             className="w-10 h-10 bg-white dark:bg-gray-800 rounded-xl shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-200 font-bold text-lg border border-gray-100 dark:border-gray-700"
             aria-label="Zoom out"
           >−</button>
-          {/* Fit all */}
           <button
             onClick={recenter}
             className="w-10 h-10 bg-white dark:bg-gray-800 rounded-xl shadow-lg flex items-center justify-center border border-gray-100 dark:border-gray-700"
-            aria-label="Fit all sites"
-            title="Fit all sites"
+            aria-label={journeyMode ? 'Go to current stage' : 'Fit all sites'}
+            title={journeyMode ? 'Go to current stage' : 'Fit all sites'}
           >
-            <Navigation size={16} className="text-[#0D7377]" />
+            <Navigation size={16} className={journeyMode ? 'text-[#C9A84C]' : 'text-[#0D7377]'} />
           </button>
         </div>
 
@@ -294,8 +455,14 @@ export default function Map() {
               <span className="text-[10px] font-medium" style={{ color: cfg.color }}>{cfg.label}</span>
             </div>
           ))}
-          {showRoute && (
+          {journeyMode && (
             <div className="flex items-center gap-1.5 mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-700">
+              <div className="w-3 h-3 rounded-full border-2 border-[#C9A84C] bg-[#FEF3C7]" />
+              <span className="text-[10px] text-[#A8873A] font-semibold">Current Stage</span>
+            </div>
+          )}
+          {showRoute && (
+            <div className="flex items-center gap-1.5 mt-1 pt-1 border-t border-gray-100 dark:border-gray-700">
               <div className="w-5 h-0 border-b-2 border-dashed border-[#C9A84C]" />
               <span className="text-[10px] text-gray-500">Hajj Route</span>
             </div>
@@ -311,7 +478,6 @@ export default function Map() {
         ].join(' ')}
         style={{ zIndex: 10 }}
       >
-        {/* Drawer header */}
         <div className="sticky top-0 bg-[var(--color-surface)] px-4 pt-3 pb-1 flex items-center justify-between z-10">
           <span className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">
             {filteredSites.length} Sites
@@ -338,12 +504,27 @@ export default function Map() {
         {/* Selected site detail card */}
         {drawerOpen && selectedSite && (() => {
           const cfg = CATEGORY_CONFIG[selectedSite.category] || CATEGORY_CONFIG.essential;
+          const isActiveStage = journeyMode && currentStage?.siteId === selectedSite.id;
           return (
-            <div className="mx-4 mb-3 rounded-2xl p-3.5 border slide-up" style={{ background: cfg.bg, borderColor: cfg.color + '40' }}>
+            <div
+              className="mx-4 mb-3 rounded-2xl p-3.5 border slide-up"
+              style={{
+                background:   isActiveStage ? '#FEF3C7' : cfg.bg,
+                borderColor: (isActiveStage ? '#C9A84C' : cfg.color) + '40',
+              }}
+            >
+              {isActiveStage && (
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Route size={12} className="text-[#A8873A]" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#A8873A]">
+                    Current Stage
+                  </span>
+                </div>
+              )}
               <div className="flex items-start gap-2 mb-2">
                 <span className="text-2xl">{cfg.emoji}</span>
                 <div>
-                  <h3 className="font-bold text-sm" style={{ color: cfg.color }}>{selectedSite.name}</h3>
+                  <h3 className="font-bold text-sm" style={{ color: isActiveStage ? '#A8873A' : cfg.color }}>{selectedSite.name}</h3>
                   <p className="arabic-text text-base" style={{ color: cfg.color }}>{selectedSite.name_ar}</p>
                   <p className="text-xs text-gray-500">📍 {selectedSite.location}</p>
                 </div>
@@ -371,8 +552,9 @@ export default function Map() {
           {(!drawerOpen || !selectedSite) && (
             <div className="px-4 pb-2 space-y-1.5">
               {filteredSites.map(site => {
-                const cfg = CATEGORY_CONFIG[site.category] || CATEGORY_CONFIG.essential;
-                const isActive = selectedSite?.id === site.id;
+                const cfg       = CATEGORY_CONFIG[site.category] || CATEGORY_CONFIG.essential;
+                const isActive  = selectedSite?.id === site.id;
+                const isCurrent = journeyMode && currentStage?.siteId === site.id;
                 return (
                   <button
                     key={site.id}
@@ -381,6 +563,8 @@ export default function Map() {
                       'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all border min-h-0 h-auto',
                       isActive
                         ? 'border-[#0D7377] bg-teal-50 dark:bg-teal-900/20'
+                        : isCurrent
+                        ? 'border-[#C9A84C] bg-amber-50 dark:bg-amber-900/10'
                         : 'border-[var(--color-border)] bg-transparent hover:bg-[var(--color-surface-2)]',
                     ].join(' ')}
                   >
@@ -389,9 +573,15 @@ export default function Map() {
                       <p className="text-sm font-semibold text-[var(--color-text)] truncate">{site.name}</p>
                       <p className="text-[10px] text-[var(--color-text-muted)] truncate">{site.location}</p>
                     </div>
-                    <span className="text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0" style={{ background: cfg.bg, color: cfg.color }}>
-                      {cfg.label}
-                    </span>
+                    {isCurrent ? (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold flex-shrink-0 bg-[#C9A84C]/15 text-[#A8873A] border border-[#C9A84C]/30">
+                        Here now
+                      </span>
+                    ) : (
+                      <span className="text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0" style={{ background: cfg.bg, color: cfg.color }}>
+                        {cfg.label}
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -400,7 +590,7 @@ export default function Map() {
         </div>
       </div>
 
-      {/* Bottom nav spacer — map page uses its own layout so we handle it manually */}
+      {/* Bottom nav spacer */}
       <div style={{ height: 64, flexShrink: 0 }} />
     </div>
   );

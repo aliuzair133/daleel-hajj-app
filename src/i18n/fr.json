@@ -12,6 +12,7 @@
     "more": "Plus"
   },
   "home": {
+    "value_tagline": "Guides rituels · Du'as · Carte · Sécurité — tout hors ligne",
     "greeting_morning": "As-salamu alaykum",
     "greeting_afternoon": "As-salamu alaykum",
     "today_in_hajj": "Hajj du jour",
@@ -148,6 +149,40 @@
     "banner": "📴 Mode hors ligne — toutes les fonctions principales disponibles",
     "online": "🌐 De retour en ligne"
   },
+  "tour": {
+    "skip": "Passer",
+    "begin": "Commencer mon voyage",
+    "of": "sur",
+    "step_home_title": "Votre tableau de bord Hajj",
+    "step_home_desc": "Consultez les rituels du jour, le compte à rebours de la prochaine prière et les raccourcis — tout en un coup d'œil.",
+    "step_rituals_title": "Guide rituel jour par jour",
+    "step_rituals_desc": "Suivez chaque étape du Hajj pas à pas sur les 6 jours. Marquez les étapes et suivez votre progression.",
+    "step_prayers_title": "Du'as et heures de prière",
+    "step_prayers_desc": "Plus de 20 du'as authentiques avec texte arabe, translittération et traduction. Enregistrez vos du'as personnels avec des étiquettes.",
+    "step_map_title": "Carte interactive des sites saints",
+    "step_map_desc": "Explorez La Mecque, Mina, Arafat et Muzdalifa. Activez le Mode Voyage pendant le Hajj pour savoir où aller.",
+    "step_more_title": "Sécurité, Liste et Guide IA",
+    "step_more_desc": "Consignes de santé et sécurité, liste de préparation au Hajj, contacts d'urgence et guide Hajj alimenté par l'IA — la plupart fonctionnent hors ligne."
+  },
+  "personal_duas": {
+    "tab": "Mes Du'as",
+    "add": "Ajouter un Du'a personnel",
+    "add_title": "Ajouter votre Du'a",
+    "edit_title": "Modifier le Du'a",
+    "title_label": "Titre",
+    "title_placeholder": "ex. Du'a pour la santé de ma famille",
+    "body_label": "Votre Du'a",
+    "body_placeholder": "Écrivez votre supplication personnelle ici…",
+    "arabic_label": "Texte arabe (optionnel)",
+    "arabic_placeholder": "Ajoutez le texte arabe si connu…",
+    "tags_label": "Étiquettes (optionnel)",
+    "tags_placeholder": "ex. famille, santé, gratitude, Maman",
+    "tags_hint": "Séparez les étiquettes par des virgules",
+    "empty_title": "Vos du'as personnels",
+    "empty_desc": "Enregistrez des supplications pour vos proches, besoins personnels, ou tout du'a à retenir pendant le Hajj.",
+    "no_results": "Aucun du'a personnel trouvé",
+    "delete_confirm": "Supprimer ce du'a ? Appuyez à nouveau pour confirmer."
+  },
   "common": {
     "loading": "Chargement...",
     "error": "Une erreur s'est produite",
@@ -165,6 +200,8 @@
     "copied": "Copié !",
     "previous": "Précédent",
     "search": "Rechercher",
-    "view_all_duas": "Voir tous les du'as →"
+    "view_all_duas": "Voir tous les du'as →",
+    "tap_again": "Appuyez à nouveau pour confirmer.",
+    "delete": "Supprimer"
   }
 }
