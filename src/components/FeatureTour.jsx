@@ -1,122 +1,289 @@
-import { useState } from 'react';
-import { ChevronRight, X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { ChevronRight, ChevronLeft, X } from 'lucide-react';
 
-// Tour steps — each maps to a core app section
-// NATIVE MIGRATION NOTE: Replace the backdrop + bottom sheet with
-// react-native-walkthrough-tooltip or a custom Modal from react-native.
-// The steps array and state logic are fully portable.
+/**
+ * FeatureTour — guided post-onboarding walkthrough.
+ *
+ * Each step spotlights a tab in the bottom navigation so the user can
+ * see exactly where to find each feature. A "cut-out" glow ring appears
+ * over the correct tab; the tooltip card sits just above it.
+ */
+
+// Tab index (0-based, left → right) and screen path for each step
 const TOUR_STEPS = [
   {
-    id:   'home',
-    icon: '🏠',
-    title: "Your Hajj Dashboard",
-    desc:  "See today's rituals, next prayer countdown, and quick links to everything you need — all at a glance.",
+    id:       'home',
+    tabIndex: 0,
+    icon:     '🏠',
+    title:    'Your Hajj Dashboard',
+    desc:     "Start here every day. See today's ritual, the next prayer countdown, quick duas, and your overall Hajj progress — at a glance.",
+    color:    '#0D7377',
   },
   {
-    id:   'rituals',
-    icon: '📿',
-    title: "Day-by-Day Rituals",
-    desc:  "Follow each Hajj stage step by step across all 6 days. Mark steps as complete and track your overall progress.",
+    id:       'rituals',
+    tabIndex: 1,
+    icon:     '📿',
+    title:    'Day-by-Day Rituals',
+    desc:     'Follow Hajj across all 6 days, step by step. Tap each step to read full guidance and mark it complete as you go.',
+    color:    '#0D7377',
   },
   {
-    id:   'prayers',
-    icon: '🤲',
-    title: "Du'as & Prayer Times",
-    desc:  "20+ authentic Hajj duas with Arabic, transliteration & translation. Save your own personal duas with tags for loved ones.",
+    id:       'prayers',
+    tabIndex: 2,
+    icon:     '🤲',
+    title:    "Du'as & Prayer Times",
+    desc:     '20+ authentic Hajj duas with Arabic, transliteration, audio, and bookmarks. Add your own personal duas for family back home.',
+    color:    '#0D7377',
   },
   {
-    id:   'map',
-    icon: '🗺️',
-    title: "Interactive Holy Sites Map",
-    desc:  "Explore Makkah, Mina, Arafat & Muzdalifah. Enable Journey Mode during Hajj to see exactly where you are and where to go next.",
+    id:       'contacts',
+    tabIndex: 3,
+    icon:     '📞',
+    title:    'Emergency Contacts',
+    desc:     "Saudi emergency numbers and your country's embassy — always one tap away. Tap any number to call immediately.",
+    color:    '#DC2626',
   },
   {
-    id:   'more',
-    icon: '🛡️',
-    title: "Safety, Checklist & AI Guide",
-    desc:  "Health & safety guidelines, pre-Hajj packing checklist, emergency contacts, and an AI-powered Hajj scholar — most features fully offline.",
+    id:       'more',
+    tabIndex: 4,
+    icon:     '🛡️',
+    title:    'Safety, Map & More',
+    desc:     'Health & crowd safety guides, interactive holy sites map, pre-Hajj checklist, and an AI-powered Hajj scholar — most features work fully offline.',
+    color:    '#2D6A4F',
   },
 ];
 
+const NAV_HEIGHT = 72; // approximate bottom nav height in px (incl safe area)
+
 export default function FeatureTour({ onComplete }) {
-  const { t } = useTranslation();
-  const [step, setStep] = useState(0);
-  const current = TOUR_STEPS[step];
-  const isFirst = step === 0;
-  const isLast  = step === TOUR_STEPS.length - 1;
+  const [step,      setStep]      = useState(0);
+  const [navWidth,  setNavWidth]  = useState(0);
+  const [spotRect,  setSpotRect]  = useState(null); // {x, y, w, h}
+  const resizeRef = useRef(null);
 
-  return (
-    <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-end justify-center">
-      {/* Bottom sheet */}
-      <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-t-3xl px-6 pt-5 pb-10 shadow-2xl">
+  const current  = TOUR_STEPS[step];
+  const isLast   = step === TOUR_STEPS.length - 1;
 
-        {/* Skip */}
-        <div className="flex justify-end mb-3">
-          <button
-            onClick={onComplete}
-            className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-medium transition-colors py-1"
-            aria-label={t('tour.skip')}
-          >
-            <X size={14} />
-            <span>{t('tour.skip')}</span>
-          </button>
-        </div>
+  // Measure the viewport width so we can compute each tab's bounding box
+  useEffect(() => {
+    function measure() {
+      const vw = window.innerWidth;
+      setNavWidth(vw);
+      const tabCount = TOUR_STEPS.length; // 5
+      const tabW     = vw / tabCount;
+      const tabX     = current.tabIndex * tabW;
+      const vh       = window.innerHeight;
+      setSpotRect({
+        x: tabX,
+        y: vh - NAV_HEIGHT,
+        w: tabW,
+        h: NAV_HEIGHT,
+      });
+    }
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [current.tabIndex]);
 
-        {/* Progress dots */}
-        <div className="flex justify-center gap-2 mb-6">
-          {TOUR_STEPS.map((s, i) => (
-            <div
-              key={s.id}
-              className={[
-                'rounded-full transition-all duration-300',
-                i === step
-                  ? 'w-6 h-2 bg-[#0D7377]'
-                  : i < step
-                  ? 'w-2 h-2 bg-[#0D7377]/35'
-                  : 'w-2 h-2 bg-gray-200 dark:bg-gray-700',
-              ].join(' ')}
+  function goNext() {
+    if (isLast) onComplete();
+    else setStep(s => s + 1);
+  }
+
+  function goBack() {
+    if (step > 0) setStep(s => s - 1);
+  }
+
+  if (!spotRect) return null;
+
+  const { x: sx, y: sy, w: sw, h: sh } = spotRect;
+  const spotCenterX = sx + sw / 2;
+
+  // Tooltip card position: just above the spotlight, centred on the tab
+  const cardWidth  = Math.min(navWidth - 32, 360);
+  const cardLeft   = Math.max(16, Math.min(spotCenterX - cardWidth / 2, navWidth - cardWidth - 16));
+  const cardBottom = sh + 12; // px above the nav bar
+
+  // SVG cutout: full-screen rect minus a rounded rect for the spotlight tab
+  const rx = 12; // corner radius for spotlight
+  const pad = 6; // padding around tab
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[300]"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Feature tour step ${step + 1} of ${TOUR_STEPS.length}`}
+    >
+      {/* ── SVG overlay with cutout ── */}
+      <svg
+        className="absolute inset-0 pointer-events-none"
+        width="100%"
+        height="100%"
+        style={{ display: 'block' }}
+      >
+        <defs>
+          <mask id="tour-mask">
+            {/* White = visible overlay */}
+            <rect width="100%" height="100%" fill="white" />
+            {/* Black cutout = transparent "spotlight" area */}
+            <rect
+              x={sx + pad}
+              y={sy + pad}
+              width={sw - pad * 2}
+              height={sh - pad}
+              rx={rx}
+              fill="black"
             />
-          ))}
-        </div>
+          </mask>
+        </defs>
+        {/* Dark scrim with hole */}
+        <rect
+          width="100%"
+          height="100%"
+          fill="rgba(0,0,0,0.72)"
+          mask="url(#tour-mask)"
+        />
+        {/* Glow ring around the spotlight */}
+        <rect
+          x={sx + pad - 3}
+          y={sy + pad - 3}
+          width={sw - pad * 2 + 6}
+          height={sh - pad + 6}
+          rx={rx + 3}
+          fill="none"
+          stroke={current.color}
+          strokeWidth="2.5"
+          opacity="0.9"
+        />
+        {/* Animated pulse ring */}
+        <rect
+          x={sx + pad - 8}
+          y={sy + pad - 8}
+          width={sw - pad * 2 + 16}
+          height={sh - pad + 16}
+          rx={rx + 8}
+          fill="none"
+          stroke={current.color}
+          strokeWidth="1.5"
+          opacity="0.4"
+          className="animate-ping"
+          style={{ transformOrigin: `${spotCenterX}px ${sy + sh / 2}px` }}
+        />
+      </svg>
 
-        {/* Step content */}
-        <div className="text-center mb-7">
-          <div className="text-5xl mb-4 leading-none">{current.icon}</div>
-          <h2 className="text-xl font-black text-gray-900 dark:text-white mb-3 leading-snug">
-            {t(`tour.step_${current.id}_title`, { defaultValue: current.title })}
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-xs mx-auto">
-            {t(`tour.step_${current.id}_desc`, { defaultValue: current.desc })}
-          </p>
-        </div>
+      {/* ── Tooltip card ── */}
+      <div
+        className="absolute"
+        style={{
+          left:   cardLeft,
+          bottom: cardBottom,
+          width:  cardWidth,
+        }}
+      >
+        {/* Tail pointer */}
+        <div
+          className="absolute bottom-[-8px] w-4 h-4 rotate-45 rounded-sm"
+          style={{
+            left: spotCenterX - cardLeft - 8,
+            background: 'white',
+          }}
+        />
 
-        {/* Navigation */}
-        <div className="flex gap-3">
-          {!isFirst && (
-            <button
-              onClick={() => setStep(s => s - 1)}
-              className="flex-1 py-4 rounded-2xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-semibold text-sm active:scale-[0.98] transition-all"
-            >
-              {t('common.back')}
-            </button>
-          )}
-          <button
-            onClick={() => isLast ? onComplete() : setStep(s => s + 1)}
-            className="flex-1 flex items-center justify-center gap-2 bg-[#0D7377] text-white py-4 rounded-2xl font-bold text-sm shadow-md active:scale-[0.98] transition-all"
-          >
-            {isLast
-              ? <>{t('tour.begin')} 🕋</>
-              : <>{t('common.next')} <ChevronRight size={16} /></>
-            }
-          </button>
-        </div>
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden">
+          {/* Progress bar */}
+          <div className="h-1 bg-gray-100 dark:bg-gray-800">
+            <div
+              className="h-full transition-all duration-500 rounded-full"
+              style={{
+                width:      `${((step + 1) / TOUR_STEPS.length) * 100}%`,
+                background: current.color,
+              }}
+            />
+          </div>
 
-        {/* Step counter */}
-        <p className="text-center text-xs text-gray-400 mt-4">
-          {step + 1} {t('tour.of')} {TOUR_STEPS.length}
-        </p>
+          <div className="px-5 pt-4 pb-4">
+            {/* Header row */}
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl flex-shrink-0"
+                  style={{ background: current.color + '18' }}
+                >
+                  {current.icon}
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5">
+                    Step {step + 1} of {TOUR_STEPS.length}
+                  </p>
+                  <h3
+                    className="text-base font-black leading-tight"
+                    style={{ color: current.color }}
+                  >
+                    {current.title}
+                  </h3>
+                </div>
+              </div>
+              <button
+                onClick={onComplete}
+                className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex-shrink-0 ml-2"
+                aria-label="Skip tour"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            {/* Description */}
+            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+              {current.desc}
+            </p>
+
+            {/* Navigation */}
+            <div className="flex gap-2">
+              {step > 0 && (
+                <button
+                  onClick={goBack}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 active:scale-95 transition-all"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+              )}
+
+              {/* Step dots */}
+              <div className="flex-1 flex items-center justify-center gap-1.5">
+                {TOUR_STEPS.map((s, i) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setStep(i)}
+                    className={[
+                      'rounded-full transition-all duration-300',
+                      i === step
+                        ? 'w-5 h-2'
+                        : 'w-2 h-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300',
+                    ].join(' ')}
+                    style={i === step ? { background: current.color } : {}}
+                    aria-label={`Go to step ${i + 1}`}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={goNext}
+                className="flex items-center justify-center gap-1.5 px-5 h-10 rounded-xl text-white font-bold text-sm active:scale-95 transition-all flex-shrink-0"
+                style={{ background: current.color }}
+              >
+                {isLast ? (
+                  <>Begin 🕋</>
+                ) : (
+                  <>Next <ChevronRight size={15} /></>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

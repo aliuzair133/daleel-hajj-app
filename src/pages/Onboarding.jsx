@@ -1,36 +1,12 @@
 import { useState } from 'react';
 import { ChevronRight, ChevronLeft, Check, MapPin, BookOpen, ScrollText, Shield } from 'lucide-react';
 import { useSettings } from '../hooks/useSettings';
+import contactsData from '../data/contacts.json';
 
-const COUNTRIES = [
-  { code: 'AF', name: 'Afghanistan' }, { code: 'AL', name: 'Albania' },
-  { code: 'DZ', name: 'Algeria' }, { code: 'AZ', name: 'Azerbaijan' },
-  { code: 'BD', name: 'Bangladesh' }, { code: 'BN', name: 'Brunei' },
-  { code: 'CA', name: 'Canada' }, { code: 'CN', name: 'China' },
-  { code: 'EG', name: 'Egypt' }, { code: 'ET', name: 'Ethiopia' },
-  { code: 'FR', name: 'France' }, { code: 'DE', name: 'Germany' },
-  { code: 'GH', name: 'Ghana' }, { code: 'IN', name: 'India' },
-  { code: 'ID', name: 'Indonesia' }, { code: 'IR', name: 'Iran' },
-  { code: 'IQ', name: 'Iraq' }, { code: 'JO', name: 'Jordan' },
-  { code: 'KZ', name: 'Kazakhstan' }, { code: 'KE', name: 'Kenya' },
-  { code: 'KW', name: 'Kuwait' }, { code: 'KG', name: 'Kyrgyzstan' },
-  { code: 'LB', name: 'Lebanon' }, { code: 'LY', name: 'Libya' },
-  { code: 'MY', name: 'Malaysia' }, { code: 'MV', name: 'Maldives' },
-  { code: 'ML', name: 'Mali' }, { code: 'MR', name: 'Mauritania' },
-  { code: 'MA', name: 'Morocco' }, { code: 'MZ', name: 'Mozambique' },
-  { code: 'NL', name: 'Netherlands' }, { code: 'NG', name: 'Nigeria' },
-  { code: 'OM', name: 'Oman' }, { code: 'PK', name: 'Pakistan' },
-  { code: 'PS', name: 'Palestine' }, { code: 'QA', name: 'Qatar' },
-  { code: 'SA', name: 'Saudi Arabia' }, { code: 'SN', name: 'Senegal' },
-  { code: 'SO', name: 'Somalia' }, { code: 'ZA', name: 'South Africa' },
-  { code: 'ES', name: 'Spain' }, { code: 'SD', name: 'Sudan' },
-  { code: 'TJ', name: 'Tajikistan' }, { code: 'TZ', name: 'Tanzania' },
-  { code: 'TN', name: 'Tunisia' }, { code: 'TR', name: 'Turkey' },
-  { code: 'TM', name: 'Turkmenistan' }, { code: 'UG', name: 'Uganda' },
-  { code: 'AE', name: 'United Arab Emirates' }, { code: 'GB', name: 'United Kingdom' },
-  { code: 'US', name: 'United States' }, { code: 'UZ', name: 'Uzbekistan' },
-  { code: 'YE', name: 'Yemen' },
-];
+// Pull all countries from contacts.json so the list stays in sync automatically
+const COUNTRIES = Object.entries(contactsData.by_country)
+  .map(([code, { name, flag }]) => ({ code, name, flag }))
+  .sort((a, b) => a.name.localeCompare(b.name));
 
 const LANGUAGES = [
   { code: 'en', label: 'English', native: 'English' },
@@ -181,7 +157,10 @@ function ScreenCountry({ country, setCountry, onNext, onBack }) {
                 : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 text-gray-800 dark:text-gray-200 hover:border-[#0D7377]/40',
             ].join(' ')}
           >
-            <span className="font-medium text-sm">{c.name}</span>
+            <span className="font-medium text-sm flex items-center gap-2">
+              {c.flag && <span className="text-base">{c.flag}</span>}
+              {c.name}
+            </span>
             {country === c.code && <Check size={16} />}
           </button>
         ))}

@@ -11,7 +11,7 @@ const duaMap = Object.fromEntries(duasData.duas.map(d => [d.id, d]));
 export default function Rituals() {
   const { t } = useTranslation();
   const { completedIds, toggleStep, completedCount, totalSteps } = useProgress();
-  const [expandedDay, setExpandedDay] = useState(0);
+  const [expandedDay, setExpandedDay] = useState(-1);
   const progressPct = totalSteps ? Math.round((completedCount / totalSteps) * 100) : 0;
 
   return (

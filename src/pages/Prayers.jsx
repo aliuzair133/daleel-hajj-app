@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, BookmarkCheck, X, ChevronLeft, ChevronRight, Volume2, Square, Bookmark, Navigation, Plus, Pencil, Trash2, Tag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
@@ -17,7 +18,7 @@ const CATEGORY_BADGE = {
 };
 
 /* ── Full-screen Dua Modal (Hajj Duas) ─────────────────────────── */
-function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBookmark, onPlay, isAudioPlaying }) {
+function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBookmark, onPlay, onSpeak, isAudioPlaying }) {
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -46,18 +47,23 @@ function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBo
         <span className="text-xs font-semibold text-gray-400">{idx + 1} / {total}</span>
 
         <div className="flex items-center gap-2">
-          {dua.audio_file && (
-            <button
-              onClick={() => onPlay?.(`/audio/${dua.audio_file}`)}
-              aria-label={isAudioPlaying ? t('prayers.stop_audio') : t('prayers.play_audio')}
-              className={[
-                'w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95',
-                isAudioPlaying ? 'bg-[#0D7377] text-white' : 'bg-teal-50 dark:bg-teal-900/30 text-[#0D7377]',
-              ].join(' ')}
-            >
-              {isAudioPlaying ? <Square size={14} fill="white" /> : <Volume2 size={16} />}
-            </button>
-          )}
+          {/* Audio: prefer file, fall back to speech synthesis */}
+          <button
+            onClick={() => {
+              if (dua.audio_file) {
+                onPlay?.(`/audio/${dua.audio_file}`);
+              } else {
+                onSpeak?.();
+              }
+            }}
+            aria-label={isAudioPlaying ? t('prayers.stop_audio') : t('prayers.play_audio')}
+            className={[
+              'w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95',
+              isAudioPlaying ? 'bg-[#0D7377] text-white' : 'bg-teal-50 dark:bg-teal-900/30 text-[#0D7377]',
+            ].join(' ')}
+          >
+            {isAudioPlaying ? <Square size={14} fill="white" /> : <Volume2 size={16} />}
+          </button>
           <button
             onClick={() => onBookmark?.(dua.id)}
             aria-label={isBookmarked ? t('prayers.bookmarked') : t('prayers.bookmark')}
@@ -384,32 +390,39 @@ function PersonalDuasTab() {
     ? filtered.filter(d => (d.tags ?? []).includes(activeTag))
     : filtered;
 
-  if (showForm || editingDetail) {
-    return (
-      <PersonalDuaForm
-        existing={editDua}
-        onSave={handleSave}
-        onCancel={() => { setShowForm(false); setEditDua(null); setEditingDetail(false); }}
-      />
-    );
-  }
+  // Portals ensure fixed modals cover the full screen (including bottom nav)
+  const formPortal = (showForm || editingDetail)
+    ? createPortal(
+        <PersonalDuaForm
+          existing={editDua}
+          onSave={handleSave}
+          onCancel={() => { setShowForm(false); setEditDua(null); setEditingDetail(false); }}
+        />,
+        document.body
+      )
+    : null;
 
-  if (detailDua) {
-    return (
-      <PersonalDuaDetail
-        dua={detailDua}
-        onClose={() => setDetailDua(null)}
-        onEdit={() => {
-          setEditDua(detailDua);
-          setEditingDetail(true);
-        }}
-        onDelete={handleDelete}
-      />
-    );
-  }
+  const detailPortal = (!showForm && !editingDetail && detailDua)
+    ? createPortal(
+        <PersonalDuaDetail
+          dua={detailDua}
+          onClose={() => setDetailDua(null)}
+          onEdit={() => {
+            setEditDua(detailDua);
+            setEditingDetail(true);
+          }}
+          onDelete={handleDelete}
+        />,
+        document.body
+      )
+    : null;
 
   return (
     <div>
+      {/* Portals for full-screen modals — rendered over entire viewport */}
+      {formPortal}
+      {detailPortal}
+
       {/* Add button + search row */}
       <div className="flex gap-2 mb-3">
         <div className="relative flex-1">
@@ -549,7 +562,7 @@ export default function Prayers() {
   const { prayerTimes, currentNext, countdown } = usePrayerTimes(
     settings.latitude, settings.longitude
   );
-  const { play, isPlaying, currentSrc } = useAudio();
+  const { play, speak, isPlaying, currentSrc, mode } = useAudio();
 
   useEffect(() => {
     getBookmarkedDuaIds().then(setBookmarkedIds);
@@ -594,8 +607,9 @@ export default function Prayers() {
           onNext={() => setSelectedIdx(i => Math.min(filteredDuas.length - 1, i + 1))}
           isBookmarked={bookmarkedIds.has(selectedDua.id)}
           onBookmark={handleBookmark}
-          onPlay={play}
-          isAudioPlaying={isPlaying && currentSrc === `/audio/${selectedDua.audio_file}`}
+          onPlay={(src) => play(src, { arabic: selectedDua.arabic, lang: 'ar-SA' })}
+          onSpeak={() => speak({ text: selectedDua.arabic, lang: 'ar-SA' })}
+          isAudioPlaying={isPlaying && (currentSrc === `/audio/${selectedDua.audio_file}` || mode === 'speech')}
         />
       )}
 
