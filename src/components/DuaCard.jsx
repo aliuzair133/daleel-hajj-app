@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bookmark, BookmarkCheck, ChevronDown, ChevronUp, Volume2, Square } from 'lucide-react';
+import { Bookmark, BookmarkCheck, ChevronDown, ChevronUp, Volume2, Square, Mic } from 'lucide-react';
 import { Badge } from './ui/Badge';
 
 const CATEGORY_BADGE = {
@@ -13,8 +13,12 @@ const CATEGORY_BADGE = {
   general:  'gray',
 };
 
-export function DuaCard({ dua, isBookmarked = false, onBookmark, defaultOpen = false, onPlay, isAudioPlaying = false }) {
+export function DuaCard({ dua, isBookmarked = false, onBookmark, defaultOpen = false, onPlay, isAudioPlaying = false, audioMode = 'idle' }) {
   const [open, setOpen] = useState(defaultOpen);
+
+  // Show mic icon when using device TTS (no MP3 file), speaker when playing MP3
+  const PlayIcon  = audioMode === 'speech' ? Mic : Volume2;
+  const iconSize  = audioMode === 'speech' ? 14  : 15;
 
   return (
     <article className="bg-white dark:bg-gray-900 rounded-2xl shadow-card border border-gray-100 dark:border-gray-800 overflow-hidden">
@@ -40,20 +44,22 @@ export function DuaCard({ dua, isBookmarked = false, onBookmark, defaultOpen = f
             </div>
 
             <div className="flex items-center gap-1 flex-shrink-0">
-              {dua.audio_file && (
-                <button
-                  onClick={() => onPlay?.(`/audio/${dua.audio_file}`)}
-                  aria-label={isAudioPlaying ? 'Stop audio' : 'Play audio'}
-                  className={[
-                    'w-9 h-9 flex items-center justify-center rounded-full transition-colors',
-                    isAudioPlaying
-                      ? 'bg-[#0D7377] text-white'
-                      : 'bg-teal-50 dark:bg-teal-900/30 text-[#0D7377] hover:bg-teal-100',
-                  ].join(' ')}
-                >
-                  {isAudioPlaying ? <Square size={13} fill="white" /> : <Volume2 size={15} />}
-                </button>
-              )}
+              {/* Audio button — always shown; uses MP3 if available, otherwise device TTS */}
+              <button
+                onClick={() => onPlay?.(`/audio/${dua.audio_file}`, dua.arabic)}
+                title={dua.audio_file ? 'Play recitation' : 'Read aloud (device voice)'}
+                aria-label={isAudioPlaying ? 'Stop audio' : (dua.audio_file ? 'Play audio' : 'Read aloud')}
+                className={[
+                  'w-9 h-9 flex items-center justify-center rounded-full transition-colors',
+                  isAudioPlaying
+                    ? 'bg-[#0D7377] text-white'
+                    : 'bg-teal-50 dark:bg-teal-900/30 text-[#0D7377] hover:bg-teal-100',
+                ].join(' ')}
+              >
+                {isAudioPlaying
+                  ? <Square size={13} fill="white" />
+                  : <PlayIcon size={iconSize} />}
+              </button>
               <button
                 onClick={() => onBookmark?.(dua.id)}
                 aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark'}

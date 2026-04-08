@@ -47,15 +47,13 @@ function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBo
         <span className="text-xs font-semibold text-gray-400">{idx + 1} / {total}</span>
 
         <div className="flex items-center gap-2">
-          {/* Audio: prefer file, fall back to speech synthesis */}
+          {/* Audio: always available — prefers MP3 file, falls back to device TTS */}
           <button
             onClick={() => {
-              if (dua.audio_file) {
-                onPlay?.(`/audio/${dua.audio_file}`);
-              } else {
-                onSpeak?.();
-              }
+              // Always call onPlay; useAudio hook falls back to TTS if MP3 missing
+              onPlay?.(`/audio/${dua.audio_file || ''}`, dua.arabic);
             }}
+            title={dua.audio_file ? 'Play recitation' : 'Read aloud (device voice)'}
             aria-label={isAudioPlaying ? t('prayers.stop_audio') : t('prayers.play_audio')}
             className={[
               'w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95',
@@ -607,7 +605,7 @@ export default function Prayers() {
           onNext={() => setSelectedIdx(i => Math.min(filteredDuas.length - 1, i + 1))}
           isBookmarked={bookmarkedIds.has(selectedDua.id)}
           onBookmark={handleBookmark}
-          onPlay={(src) => play(src, { arabic: selectedDua.arabic, lang: 'ar-SA' })}
+          onPlay={(src, arabic) => play(src, { arabic: arabic ?? selectedDua.arabic, lang: 'ar-SA' })}
           onSpeak={() => speak({ text: selectedDua.arabic, lang: 'ar-SA' })}
           isAudioPlaying={isPlaying && (currentSrc === `/audio/${selectedDua.audio_file}` || mode === 'speech')}
         />
@@ -716,7 +714,7 @@ export default function Prayers() {
                       <div className="flex items-center justify-between mt-2">
                         {dua.audio_file
                           ? <span className="text-[10px] text-[#0D7377] font-semibold">🔊 Audio</span>
-                          : <span />}
+                          : <span className="text-[10px] text-teal-500 font-semibold">🎙 Read aloud</span>}
                         {bookmarkedIds.has(dua.id)
                           ? <BookmarkCheck size={13} className="text-[#C9A84C]" />
                           : null}
