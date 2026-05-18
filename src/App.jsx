@@ -19,6 +19,7 @@ const Settings   = lazy(() => import('./pages/Settings'));
 const AIGuide    = lazy(() => import('./pages/AIGuide'));
 const Onboarding = lazy(() => import('./pages/Onboarding'));
 const ShareDua   = lazy(() => import('./pages/ShareDua'));
+const ReceiveDua = lazy(() => import('./pages/ReceiveDua'));
 
 /* ── Loading skeleton shown during Suspense or initial DB check ── */
 function LoadingFallback() {
@@ -53,6 +54,7 @@ function AnimatedRoutes() {
         <Route path="/ai-guide"      element={<AIGuide />} />
         <Route path="/settings"      element={<Settings />} />
         <Route path="/share/:tagSlug" element={<ShareDua />} />
+        <Route path="/receive"        element={<ReceiveDua />} />
       </Routes>
     </div>
   );
@@ -83,16 +85,18 @@ export default function App() {
     setShowTour(false);
   }
 
-  // ── Share routes work for EVERYONE — no onboarding required ──────
-  // Check via window.location before BrowserRouter mounts so that
-  // people who receive a share link can submit a du'a immediately.
-  const isShareRoute = window.location.pathname.startsWith('/share/');
-  if (isShareRoute) {
+  // ── Share + Receive routes work for EVERYONE — no onboarding needed ──
+  // Family members open /share/:tag to submit, then send the pilgrim
+  // a /receive?d=... link which imports the dua into the pilgrim's app.
+  const path = window.location.pathname;
+  const isPublicRoute = path.startsWith('/share/') || path.startsWith('/receive');
+  if (isPublicRoute) {
     return (
       <BrowserRouter>
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
             <Route path="/share/:tagSlug" element={<ShareDua />} />
+            <Route path="/receive"        element={<ReceiveDua />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

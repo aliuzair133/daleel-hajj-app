@@ -69,15 +69,22 @@ export async function getBookmarkedDuaIds() {
 }
 
 // --- Personal Duas helpers ---
-// NATIVE MIGRATION NOTE: Wrap these with SQLite async queries via expo-sqlite or react-native-sqlite-storage
-export async function addPersonalDua({ title, body, arabic = '', tags = [] }) {
+export async function addPersonalDua({ title, body, arabic = '', tags = [], sourceId = null }) {
   return db.personal_duas.add({
     title:     title.trim(),
     body:      body.trim(),
     arabic:    arabic.trim(),
     tags:      Array.isArray(tags) ? tags : [],
+    sourceId:  sourceId ?? null,  // tracks imports from share links (for deduplication)
     createdAt: new Date().toISOString(),
   });
+}
+
+// Find an imported dua by its sourceId (for deduplication on re-import)
+export async function getPersonalDuaBySourceId(sourceId) {
+  if (!sourceId) return null;
+  const all = await db.personal_duas.toArray();
+  return all.find(d => d.sourceId === sourceId) ?? null;
 }
 
 export async function updatePersonalDua(id, updates) {

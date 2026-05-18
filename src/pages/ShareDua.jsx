@@ -1,199 +1,271 @@
 /**
- * ShareDua.jsx — Public standalone dua submission form
+ * ShareDua.jsx — Dua submission form for the SENDER (family / friend)
  *
  * Route: /share/:tagSlug
  *
- * Anyone with the link can submit a personal du'a that gets saved to
- * their own device's IndexedDB under the given tag. If they return to
- * the same URL on the same device, their previous submission is loaded
- * for editing (identified via localStorage).
+ * Flow:
+ *  1. Pilgrim generates link for a tag → shares via WhatsApp/SMS
+ *  2. Family member opens link → fills in their dua/prayer request
+ *  3. On submit → they receive a "pilgrim receive link" to forward
+ *  4. Pilgrim opens that link (ReceiveDua page) → dua saved to THEIR app
  *
- * No sign-in required. No server. Fully offline-capable after first load.
+ * Returning device detection: localStorage keeps the sourceId so that
+ * if the same person opens the link again they can update their dua
+ * and resend a fresh receive link.
  */
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Send, Pencil, Check } from 'lucide-react';
-import {
-  addPersonalDua,
-  updatePersonalDua,
-  db,
-} from '../utils/db';
+import { ChevronLeft, Send, Pencil, Copy, Check, MessageCircle } from 'lucide-react';
 
-/* localStorage key for remembering a previous submission per tag */
-function storageKey(tagSlug) {
-  return `daleel_share_${tagSlug}`;
-}
+/* ── Helpers ─────────────────────────────────────────────────────── */
 
-/* Read the saved dua id for this tag from localStorage */
-function getSavedDuaId(tagSlug) {
+/** Stable ID for a submitter+tag pair, stored in localStorage */
+function getOrCreateSourceId(tagSlug) {
+  const key = `daleel_sourceid_${tagSlug}`;
   try {
-    return localStorage.getItem(storageKey(tagSlug));
+    const saved = localStorage.getItem(key);
+    if (saved) return saved;
+    const id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem(key, id);
+    return id;
   } catch {
-    return null;
+    return Math.random().toString(36).slice(2);
   }
 }
 
-/* Save the dua id for this tag to localStorage */
-function saveDuaId(tagSlug, id) {
+/** Retrieve previously submitted dua data for this tag (for edit mode) */
+function getSavedDraft(tagSlug) {
   try {
-    localStorage.setItem(storageKey(tagSlug), String(id));
+    const raw = localStorage.getItem(`daleel_draft_${tagSlug}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+/** Persist draft so returning submitter can edit */
+function saveDraft(tagSlug, data) {
+  try {
+    localStorage.setItem(`daleel_draft_${tagSlug}`, JSON.stringify(data));
   } catch { /* ignore */ }
 }
+
+/**
+ * Encode dua payload as a safe base64 URL param.
+ * Uses encodeURIComponent → unescape trick to handle Arabic/Unicode in btoa.
+ */
+function encodePayload(obj) {
+  return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+}
+
+/** Build the pilgrim's receive URL */
+function buildReceiveUrl(payload) {
+  return `${window.location.origin}/receive?d=${encodePayload(payload)}`;
+}
+
+/* ── Component ───────────────────────────────────────────────────── */
 
 export default function ShareDua() {
   const { tagSlug } = useParams();
   const tag = decodeURIComponent(tagSlug ?? '');
 
-  const [title,    setTitle]    = useState('');
-  const [body,     setBody]     = useState('');
-  const [arabic,   setArabic]   = useState('');
-  const [loading,  setLoading]  = useState(true);
-  const [saving,   setSaving]   = useState(false);
-  const [done,     setDone]     = useState(false);
-  const [isEdit,   setIsEdit]   = useState(false);
-  const [existingId, setExistingId] = useState(null);
-  const [error,    setError]    = useState('');
+  const [senderName, setSenderName] = useState('');
+  const [title,      setTitle]      = useState('');
+  const [body,       setBody]       = useState('');
+  const [arabic,     setArabic]     = useState('');
+  const [isEdit,     setIsEdit]     = useState(false);
+  const [receiveUrl, setReceiveUrl] = useState('');
+  const [copied,     setCopied]     = useState(false);
+  const [submitted,  setSubmitted]  = useState(false);
 
-  /* On mount: check if this device already submitted a dua for this tag */
+  /* Pre-fill if this device has submitted before */
   useEffect(() => {
-    async function checkExisting() {
-      const savedId = getSavedDuaId(tag);
-      if (savedId) {
-        try {
-          const existing = await db.personal_duas.get(Number(savedId));
-          if (existing) {
-            setTitle(existing.title);
-            setBody(existing.body);
-            setArabic(existing.arabic ?? '');
-            setExistingId(existing.id);
-            setIsEdit(true);
-          }
-        } catch { /* id not found — treat as new */ }
-      }
-      setLoading(false);
+    const draft = getSavedDraft(tag);
+    if (draft) {
+      setSenderName(draft.senderName ?? '');
+      setTitle(draft.title ?? '');
+      setBody(draft.body ?? '');
+      setArabic(draft.arabic ?? '');
+      setIsEdit(true);
     }
-    if (tag) checkExisting();
-    else setLoading(false);
   }, [tag]);
 
   const isValid = title.trim().length > 0 && body.trim().length > 0;
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
     if (!isValid) return;
-    setSaving(true);
-    setError('');
-    try {
-      if (isEdit && existingId != null) {
-        await updatePersonalDua(existingId, {
-          title: title.trim(),
-          body:  body.trim(),
-          arabic: arabic.trim(),
-        });
-      } else {
-        const id = await addPersonalDua({
-          title:  title.trim(),
-          body:   body.trim(),
-          arabic: arabic.trim(),
-          tags:   [tag],
-        });
-        saveDuaId(tag, id);
-        setExistingId(id);
-        setIsEdit(true);
+
+    const sourceId   = getOrCreateSourceId(tag);
+    const payload    = {
+      sourceId,
+      tag,
+      senderName: senderName.trim(),
+      title:      title.trim(),
+      body:       body.trim(),
+      arabic:     arabic.trim(),
+      sentAt:     new Date().toISOString(),
+    };
+
+    // Persist draft for next visit
+    saveDraft(tag, payload);
+
+    // Build the receive URL the pilgrim will open
+    setReceiveUrl(buildReceiveUrl(payload));
+    setSubmitted(true);
+    setIsEdit(true);
+  }
+
+  function copyLink() {
+    const copy = async () => {
+      try {
+        await navigator.clipboard.writeText(receiveUrl);
+      } catch {
+        const el = Object.assign(document.createElement('input'), { value: receiveUrl });
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
       }
-      setDone(true);
-    } catch (err) {
-      setError('Could not save. Please try again.');
-    } finally {
-      setSaving(false);
-    }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    };
+    copy();
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center">
-        <p className="text-gray-400 text-sm">Loading…</p>
-      </div>
-    );
-  }
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
+    `Here is my du'a for you to include in your Hajj prayers 🤲\n\n${receiveUrl}`
+  )}`;
 
-  /* ── Success screen ─────────────────────────────────────────────── */
-  if (done) {
+  /* ── Success / send-to-pilgrim screen ────────────────────────── */
+  if (submitted) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg)] flex flex-col items-center justify-center px-6 text-center">
-        <div className="w-16 h-16 rounded-full bg-[#2D6A4F]/15 flex items-center justify-center mb-5">
-          <Check size={32} className="text-[#2D6A4F]" />
-        </div>
-        <h1 className="text-xl font-black text-gray-900 dark:text-white mb-2">
-          {isEdit && existingId ? 'Du\'a Updated' : 'Du\'a Saved'}
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-2">
-          Your du'a has been saved under the <strong className="text-[#0D7377]">{tag}</strong> tag.
-        </p>
-        <p className="text-xs text-gray-400 mb-8 leading-relaxed max-w-xs">
-          It's stored on this device. Return to this link anytime to update it.
-        </p>
-
-        <div className="flex flex-col gap-3 w-full max-w-xs">
+      <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center gap-3 px-4 pt-safe pt-5 pb-4 border-b border-[var(--color-border-soft)]">
           <button
-            onClick={() => setDone(false)}
-            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl border border-[#0D7377] text-[#0D7377] font-semibold text-sm active:scale-[0.98] transition-all"
+            onClick={() => setSubmitted(false)}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 active:scale-95 transition-all"
           >
-            <Pencil size={15} /> Edit My Du'a
+            <ChevronLeft size={18} />
           </button>
-          <Link
-            to="/"
-            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-[#0D7377] text-white font-semibold text-sm active:scale-[0.98] transition-all no-underline"
-          >
-            Open Daleel App
-          </Link>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#2D6A4F]">Du'a written ✓</p>
+            <h1 className="text-base font-black text-gray-900 dark:text-white">Now send it to the pilgrim</h1>
+          </div>
+          <span className="text-xl font-arabic text-[#0D7377]">دليل</span>
         </div>
 
-        {/* Spiritual closing */}
-        <p className="text-xs text-gray-400 mt-8">
-          🤲 May Allah accept your du'a and grant your wishes.
+        <div className="flex-1 px-4 py-5 space-y-5 max-w-lg mx-auto w-full">
+          {/* Instruction card */}
+          <div className="rounded-2xl bg-[#0D7377]/8 dark:bg-[#0D7377]/15 border border-[#0D7377]/20 p-4">
+            <p className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+              Your du'a is ready 🤲
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              Send the link below to the Hajj pilgrim. When they open it, your du'a will be added directly to their Daleel app under <strong className="text-[#0D7377]">"{tag}"</strong>.
+            </p>
+          </div>
+
+          {/* Preview of what was submitted */}
+          <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-card p-4 space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Your submission</p>
+            <p className="font-bold text-sm text-gray-900 dark:text-white">{title}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">{body}</p>
+            {arabic && (
+              <p className="font-arabic text-[#0D7377] text-base text-right leading-relaxed" dir="rtl">
+                {arabic}
+              </p>
+            )}
+            {senderName && (
+              <p className="text-xs text-gray-400">— {senderName}</p>
+            )}
+          </div>
+
+          {/* Send via WhatsApp */}
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-[#25D366] text-white font-bold text-base active:scale-[0.98] transition-all shadow-sm no-underline"
+          >
+            <MessageCircle size={20} fill="white" />
+            Send via WhatsApp
+          </a>
+
+          {/* Copy link */}
+          <button
+            onClick={copyLink}
+            className={[
+              'flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl border font-semibold text-sm active:scale-[0.98] transition-all',
+              copied
+                ? 'bg-[#2D6A4F]/10 border-[#2D6A4F]/30 text-[#2D6A4F] dark:text-green-400'
+                : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300',
+            ].join(' ')}
+          >
+            {copied ? <><Check size={16} /> Link copied!</> : <><Copy size={16} /> Copy link</>}
+          </button>
+
+          {/* Edit and resend */}
+          <button
+            onClick={() => setSubmitted(false)}
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-gray-400 text-sm font-medium active:scale-[0.98] transition-all"
+          >
+            <Pencil size={14} /> Edit my du'a and resend
+          </button>
+        </div>
+
+        <p className="text-xs text-center text-gray-400 px-4 pb-6 leading-relaxed">
+          🔒 No server involved. Your du'a travels through this link only.
         </p>
       </div>
     );
   }
 
-  /* ── Form screen ────────────────────────────────────────────────── */
+  /* ── Form screen ─────────────────────────────────────────────── */
   return (
     <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
-
-      {/* Top bar */}
+      {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-safe pt-5 pb-4 border-b border-[var(--color-border-soft)]">
         <Link
           to="/"
           className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 no-underline active:scale-95 transition-all"
-          aria-label="Back to app"
         >
           <ChevronLeft size={18} />
         </Link>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-widest text-[#0D7377]">
-            {isEdit ? 'Update your du\'a' : 'Submit a du\'a'}
+            {isEdit ? 'Update your du\'a' : 'Write your du\'a'}
           </p>
           <h1 className="text-base font-black text-gray-900 dark:text-white truncate">
-            Tag: <span className="text-[#C9A84C]">{tag}</span>
+            For tag: <span className="text-[#C9A84C]">{tag}</span>
           </h1>
         </div>
-        {/* Daleel logo */}
         <span className="text-xl font-arabic text-[#0D7377]">دليل</span>
       </div>
 
-      {/* Context card */}
-      <div className="mx-4 mt-4 rounded-2xl bg-[#0D7377]/6 dark:bg-[#0D7377]/12 border border-[#0D7377]/15 px-4 py-3">
-        <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-          {isEdit
-            ? `You've already submitted a du'a here. Update it below.`
-            : `Write your prayer request or du'a below. It will be saved to your device under the "${tag}" tag.`}
+      {/* Context */}
+      <div className="mx-4 mt-4 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 px-4 py-3">
+        <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
+          A pilgrim going to Hajj will make your du'a at the holy sites. Write your prayer request below — after submitting you'll get a link to send to them. 🕋
         </p>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="flex-1 px-4 py-5 space-y-4 max-w-lg mx-auto w-full">
+        {/* Your name */}
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5">
+            Your Name <span className="text-gray-400 font-normal normal-case">(optional)</span>
+          </label>
+          <input
+            type="text"
+            value={senderName}
+            onChange={e => setSenderName(e.target.value)}
+            placeholder="e.g. Amina, or just Mum"
+            maxLength={60}
+            className="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0D7377] transition-all"
+          />
+          <p className="text-xs text-gray-400 mt-1">So the pilgrim knows whose du'a this is.</p>
+        </div>
 
         {/* Title */}
         <div>
@@ -204,27 +276,27 @@ export default function ShareDua() {
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            placeholder="e.g. Prayer for my mother's health"
+            placeholder="e.g. Prayer for Baba's recovery"
             maxLength={100}
             className="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0D7377] transition-all"
           />
         </div>
 
-        {/* Du'a / prayer text */}
+        {/* Du'a body */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5">
-            Your Du'a or Prayer Request <span className="text-red-400">*</span>
+            Your Prayer Request <span className="text-red-400">*</span>
           </label>
           <textarea
             rows={5}
             value={body}
             onChange={e => setBody(e.target.value)}
-            placeholder="Write your prayer or request here… You can write in any language."
+            placeholder="Write what you'd like the pilgrim to pray for on your behalf… You can write in any language."
             className="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0D7377] resize-none transition-all"
           />
         </div>
 
-        {/* Arabic text (optional) */}
+        {/* Arabic */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5">
             Arabic Text <span className="text-gray-400 font-normal normal-case">(optional)</span>
@@ -239,27 +311,18 @@ export default function ShareDua() {
           />
         </div>
 
-        {error && (
-          <p className="text-sm text-red-500 text-center">{error}</p>
-        )}
-
-        {/* Submit */}
         <button
           type="submit"
-          disabled={!isValid || saving}
+          disabled={!isValid}
           className="w-full flex items-center justify-center gap-2 bg-[#0D7377] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#095C5F] transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
         >
-          {saving ? (
-            'Saving…'
-          ) : isEdit ? (
-            <><Pencil size={17} /> Update My Du'a</>
-          ) : (
-            <><Send size={17} /> Submit Du'a</>
-          )}
+          {isEdit
+            ? <><Pencil size={17} /> Update &amp; Get New Link</>
+            : <><Send size={17} /> Write Du'a &amp; Get Link</>}
         </button>
 
         <p className="text-xs text-center text-gray-400 pb-4 leading-relaxed">
-          🔒 Your du'a is saved only on this device. Nothing is sent to any server.
+          After submitting you'll get a link to send to the pilgrim via WhatsApp or SMS.
         </p>
       </form>
     </div>
