@@ -45,14 +45,31 @@ function saveDraft(tag, data) {
   catch {}
 }
 
+/** Max characters per individual prayer entry */
+const MAX_PRAYER_CHARS = 500;
+
+/** Max total body length before URL becomes dangerously large */
+const MAX_BODY_CHARS = 1200;
+
 /** Build combined body: each prayer on its own bullet line */
 function buildBody(prayers) {
   return prayers.filter(Boolean).map(p => `• ${p.trim()}`).join('\n');
 }
 
-/** Encode payload for the receive URL */
+/**
+ * Compact encode — uses 1-char JSON keys to minimise URL length.
+ * Saves ~80 chars of overhead vs full key names, ~110 chars in base64.
+ * Compact keys: s=sourceId  t=tag  n=senderName  b=body
+ */
 function encodePayload(obj) {
-  return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+  const compact = { s: obj.sourceId, t: obj.tag, n: obj.senderName, b: obj.body };
+  return btoa(unescape(encodeURIComponent(JSON.stringify(compact))));
+}
+
+/** Estimate the resulting URL length before generating it */
+function estimateUrlLength(payload) {
+  const encoded = encodePayload(payload);
+  return (window.location.origin + '/receive?d=' + encoded).length;
 }
 
 function buildReceiveUrl(payload) {
@@ -76,6 +93,7 @@ export default function ShareDua() {
   const [copied,       setCopied]       = useState(false);
   const [submitted,    setSubmitted]    = useState(false);
   const [editingName,  setEditingName]  = useState(false);
+  const [urlTooLong,   setUrlTooLong]   = useState(false);
 
   /* Load draft on mount */
   useEffect(() => {
@@ -95,15 +113,18 @@ export default function ShareDua() {
 
     const updatedPrayers = [...prayers, newPrayer.trim()];
     const sourceId = getOrCreateSourceId(tag);
+    const body = buildBody(updatedPrayers);
 
-    const payload = {
-      sourceId,
-      tag,
-      senderName: senderName.trim(),
-      body:       buildBody(updatedPrayers),
-      sentAt:     new Date().toISOString(),
-    };
+    const payload = { sourceId, tag, senderName: senderName.trim(), body };
 
+    // Guard: check URL length before committing
+    const urlLen = estimateUrlLength(payload);
+    if (urlLen > 2000) {
+      setUrlTooLong(true);
+      return;
+    }
+
+    setUrlTooLong(false);
     // Persist so next visit shows existing prayers
     saveDraft(tag, { senderName: senderName.trim(), prayers: updatedPrayers });
     setPrayers(updatedPrayers);
@@ -328,22 +349,62 @@ export default function ShareDua() {
 
         {/* New prayer input */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5">
-            {prayers.length === 0 ? 'Your Prayer Request' : 'Add Another Prayer'}
-            <span className="text-red-400"> *</span>
-          </label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">
+              {prayers.length === 0 ? 'Your Prayer Request' : 'Add Another Prayer'}
+              <span className="text-red-400"> *</span>
+            </label>
+            <span className={[
+              'text-xs font-semibold tabular-nums',
+              newPrayer.length > MAX_PRAYER_CHARS * 0.9
+                ? 'text-red-500'
+                : newPrayer.length > MAX_PRAYER_CHARS * 0.7
+                ? 'text-amber-500'
+                : 'text-gray-400',
+            ].join(' ')}>
+              {newPrayer.length}/{MAX_PRAYER_CHARS}
+            </span>
+          </div>
           <textarea
             rows={4}
             value={newPrayer}
-            onChange={e => setNewPrayer(e.target.value)}
+            onChange={e => {
+              if (e.target.value.length <= MAX_PRAYER_CHARS) {
+                setNewPrayer(e.target.value);
+                setUrlTooLong(false);
+              }
+            }}
+            maxLength={MAX_PRAYER_CHARS}
             placeholder={
               prayers.length === 0
                 ? 'Write what you\'d like the pilgrim to pray for on your behalf…'
                 : 'Add another prayer request…'
             }
-            className="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0D7377] resize-none transition-all"
+            className={[
+              'w-full px-4 py-3.5 rounded-xl border bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 resize-none transition-all',
+              newPrayer.length >= MAX_PRAYER_CHARS
+                ? 'border-red-300 dark:border-red-700 focus:ring-red-400/30'
+                : 'border-gray-200 dark:border-gray-700 focus:ring-[#0D7377]',
+            ].join(' ')}
           />
+          {newPrayer.length >= MAX_PRAYER_CHARS && (
+            <p className="text-xs text-red-500 mt-1">
+              Maximum length reached. Please be concise — the pilgrim will hold all your prayers in their heart. 🤲
+            </p>
+          )}
         </div>
+
+        {/* URL too long error */}
+        {urlTooLong && (
+          <div className="rounded-xl bg-red-50 dark:bg-red-900/15 border border-red-200 dark:border-red-800 px-4 py-3">
+            <p className="text-sm font-semibold text-red-700 dark:text-red-400 mb-1">
+              Your combined prayers are too long for a single link.
+            </p>
+            <p className="text-xs text-red-600/80 dark:text-red-400/80 leading-relaxed">
+              Please shorten your latest prayer, or remove an older one (tap ×) to make room. Each prayer is limited to {MAX_PRAYER_CHARS} characters.
+            </p>
+          </div>
+        )}
 
         <button
           type="submit"

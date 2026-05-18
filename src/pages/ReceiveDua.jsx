@@ -17,10 +17,20 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Check, Tag, ChevronRight, AlertCircle } from 'lucide-react';
 import { addPersonalDua, updatePersonalDua, getPersonalDuaBySourceId } from '../utils/db';
 
-/* ── Decode helper ─────────────────────────────────────────────── */
+/* ── Decode helper — handles both compact keys {s,t,n,b} and old full keys ── */
 function decodePayload(encoded) {
   try {
-    return JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    const raw = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    // Normalise compact keys → full keys (backwards compatible)
+    return {
+      sourceId:   raw.s   ?? raw.sourceId,
+      tag:        raw.t   ?? raw.tag,
+      senderName: raw.n   ?? raw.senderName,
+      body:       raw.b   ?? raw.body,
+      // legacy fields kept for any old links still in the wild
+      title:      raw.title,
+      arabic:     raw.arabic,
+    };
   } catch {
     return null;
   }
