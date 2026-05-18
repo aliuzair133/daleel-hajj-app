@@ -1,187 +1,202 @@
 /**
- * ShareDua.jsx — Dua submission form for the SENDER (family / friend)
+ * ShareDua.jsx — Dua submission form for family / friends of the pilgrim
  *
  * Route: /share/:tagSlug
  *
- * Flow:
- *  1. Pilgrim generates link for a tag → shares via WhatsApp/SMS
- *  2. Family member opens link → fills in their dua/prayer request
- *  3. On submit → they receive a "pilgrim receive link" to forward
- *  4. Pilgrim opens that link (ReceiveDua page) → dua saved to THEIR app
- *
- * Returning device detection: localStorage keeps the sourceId so that
- * if the same person opens the link again they can update their dua
- * and resend a fresh receive link.
+ * Rules:
+ * - The sender's NAME becomes the title of the dua in the pilgrim's app
+ * - Each submission from the same device adds a bullet point to that person's
+ *   combined dua entry (one entry per person, not one per prayer)
+ * - After submitting, sender gets a link to forward to the pilgrim
+ * - Pilgrim opens /receive?d=… and the combined dua is saved/updated in their app
  */
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Send, Pencil, Copy, Check, MessageCircle } from 'lucide-react';
+import {
+  ChevronLeft, Send, Pencil, Copy, Check,
+  MessageCircle, Plus, X,
+} from 'lucide-react';
 
-/* ── Helpers ─────────────────────────────────────────────────────── */
+/* ── localStorage helpers ──────────────────────────────────────── */
 
-/** Stable ID for a submitter+tag pair, stored in localStorage */
-function getOrCreateSourceId(tagSlug) {
-  const key = `daleel_sourceid_${tagSlug}`;
+const SOURCEID_KEY = tag => `daleel_sourceid_${tag}`;
+const DRAFT_KEY    = tag => `daleel_draft_${tag}`;
+
+function getOrCreateSourceId(tag) {
   try {
-    const saved = localStorage.getItem(key);
+    const saved = localStorage.getItem(SOURCEID_KEY(tag));
     if (saved) return saved;
     const id = Math.random().toString(36).slice(2) + Date.now().toString(36);
-    localStorage.setItem(key, id);
+    localStorage.setItem(SOURCEID_KEY(tag), id);
     return id;
   } catch {
     return Math.random().toString(36).slice(2);
   }
 }
 
-/** Retrieve previously submitted dua data for this tag (for edit mode) */
-function getSavedDraft(tagSlug) {
-  try {
-    const raw = localStorage.getItem(`daleel_draft_${tagSlug}`);
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
+function getDraft(tag) {
+  try { return JSON.parse(localStorage.getItem(DRAFT_KEY(tag)) ?? 'null'); }
+  catch { return null; }
 }
 
-/** Persist draft so returning submitter can edit */
-function saveDraft(tagSlug, data) {
-  try {
-    localStorage.setItem(`daleel_draft_${tagSlug}`, JSON.stringify(data));
-  } catch { /* ignore */ }
+function saveDraft(tag, data) {
+  try { localStorage.setItem(DRAFT_KEY(tag), JSON.stringify(data)); }
+  catch {}
 }
 
-/**
- * Encode dua payload as a safe base64 URL param.
- * Uses encodeURIComponent → unescape trick to handle Arabic/Unicode in btoa.
- */
+/** Build combined body: each prayer on its own bullet line */
+function buildBody(prayers) {
+  return prayers.filter(Boolean).map(p => `• ${p.trim()}`).join('\n');
+}
+
+/** Encode payload for the receive URL */
 function encodePayload(obj) {
   return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
 }
 
-/** Build the pilgrim's receive URL */
 function buildReceiveUrl(payload) {
   return `${window.location.origin}/receive?d=${encodePayload(payload)}`;
 }
 
-/* ── Component ───────────────────────────────────────────────────── */
+/* ── Component ─────────────────────────────────────────────────── */
 
 export default function ShareDua() {
   const { tagSlug } = useParams();
   const tag = decodeURIComponent(tagSlug ?? '');
 
-  const [senderName, setSenderName] = useState('');
-  const [title,      setTitle]      = useState('');
-  const [body,       setBody]       = useState('');
-  const [arabic,     setArabic]     = useState('');
-  const [isEdit,     setIsEdit]     = useState(false);
-  const [receiveUrl, setReceiveUrl] = useState('');
-  const [copied,     setCopied]     = useState(false);
-  const [submitted,  setSubmitted]  = useState(false);
+  // Persisted sender state
+  const [senderName,   setSenderName]   = useState('');
+  const [prayers,      setPrayers]      = useState([]); // existing prayers array
+  const [newPrayer,    setNewPrayer]    = useState(''); // the text area for the new one
+  const [nameLocked,   setNameLocked]   = useState(false); // true after first submission
 
-  /* Pre-fill if this device has submitted before */
+  // UI state
+  const [receiveUrl,   setReceiveUrl]   = useState('');
+  const [copied,       setCopied]       = useState(false);
+  const [submitted,    setSubmitted]    = useState(false);
+  const [editingName,  setEditingName]  = useState(false);
+
+  /* Load draft on mount */
   useEffect(() => {
-    const draft = getSavedDraft(tag);
+    const draft = getDraft(tag);
     if (draft) {
       setSenderName(draft.senderName ?? '');
-      setTitle(draft.title ?? '');
-      setBody(draft.body ?? '');
-      setArabic(draft.arabic ?? '');
-      setIsEdit(true);
+      setPrayers(draft.prayers ?? []);
+      setNameLocked(!!(draft.senderName));
     }
   }, [tag]);
 
-  const isValid = title.trim().length > 0 && body.trim().length > 0;
+  const canSubmit = newPrayer.trim().length > 0 && senderName.trim().length > 0;
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!isValid) return;
+    if (!canSubmit) return;
 
-    const sourceId   = getOrCreateSourceId(tag);
-    const payload    = {
+    const updatedPrayers = [...prayers, newPrayer.trim()];
+    const sourceId = getOrCreateSourceId(tag);
+
+    const payload = {
       sourceId,
       tag,
       senderName: senderName.trim(),
-      title:      title.trim(),
-      body:       body.trim(),
-      arabic:     arabic.trim(),
+      body:       buildBody(updatedPrayers),
       sentAt:     new Date().toISOString(),
     };
 
-    // Persist draft for next visit
-    saveDraft(tag, payload);
-
-    // Build the receive URL the pilgrim will open
+    // Persist so next visit shows existing prayers
+    saveDraft(tag, { senderName: senderName.trim(), prayers: updatedPrayers });
+    setPrayers(updatedPrayers);
+    setNewPrayer('');
+    setNameLocked(true);
     setReceiveUrl(buildReceiveUrl(payload));
     setSubmitted(true);
-    setIsEdit(true);
+  }
+
+  function removePrayer(idx) {
+    const updated = prayers.filter((_, i) => i !== idx);
+    setPrayers(updated);
+    saveDraft(tag, { senderName, prayers: updated });
+  }
+
+  function handleAddAnother() {
+    setSubmitted(false);
   }
 
   function copyLink() {
-    const copy = async () => {
-      try {
-        await navigator.clipboard.writeText(receiveUrl);
-      } catch {
-        const el = Object.assign(document.createElement('input'), { value: receiveUrl });
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-      }
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+    const fallback = () => {
+      const el = Object.assign(document.createElement('input'), { value: receiveUrl });
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
     };
-    copy();
+    navigator.clipboard?.writeText(receiveUrl).catch(fallback) ?? fallback();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   }
 
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
-    `Here is my du'a for you to include in your Hajj prayers 🤲\n\n${receiveUrl}`
-  )}`;
+  const whatsappText = senderName
+    ? `Assalamu alaykum! Here are my du'as for you to make at Hajj 🤲 — from ${senderName}\n\n${receiveUrl}`
+    : `Here is a du'a for you to include in your Hajj prayers 🤲\n\n${receiveUrl}`;
 
-  /* ── Success / send-to-pilgrim screen ────────────────────────── */
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
+
+  /* ── After submit: send-to-pilgrim screen ─────────────────────── */
   if (submitted) {
     return (
       <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
         {/* Header */}
         <div className="flex items-center gap-3 px-4 pt-safe pt-5 pb-4 border-b border-[var(--color-border-soft)]">
-          <button
-            onClick={() => setSubmitted(false)}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 active:scale-95 transition-all"
-          >
-            <ChevronLeft size={18} />
-          </button>
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#2D6A4F]">Du'a written ✓</p>
-            <h1 className="text-base font-black text-gray-900 dark:text-white">Now send it to the pilgrim</h1>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#2D6A4F]">
+              Du'as ready ✓
+            </p>
+            <h1 className="text-base font-black text-gray-900 dark:text-white">
+              Send to the pilgrim
+            </h1>
           </div>
           <span className="text-xl font-arabic text-[#0D7377]">دليل</span>
         </div>
 
-        <div className="flex-1 px-4 py-5 space-y-5 max-w-lg mx-auto w-full">
-          {/* Instruction card */}
+        <div className="flex-1 px-4 py-5 space-y-4 max-w-lg mx-auto w-full">
+          {/* Instruction */}
           <div className="rounded-2xl bg-[#0D7377]/8 dark:bg-[#0D7377]/15 border border-[#0D7377]/20 p-4">
             <p className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
-              Your du'a is ready 🤲
+              Your du'as are ready 🤲
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              Send the link below to the Hajj pilgrim. When they open it, your du'a will be added directly to their Daleel app under <strong className="text-[#0D7377]">"{tag}"</strong>.
+              Send the link below to the Hajj pilgrim. When they open it, all your
+              prayers will appear under their <strong className="text-[#0D7377]">"{tag}"</strong> tag,
+              listed under your name.
             </p>
           </div>
 
-          {/* Preview of what was submitted */}
-          <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-card p-4 space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Your submission</p>
-            <p className="font-bold text-sm text-gray-900 dark:text-white">{title}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">{body}</p>
-            {arabic && (
-              <p className="font-arabic text-[#0D7377] text-base text-right leading-relaxed" dir="rtl">
-                {arabic}
-              </p>
-            )}
-            {senderName && (
-              <p className="text-xs text-gray-400">— {senderName}</p>
-            )}
+          {/* Summary of what's included */}
+          <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-card p-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+              {senderName && <span className="text-[#C9A84C]">{senderName} · </span>}
+              {prayers.length} prayer{prayers.length !== 1 ? 's' : ''}
+            </p>
+            <ul className="space-y-1.5">
+              {prayers.map((p, i) => (
+                <li key={i} className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed flex gap-2">
+                  <span className="text-[#0D7377] font-bold flex-shrink-0">•</span>
+                  <span>{p}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Send via WhatsApp */}
+          {/* Add another prayer */}
+          <button
+            onClick={handleAddAnother}
+            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border border-dashed border-[#0D7377]/40 text-[#0D7377] font-semibold text-sm active:scale-[0.98] transition-all"
+          >
+            <Plus size={16} /> Add another prayer
+          </button>
+
+          {/* WhatsApp */}
           <a
             href={whatsappUrl}
             target="_blank"
@@ -202,26 +217,20 @@ export default function ShareDua() {
                 : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300',
             ].join(' ')}
           >
-            {copied ? <><Check size={16} /> Link copied!</> : <><Copy size={16} /> Copy link</>}
-          </button>
-
-          {/* Edit and resend */}
-          <button
-            onClick={() => setSubmitted(false)}
-            className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-gray-400 text-sm font-medium active:scale-[0.98] transition-all"
-          >
-            <Pencil size={14} /> Edit my du'a and resend
+            {copied ? <><Check size={16} /> Copied!</> : <><Copy size={16} /> Copy link</>}
           </button>
         </div>
 
         <p className="text-xs text-center text-gray-400 px-4 pb-6 leading-relaxed">
-          🔒 No server involved. Your du'a travels through this link only.
+          🔒 No server involved. Du'as travel through this link only.
         </p>
       </div>
     );
   }
 
   /* ── Form screen ─────────────────────────────────────────────── */
+  const isFirstSubmission = prayers.length === 0;
+
   return (
     <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
       {/* Header */}
@@ -234,95 +243,120 @@ export default function ShareDua() {
         </Link>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-widest text-[#0D7377]">
-            {isEdit ? 'Update your du\'a' : 'Write your du\'a'}
+            {isFirstSubmission ? 'Write a du\'a' : `Add another prayer`}
           </p>
           <h1 className="text-base font-black text-gray-900 dark:text-white truncate">
-            For tag: <span className="text-[#C9A84C]">{tag}</span>
+            Tag: <span className="text-[#C9A84C]">{tag}</span>
           </h1>
         </div>
         <span className="text-xl font-arabic text-[#0D7377]">دليل</span>
       </div>
 
-      {/* Context */}
+      {/* Context banner */}
       <div className="mx-4 mt-4 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 px-4 py-3">
         <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
-          A pilgrim going to Hajj will make your du'a at the holy sites. Write your prayer request below — after submitting you'll get a link to send to them. 🕋
+          A pilgrim going to Hajj will make your du'a at the holy sites. Write your prayer requests below — they'll be saved under your name. 🕋
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex-1 px-4 py-5 space-y-4 max-w-lg mx-auto w-full">
-        {/* Your name */}
+
+        {/* Sender name — becomes the dua title */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5">
-            Your Name <span className="text-gray-400 font-normal normal-case">(optional)</span>
+            Your Name <span className="text-red-400">*</span>
           </label>
-          <input
-            type="text"
-            value={senderName}
-            onChange={e => setSenderName(e.target.value)}
-            placeholder="e.g. Amina, or just Mum"
-            maxLength={60}
-            className="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0D7377] transition-all"
-          />
-          <p className="text-xs text-gray-400 mt-1">So the pilgrim knows whose du'a this is.</p>
+          {nameLocked && !editingName ? (
+            <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#0D7377]/8 dark:bg-[#0D7377]/15 border border-[#0D7377]/20">
+              <span className="flex-1 text-sm font-semibold text-gray-900 dark:text-white">
+                {senderName}
+              </span>
+              <button
+                type="button"
+                onClick={() => setEditingName(true)}
+                className="text-xs text-[#0D7377] font-semibold"
+              >
+                Edit
+              </button>
+            </div>
+          ) : (
+            <input
+              type="text"
+              value={senderName}
+              onChange={e => setSenderName(e.target.value)}
+              onBlur={() => { if (senderName.trim() && nameLocked) setEditingName(false); }}
+              placeholder="e.g. Amina, or just Mum"
+              maxLength={60}
+              autoFocus={editingName}
+              className="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0D7377] transition-all"
+            />
+          )}
+          <p className="text-xs text-gray-400 mt-1">
+            This becomes the title in the pilgrim's app — so they know who each du'a is from.
+          </p>
         </div>
 
-        {/* Title */}
-        <div>
-          <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5">
-            Title <span className="text-red-400">*</span>
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder="e.g. Prayer for Baba's recovery"
-            maxLength={100}
-            className="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0D7377] transition-all"
-          />
-        </div>
+        {/* Previously submitted prayers */}
+        {prayers.length > 0 && (
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+              Your prayers so far
+            </p>
+            <div className="space-y-2">
+              {prayers.map((p, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-teal-50 dark:bg-teal-900/15 border border-teal-100 dark:border-teal-800"
+                >
+                  <span className="text-[#0D7377] font-bold mt-0.5 flex-shrink-0">•</span>
+                  <p className="flex-1 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {p}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => removePrayer(i)}
+                    className="text-gray-300 dark:text-gray-600 hover:text-red-400 transition-colors flex-shrink-0 mt-0.5"
+                    aria-label="Remove this prayer"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-        {/* Du'a body */}
+        {/* New prayer input */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5">
-            Your Prayer Request <span className="text-red-400">*</span>
+            {prayers.length === 0 ? 'Your Prayer Request' : 'Add Another Prayer'}
+            <span className="text-red-400"> *</span>
           </label>
           <textarea
-            rows={5}
-            value={body}
-            onChange={e => setBody(e.target.value)}
-            placeholder="Write what you'd like the pilgrim to pray for on your behalf… You can write in any language."
+            rows={4}
+            value={newPrayer}
+            onChange={e => setNewPrayer(e.target.value)}
+            placeholder={
+              prayers.length === 0
+                ? 'Write what you\'d like the pilgrim to pray for on your behalf…'
+                : 'Add another prayer request…'
+            }
             className="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0D7377] resize-none transition-all"
-          />
-        </div>
-
-        {/* Arabic */}
-        <div>
-          <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5">
-            Arabic Text <span className="text-gray-400 font-normal normal-case">(optional)</span>
-          </label>
-          <textarea
-            rows={2}
-            value={arabic}
-            onChange={e => setArabic(e.target.value)}
-            placeholder="اكتب الدعاء بالعربية (اختياري)"
-            dir="rtl"
-            className="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-base font-arabic text-right text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0D7377] resize-none transition-all"
           />
         </div>
 
         <button
           type="submit"
-          disabled={!isValid}
+          disabled={!canSubmit}
           className="w-full flex items-center justify-center gap-2 bg-[#0D7377] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#095C5F] transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
         >
-          {isEdit
-            ? <><Pencil size={17} /> Update &amp; Get New Link</>
-            : <><Send size={17} /> Write Du'a &amp; Get Link</>}
+          {prayers.length === 0
+            ? <><Send size={17} /> Submit &amp; Get Link for Pilgrim</>
+            : <><Plus size={17} /> Add Prayer &amp; Update Link</>}
         </button>
 
         <p className="text-xs text-center text-gray-400 pb-4 leading-relaxed">
-          After submitting you'll get a link to send to the pilgrim via WhatsApp or SMS.
+          After submitting, you'll get a link to send to the pilgrim via WhatsApp or SMS.
         </p>
       </form>
     </div>

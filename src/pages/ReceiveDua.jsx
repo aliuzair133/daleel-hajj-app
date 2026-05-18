@@ -52,23 +52,21 @@ export default function ReceiveDua() {
         : null;
 
       const tags = payload.tag ? [payload.tag] : [];
-      const bodyText = payload.senderName
-        ? `${payload.body}\n\n— ${payload.senderName}`
-        : payload.body;
+      // Title is always the sender's name (backward compat: fall back to payload.title)
+      const title = payload.senderName?.trim() || payload.title?.trim() || 'Prayer Request';
 
       if (existing) {
-        // Update: keep same id, refresh content
         await updatePersonalDua(existing.id, {
-          title:  payload.title,
-          body:   bodyText,
+          title,
+          body:   payload.body,
           arabic: payload.arabic ?? '',
           tags,
         });
         setStatus('updated');
       } else {
         await addPersonalDua({
-          title:    payload.title,
-          body:     bodyText,
+          title,
+          body:     payload.body,
           arabic:   payload.arabic ?? '',
           tags,
           sourceId: payload.sourceId ?? null,
@@ -110,8 +108,7 @@ export default function ReceiveDua() {
           {status === 'updated' ? 'Du\'a Updated' : 'Du\'a Added'}
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-1">
-          <strong className="text-gray-700 dark:text-gray-200">"{payload.title}"</strong>
-          {payload.senderName && <span> from <strong className="text-[#0D7377]">{payload.senderName}</strong></span>}
+          Prayers from <strong className="text-[#0D7377]">{payload.senderName || payload.title || 'your loved one'}</strong>
         </p>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
           Saved to <span className="font-semibold text-[#C9A84C]">{payload.tag}</span> in My Du'as.
@@ -154,21 +151,6 @@ export default function ReceiveDua() {
           </div>
         )}
 
-        {/* Sender */}
-        {payload.senderName && (
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-[#C9A84C]/20 flex items-center justify-center flex-shrink-0">
-              <span className="text-sm font-black text-[#C9A84C]">
-                {payload.senderName.charAt(0).toUpperCase()}
-              </span>
-            </div>
-            <div>
-              <p className="text-xs text-gray-400">Du'a from</p>
-              <p className="text-sm font-bold text-gray-900 dark:text-white">{payload.senderName}</p>
-            </div>
-          </div>
-        )}
-
         {/* Tag badge */}
         <div className="flex items-center gap-1.5">
           <Tag size={12} className="text-[#C9A84C]" />
@@ -177,11 +159,31 @@ export default function ReceiveDua() {
           </span>
         </div>
 
-        {/* Dua preview card */}
+        {/* Dua preview card — title = sender name, body = bullet list */}
         <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-card p-5 space-y-4">
-          <h2 className="text-lg font-black text-gray-900 dark:text-white leading-snug">
-            {payload.title}
-          </h2>
+          {/* Sender name as title with avatar */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#C9A84C]/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-base font-black text-[#C9A84C]">
+                {(payload.senderName || payload.title || '?').charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400">Prayers from</p>
+              <h2 className="text-lg font-black text-gray-900 dark:text-white leading-tight">
+                {payload.senderName || payload.title || 'Prayer Request'}
+              </h2>
+            </div>
+          </div>
+
+          {/* Bullet-pointed prayers */}
+          <div className="rounded-xl bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 p-4 space-y-2">
+            {payload.body.split('\n').filter(Boolean).map((line, i) => (
+              <p key={i} className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                {line}
+              </p>
+            ))}
+          </div>
 
           {payload.arabic && (
             <div className="rounded-xl bg-[#0D7377]/5 dark:bg-[#0D7377]/10 border border-[#0D7377]/15 p-4">
@@ -194,12 +196,6 @@ export default function ReceiveDua() {
               </p>
             </div>
           )}
-
-          <div className="rounded-xl bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 p-4">
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-              {payload.body}
-            </p>
-          </div>
         </div>
 
         {/* Add button */}
