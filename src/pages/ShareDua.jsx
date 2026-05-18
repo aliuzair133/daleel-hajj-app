@@ -7,15 +7,15 @@
  * - The sender's NAME becomes the title of the dua in the pilgrim's app
  * - Each submission from the same device adds a bullet point to that person's
  *   combined dua entry (one entry per person, not one per prayer)
- * - After submitting, sender gets a link to forward to the pilgrim
+ * - After submitting, sender gets a SHORT link (via is.gd) to forward to pilgrim
  * - Pilgrim opens /receive?d=… and the combined dua is saved/updated in their app
  */
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
-  ChevronLeft, Send, Pencil, Copy, Check,
-  MessageCircle, Plus, X,
+  ChevronLeft, Send, Copy, Check,
+  MessageCircle, Plus, X, Loader2,
 } from 'lucide-react';
 
 /* ── localStorage helpers ──────────────────────────────────────── */
@@ -45,11 +45,8 @@ function saveDraft(tag, data) {
   catch {}
 }
 
-/** Max characters per individual prayer entry */
-const MAX_PRAYER_CHARS = 500;
-
-/** Max total body length before URL becomes dangerously large */
-const MAX_BODY_CHARS = 1200;
+/** Max total characters across ALL combined prayers (overall body limit) */
+const MAX_TOTAL_CHARS = 20000;
 
 /** Build combined body: each prayer on its own bullet line */
 function buildBody(prayers) {
@@ -58,7 +55,6 @@ function buildBody(prayers) {
 
 /**
  * Compact encode — uses 1-char JSON keys to minimise URL length.
- * Saves ~80 chars of overhead vs full key names, ~110 chars in base64.
  * Compact keys: s=sourceId  t=tag  n=senderName  b=body
  */
 function encodePayload(obj) {
@@ -66,14 +62,25 @@ function encodePayload(obj) {
   return btoa(unescape(encodeURIComponent(JSON.stringify(compact))));
 }
 
-/** Estimate the resulting URL length before generating it */
-function estimateUrlLength(payload) {
-  const encoded = encodePayload(payload);
-  return (window.location.origin + '/receive?d=' + encoded).length;
-}
-
 function buildReceiveUrl(payload) {
   return `${window.location.origin}/receive?d=${encodePayload(payload)}`;
+}
+
+/**
+ * Shorten a URL using the is.gd API (free, no auth, no backend needed).
+ * Returns the short URL string, or null on failure.
+ */
+async function shortenWithIsGd(longUrl) {
+  try {
+    const res = await fetch(
+      `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.shorturl ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /* ── Component ─────────────────────────────────────────────────── */
@@ -89,11 +96,11 @@ export default function ShareDua() {
   const [nameLocked,   setNameLocked]   = useState(false); // true after first submission
 
   // UI state
-  const [receiveUrl,   setReceiveUrl]   = useState('');
-  const [copied,       setCopied]       = useState(false);
-  const [submitted,    setSubmitted]    = useState(false);
-  const [editingName,  setEditingName]  = useState(false);
-  const [urlTooLong,   setUrlTooLong]   = useState(false);
+  const [receiveUrl,    setReceiveUrl]    = useState(''); // short URL (or long as fallback)
+  const [shorteningUrl, setShorteningUrl] = useState(false);
+  const [copied,        setCopied]        = useState(false);
+  const [submitted,     setSubmitted]     = useState(false);
+  const [editingName,   setEditingName]   = useState(false);
 
   /* Load draft on mount */
   useEffect(() => {
@@ -105,9 +112,15 @@ export default function ShareDua() {
     }
   }, [tag]);
 
-  const canSubmit = newPrayer.trim().length > 0 && senderName.trim().length > 0;
+  // Total chars across all existing prayers + the new one being typed
+  const existingBodyLength = buildBody(prayers).length;
+  const combinedLength = existingBodyLength + (newPrayer.trim() ? newPrayer.length + 3 : 0); // +3 for "• \n"
+  const overLimit = combinedLength > MAX_TOTAL_CHARS;
+  const nearLimit = combinedLength > MAX_TOTAL_CHARS * 0.85;
 
-  function handleSubmit(e) {
+  const canSubmit = newPrayer.trim().length > 0 && senderName.trim().length > 0 && !overLimit;
+
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!canSubmit) return;
 
@@ -116,22 +129,21 @@ export default function ShareDua() {
     const body = buildBody(updatedPrayers);
 
     const payload = { sourceId, tag, senderName: senderName.trim(), body };
+    const longUrl = buildReceiveUrl(payload);
 
-    // Guard: check URL length before committing
-    const urlLen = estimateUrlLength(payload);
-    if (urlLen > 2000) {
-      setUrlTooLong(true);
-      return;
-    }
-
-    setUrlTooLong(false);
     // Persist so next visit shows existing prayers
     saveDraft(tag, { senderName: senderName.trim(), prayers: updatedPrayers });
     setPrayers(updatedPrayers);
     setNewPrayer('');
     setNameLocked(true);
-    setReceiveUrl(buildReceiveUrl(payload));
+    setReceiveUrl(longUrl); // fallback shown while shortening
     setSubmitted(true);
+    setShorteningUrl(true);
+
+    // Shorten in background — update once ready
+    const short = await shortenWithIsGd(longUrl);
+    setReceiveUrl(short ?? longUrl);
+    setShorteningUrl(false);
   }
 
   function removePrayer(idx) {
@@ -209,6 +221,28 @@ export default function ShareDua() {
             </ul>
           </div>
 
+          {/* Short URL preview — shown once ready */}
+          {!shorteningUrl && receiveUrl && (
+            <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 px-4 py-3">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">
+                Share link
+              </p>
+              <p className="text-sm font-semibold text-[#0D7377] break-all leading-relaxed">
+                {receiveUrl}
+              </p>
+            </div>
+          )}
+
+          {/* Generating short URL indicator */}
+          {shorteningUrl && (
+            <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3">
+              <Loader2 size={16} className="text-[#0D7377] animate-spin flex-shrink-0" />
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Generating short link…
+              </p>
+            </div>
+          )}
+
           {/* Add another prayer */}
           <button
             onClick={handleAddAnother}
@@ -219,31 +253,45 @@ export default function ShareDua() {
 
           {/* WhatsApp */}
           <a
-            href={whatsappUrl}
+            href={shorteningUrl ? undefined : whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-[#25D366] text-white font-bold text-base active:scale-[0.98] transition-all shadow-sm no-underline"
+            onClick={shorteningUrl ? e => e.preventDefault() : undefined}
+            className={[
+              'flex items-center justify-center gap-3 w-full py-4 rounded-2xl font-bold text-base active:scale-[0.98] transition-all shadow-sm no-underline',
+              shorteningUrl
+                ? 'bg-[#25D366]/60 text-white cursor-wait'
+                : 'bg-[#25D366] text-white',
+            ].join(' ')}
           >
-            <MessageCircle size={20} fill="white" />
-            Send via WhatsApp
+            {shorteningUrl
+              ? <><Loader2 size={18} className="animate-spin" /> Preparing link…</>
+              : <><MessageCircle size={20} fill="white" /> Send via WhatsApp</>
+            }
           </a>
 
           {/* Copy link */}
           <button
-            onClick={copyLink}
+            onClick={shorteningUrl ? undefined : copyLink}
+            disabled={shorteningUrl}
             className={[
               'flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl border font-semibold text-sm active:scale-[0.98] transition-all',
               copied
                 ? 'bg-[#2D6A4F]/10 border-[#2D6A4F]/30 text-[#2D6A4F] dark:text-green-400'
-                : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300',
+                : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 disabled:opacity-50',
             ].join(' ')}
           >
-            {copied ? <><Check size={16} /> Copied!</> : <><Copy size={16} /> Copy link</>}
+            {shorteningUrl
+              ? <><Loader2 size={14} className="animate-spin" /> Generating link…</>
+              : copied
+              ? <><Check size={16} /> Copied!</>
+              : <><Copy size={16} /> Copy link</>
+            }
           </button>
         </div>
 
         <p className="text-xs text-center text-gray-400 px-4 pb-6 leading-relaxed">
-          🔒 No server involved. Du'as travel through this link only.
+          🔒 No server stores your du'as. They travel through the link only.
         </p>
       </div>
     );
@@ -354,27 +402,21 @@ export default function ShareDua() {
               {prayers.length === 0 ? 'Your Prayer Request' : 'Add Another Prayer'}
               <span className="text-red-400"> *</span>
             </label>
-            <span className={[
-              'text-xs font-semibold tabular-nums',
-              newPrayer.length > MAX_PRAYER_CHARS * 0.9
-                ? 'text-red-500'
-                : newPrayer.length > MAX_PRAYER_CHARS * 0.7
-                ? 'text-amber-500'
-                : 'text-gray-400',
-            ].join(' ')}>
-              {newPrayer.length}/{MAX_PRAYER_CHARS}
-            </span>
+            {/* Overall counter — only show when getting close */}
+            {(combinedLength > MAX_TOTAL_CHARS * 0.5 || overLimit) && (
+              <span className={[
+                'text-xs font-semibold tabular-nums',
+                overLimit  ? 'text-red-500'   :
+                nearLimit  ? 'text-amber-500' : 'text-gray-400',
+              ].join(' ')}>
+                {combinedLength.toLocaleString()}/{MAX_TOTAL_CHARS.toLocaleString()} total
+              </span>
+            )}
           </div>
           <textarea
             rows={4}
             value={newPrayer}
-            onChange={e => {
-              if (e.target.value.length <= MAX_PRAYER_CHARS) {
-                setNewPrayer(e.target.value);
-                setUrlTooLong(false);
-              }
-            }}
-            maxLength={MAX_PRAYER_CHARS}
+            onChange={e => setNewPrayer(e.target.value)}
             placeholder={
               prayers.length === 0
                 ? 'Write what you\'d like the pilgrim to pray for on your behalf…'
@@ -382,29 +424,22 @@ export default function ShareDua() {
             }
             className={[
               'w-full px-4 py-3.5 rounded-xl border bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 resize-none transition-all',
-              newPrayer.length >= MAX_PRAYER_CHARS
+              overLimit
                 ? 'border-red-300 dark:border-red-700 focus:ring-red-400/30'
                 : 'border-gray-200 dark:border-gray-700 focus:ring-[#0D7377]',
             ].join(' ')}
           />
-          {newPrayer.length >= MAX_PRAYER_CHARS && (
-            <p className="text-xs text-red-500 mt-1">
-              Maximum length reached. Please be concise — the pilgrim will hold all your prayers in their heart. 🤲
+          {overLimit && (
+            <p className="text-xs text-red-500 mt-1.5 leading-relaxed">
+              Combined prayers exceed {MAX_TOTAL_CHARS.toLocaleString()} characters. Please shorten this prayer or remove an older one (tap ×) to continue.
+            </p>
+          )}
+          {nearLimit && !overLimit && (
+            <p className="text-xs text-amber-500 mt-1.5 leading-relaxed">
+              Getting close to the limit.
             </p>
           )}
         </div>
-
-        {/* URL too long error */}
-        {urlTooLong && (
-          <div className="rounded-xl bg-red-50 dark:bg-red-900/15 border border-red-200 dark:border-red-800 px-4 py-3">
-            <p className="text-sm font-semibold text-red-700 dark:text-red-400 mb-1">
-              Your combined prayers are too long for a single link.
-            </p>
-            <p className="text-xs text-red-600/80 dark:text-red-400/80 leading-relaxed">
-              Please shorten your latest prayer, or remove an older one (tap ×) to make room. Each prayer is limited to {MAX_PRAYER_CHARS} characters.
-            </p>
-          </div>
-        )}
 
         <button
           type="submit"
@@ -417,7 +452,7 @@ export default function ShareDua() {
         </button>
 
         <p className="text-xs text-center text-gray-400 pb-4 leading-relaxed">
-          After submitting, you'll get a link to send to the pilgrim via WhatsApp or SMS.
+          After submitting, you'll get a short link to send to the pilgrim via WhatsApp or SMS.
         </p>
       </form>
     </div>
