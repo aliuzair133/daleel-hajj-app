@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronRight, ChevronLeft, Check, MapPin, BookOpen, ScrollText, Shield } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, MapPin, BookOpen, ScrollText, Shield, Navigation } from 'lucide-react';
 import { useSettings } from '../hooks/useSettings';
 import contactsData from '../data/contacts.json';
 
@@ -180,8 +180,8 @@ function ScreenCountry({ country, setCountry, onNext, onBack }) {
   );
 }
 
-// ─── Screen 3: Language + Mahram ─────────────────────────────────────────────
-function ScreenPreferences({ language, setLanguage, isMahram, setIsMahram, onFinish, onBack, userName }) {
+// ─── Screen 3: Language + Mahram + Location ──────────────────────────────────
+function ScreenPreferences({ language, setLanguage, isMahram, setIsMahram, onFinish, onBack, userName, onRequestLocation, locating, locationName }) {
   return (
     <div className="flex flex-col min-h-screen px-4 pt-12 pb-6">
       {/* Back + progress */}
@@ -255,6 +255,35 @@ function ScreenPreferences({ language, setLanguage, isMahram, setIsMahram, onFin
         </div>
       </div>
 
+      {/* Location permission */}
+      <div className="mb-6">
+        <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-0.5">Prayer Time Location</p>
+        <p className="text-xs text-gray-400 mb-3">
+          Grant location access for accurate prayer times wherever you are. Default is Makkah.
+        </p>
+        <button
+          onClick={onRequestLocation}
+          disabled={locating || !!locationName}
+          className={[
+            'w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border font-semibold text-sm transition-all active:scale-[0.98]',
+            locationName
+              ? 'bg-[#2D6A4F]/10 border-[#2D6A4F]/30 text-[#2D6A4F] dark:text-green-400 cursor-default'
+              : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#0D7377]/50',
+          ].join(' ')}
+        >
+          {locating ? (
+            <><Navigation size={16} className="animate-pulse text-[#0D7377]" /> Detecting location…</>
+          ) : locationName ? (
+            <><span className="text-base">📍</span> {locationName}</>
+          ) : (
+            <><Navigation size={16} className="text-[#0D7377]" /> Use My Current Location</>
+          )}
+        </button>
+        {!locationName && !locating && (
+          <p className="text-xs text-gray-400 mt-1.5 text-center">Optional — you can change this in Settings later.</p>
+        )}
+      </div>
+
       {/* Disclaimer */}
       <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 mb-6">
         <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
@@ -277,13 +306,27 @@ function ScreenPreferences({ language, setLanguage, isMahram, setIsMahram, onFin
 
 // ─── Main Onboarding component ────────────────────────────────────────────────
 export default function Onboarding({ onComplete }) {
-  const { updateSetting } = useSettings();
+  const { updateSetting, detectLocation } = useSettings();
   const [screen, setScreen] = useState(0);
 
-  const [name, setName]         = useState('');
-  const [country, setCountry]   = useState('');
-  const [language, setLanguage] = useState('en');
-  const [isMahram, setIsMahram] = useState(null);
+  const [name,         setName]         = useState('');
+  const [country,      setCountry]      = useState('');
+  const [language,     setLanguage]     = useState('en');
+  const [isMahram,     setIsMahram]     = useState(null);
+  const [locating,     setLocating]     = useState(false);
+  const [locationName, setLocationName] = useState('');
+
+  async function handleRequestLocation() {
+    setLocating(true);
+    try {
+      const result = await detectLocation();
+      setLocationName(result.locationName || `${result.latitude.toFixed(2)}°N, ${result.longitude.toFixed(2)}°E`);
+    } catch {
+      // permission denied or error — just continue without location
+    } finally {
+      setLocating(false);
+    }
+  }
 
   async function handleFinish() {
     await Promise.all([
@@ -322,6 +365,9 @@ export default function Onboarding({ onComplete }) {
           onFinish={handleFinish}
           onBack={() => setScreen(1)}
           userName={name.trim() || 'Pilgrim'}
+          onRequestLocation={handleRequestLocation}
+          locating={locating}
+          locationName={locationName}
         />
       )}
     </div>

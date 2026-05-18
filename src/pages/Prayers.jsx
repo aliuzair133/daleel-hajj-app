@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import {
   Search, BookmarkCheck, X, ChevronLeft, ChevronRight,
   Volume2, Square, Bookmark, Navigation, Plus, Pencil,
-  Trash2, Tag, Layers,
+  Trash2, Tag, Layers, MapPin, Share2, Check,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
@@ -509,6 +509,22 @@ function PersonalDuasTab() {
   const [activeTag,      setActiveTag]     = useState(null);
   const [swiperOpen,     setSwiperOpen]    = useState(false);
   const [swiperStartIdx, setSwiperStartIdx] = useState(0);
+  const [copiedTag,      setCopiedTag]     = useState(null); // which tag link was just copied
+
+  function copyShareLink(tag) {
+    const url = `${window.location.origin}/share/${encodeURIComponent(tag)}`;
+    navigator.clipboard?.writeText(url).catch(() => {
+      // Fallback: create temp input
+      const el = document.createElement('input');
+      el.value = url;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+    });
+    setCopiedTag(tag);
+    setTimeout(() => setCopiedTag(null), 2000);
+  }
 
   async function reload() {
     const all = await getAllPersonalDuas();
@@ -633,7 +649,7 @@ function PersonalDuasTab() {
         </button>
       </div>
 
-      {/* Tag filter chips */}
+      {/* Tag filter chips + share buttons */}
       {allTags.length > 0 && (
         <div className="flex gap-2 overflow-x-auto pb-2 mb-3 -mx-1 px-1 scrollbar-hide">
           <button
@@ -646,16 +662,33 @@ function PersonalDuasTab() {
             {t('common.all')}
           </button>
           {allTags.map(tag => (
-            <button
-              key={tag}
-              onClick={() => setActiveTag(t => t === tag ? null : tag)}
-              className={[
-                'flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all',
-                activeTag === tag ? 'bg-[#C9A84C] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500',
-              ].join(' ')}
-            >
-              <Tag size={10} /> {tag}
-            </button>
+            <div key={tag} className="flex-shrink-0 flex items-center gap-0.5">
+              {/* Filter button */}
+              <button
+                onClick={() => setActiveTag(t => t === tag ? null : tag)}
+                className={[
+                  'flex items-center gap-1 pl-3 pr-2.5 py-1.5 rounded-l-full text-xs font-bold transition-all',
+                  activeTag === tag ? 'bg-[#C9A84C] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500',
+                ].join(' ')}
+              >
+                <Tag size={10} /> {tag}
+              </button>
+              {/* Share link button */}
+              <button
+                onClick={() => copyShareLink(tag)}
+                title={`Copy share link for "${tag}"`}
+                className={[
+                  'flex items-center justify-center w-7 h-7 rounded-r-full text-xs transition-all active:scale-90',
+                  copiedTag === tag
+                    ? 'bg-[#2D6A4F] text-white'
+                    : activeTag === tag
+                    ? 'bg-[#b8943d] text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-400',
+                ].join(' ')}
+              >
+                {copiedTag === tag ? <Check size={10} /> : <Share2 size={10} />}
+              </button>
+            </div>
           ))}
         </div>
       )}
@@ -947,7 +980,15 @@ export default function Prayers() {
         {activeTab === 'prayers' && (
           <div className="space-y-2.5">
             <div className="flex items-center justify-between mb-1">
-              <p className="text-xs text-gray-500">{t('prayers.uma_qura')}</p>
+              <div>
+                <p className="text-xs text-gray-500">{t('prayers.uma_qura')}</p>
+                {settings.locationName && (
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 flex items-center gap-1 mt-0.5">
+                    <MapPin size={9} className="text-[#0D7377]" />
+                    {settings.locationName}
+                  </p>
+                )}
+              </div>
               <button
                 onClick={handleDetectLocation}
                 disabled={locating}

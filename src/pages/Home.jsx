@@ -232,7 +232,7 @@ export default function Home() {
       {/* ── Next Prayer ── */}
       {prayerTimes && currentNext?.next && (
         <div>
-          <div className="flex items-center justify-between mb-2 px-1">
+          <div className="flex items-center justify-between mb-1.5 px-1">
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('home.prayer_times')}</h3>
             <button
               onClick={handleDetectLocation}
@@ -243,6 +243,12 @@ export default function Home() {
               {locating ? t('home.detecting') : t('home.use_my_location')}
             </button>
           </div>
+          {settings.locationName && (
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 px-1 mb-2 flex items-center gap-1">
+              <MapPin size={10} className="text-[#0D7377]" />
+              {settings.locationName}
+            </p>
+          )}
           {locError && <p className="text-xs text-amber-600 mb-2 px-1">{locError}</p>}
           <div className="space-y-2">
             {prayers.map(name => (

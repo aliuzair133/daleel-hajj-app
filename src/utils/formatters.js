@@ -27,16 +27,22 @@ export function toArabicNumerals(num) {
   return String(num).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
 }
 
-// Get Hijri date string (approximate — for display only)
+// Get Hijri date string using Umm al-Qura calendar (official Saudi / Hajj calendar)
 export function getHijriDate(date = new Date()) {
-  // Use browser's Intl API for Hijri calendar
-  try {
-    return new Intl.DateTimeFormat('en-u-ca-islamic', {
-      day: 'numeric', month: 'long', year: 'numeric'
-    }).format(date);
-  } catch {
-    return '';
+  const d = date instanceof Date ? date : new Date(date);
+  // 1st choice: Umm al-Qura (Islamic calendar used in Saudi Arabia)
+  const calendars = ['islamic-umalqura', 'islamic-rgsa', 'islamic'];
+  for (const cal of calendars) {
+    try {
+      const result = new Intl.DateTimeFormat(`en-u-ca-${cal}`, {
+        day: 'numeric', month: 'long', year: 'numeric',
+      }).format(d);
+      if (result) return result;
+    } catch {
+      // try next calendar
+    }
   }
+  return '';
 }
 
 // Capitalize first letter

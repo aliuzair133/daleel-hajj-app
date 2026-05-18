@@ -18,6 +18,7 @@ const IhramRules = lazy(() => import('./pages/IhramRules'));
 const Settings   = lazy(() => import('./pages/Settings'));
 const AIGuide    = lazy(() => import('./pages/AIGuide'));
 const Onboarding = lazy(() => import('./pages/Onboarding'));
+const ShareDua   = lazy(() => import('./pages/ShareDua'));
 
 /* ── Loading skeleton shown during Suspense or initial DB check ── */
 function LoadingFallback() {
@@ -40,17 +41,18 @@ function AnimatedRoutes() {
   return (
     <div key={location.pathname} className="route-wrapper">
       <Routes location={location}>
-        <Route path="/"            element={<Home />} />
-        <Route path="/rituals"     element={<Rituals />} />
-        <Route path="/prayers"     element={<Prayers />} />
-        <Route path="/contacts"    element={<Contacts />} />
-        <Route path="/more"        element={<More />} />
-        <Route path="/safety"      element={<Safety />} />
-        <Route path="/checklist"   element={<Checklist />} />
-        <Route path="/map"         element={<Map />} />
-        <Route path="/ihram-rules" element={<IhramRules />} />
-        <Route path="/ai-guide"    element={<AIGuide />} />
-        <Route path="/settings"    element={<Settings />} />
+        <Route path="/"              element={<Home />} />
+        <Route path="/rituals"       element={<Rituals />} />
+        <Route path="/prayers"       element={<Prayers />} />
+        <Route path="/contacts"      element={<Contacts />} />
+        <Route path="/more"          element={<More />} />
+        <Route path="/safety"        element={<Safety />} />
+        <Route path="/checklist"     element={<Checklist />} />
+        <Route path="/map"           element={<Map />} />
+        <Route path="/ihram-rules"   element={<IhramRules />} />
+        <Route path="/ai-guide"      element={<AIGuide />} />
+        <Route path="/settings"      element={<Settings />} />
+        <Route path="/share/:tagSlug" element={<ShareDua />} />
       </Routes>
     </div>
   );
@@ -67,8 +69,6 @@ export default function App() {
       .then(row => {
         const done = !!row?.value;
         setOnboardingDone(done);
-
-        // If onboarding is already done, check whether the tour has been seen
         if (done) {
           db.settings.get('tourComplete').then(tr => {
             if (!tr?.value) setShowTour(true);
@@ -83,6 +83,22 @@ export default function App() {
     setShowTour(false);
   }
 
+  // ── Share routes work for EVERYONE — no onboarding required ──────
+  // Check via window.location before BrowserRouter mounts so that
+  // people who receive a share link can submit a du'a immediately.
+  const isShareRoute = window.location.pathname.startsWith('/share/');
+  if (isShareRoute) {
+    return (
+      <BrowserRouter>
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route path="/share/:tagSlug" element={<ShareDua />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    );
+  }
+
   // Still checking IndexedDB — show loading screen
   if (onboardingDone === null) return <LoadingFallback />;
 
@@ -93,7 +109,7 @@ export default function App() {
         <Onboarding
           onComplete={() => {
             setOnboardingDone(true);
-            setShowTour(true); // trigger tour immediately after onboarding
+            setShowTour(true);
           }}
         />
       </Suspense>
@@ -102,10 +118,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      {/* Offline alert banner at very top */}
       <OfflineBanner />
-
-      {/* App shell: scrollable main + fixed BottomNav */}
       <div className="flex flex-col min-h-dvh bg-[var(--color-bg)]">
         <main className="main-scroll">
           <Suspense fallback={<LoadingFallback />}>
@@ -114,8 +127,6 @@ export default function App() {
         </main>
         <BottomNav />
       </div>
-
-      {/* Feature tour overlay — shown once after first onboarding */}
       {showTour && <FeatureTour onComplete={handleTourComplete} />}
     </BrowserRouter>
   );
