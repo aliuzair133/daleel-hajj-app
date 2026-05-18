@@ -23,7 +23,7 @@
       "translation": "O Allah, I intend to perform Hajj, so make it easy for me and accept it from me.",
       "when_to_recite": "Upon putting on the Ihram garments and making the intention",
       "source": "Authenticated by scholars of Hajj fiqh",
-      "audio_file": "dua-ihram.mp3",
+      "audio_file": null,
       "notes": "The intention is in the heart; verbal expression is recommended."
     },
     {
@@ -36,7 +36,7 @@
       "translation": "In the name of Allah and Allah is the Greatest. O Allah, [I begin this tawaf] with faith in You, affirming Your Book, fulfilling Your covenant, and following the Sunnah of Your Prophet Muhammad ﷺ.",
       "when_to_recite": "Upon reaching the Black Stone and beginning each circuit of Tawaf",
       "source": "Baihaqi — Authenticated by Al-Albani",
-      "audio_file": "dua-tawaf.mp3",
+      "audio_file": null,
       "notes": "Touch or kiss the Black Stone if possible, otherwise point toward it."
     },
     {
@@ -88,7 +88,7 @@
       "translation": "Indeed, Safa and Marwa are among the symbols of Allah. I begin with what Allah began with. Allah is the Greatest, Allah is the Greatest, Allah is the Greatest. There is no god but Allah alone, with no partner. To Him belongs sovereignty and praise, and He has power over everything.",
       "when_to_recite": "Upon climbing Safa at the beginning of each Sa'i and while facing the Qiblah",
       "source": "Sahih Muslim 1218",
-      "audio_file": "dua-sai.mp3",
+      "audio_file": null,
       "notes": "Raise your hands in du'a after reciting this and make any supplication you wish."
     },
     {
@@ -101,7 +101,7 @@
       "translation": "There is no god but Allah alone, with no partner. To Him belongs sovereignty and praise, and He has power over everything.",
       "when_to_recite": "Throughout the standing at Arafat — repeat abundantly",
       "source": "Tirmidhi 3585 — classified Hasan",
-      "audio_file": "dua-arafat.mp3",
+      "audio_file": null,
       "notes": "This is the most virtuous dhikr to repeat at Arafat. Combine it with personal du'a in your own language."
     },
     {
@@ -114,7 +114,7 @@
       "translation": "O Allah, You hear my words, You see my situation, You know my hidden and open affairs — nothing of my matter is hidden from You. I am wretched and poor, seeking Your help and refuge, fearful and anxious. I ask You with the asking of the destitute, I plead to You with the pleading of the humbled sinner, and I call upon You with the supplication of the fearful afflicted.",
       "when_to_recite": "At Arafat during the wuquf",
       "source": "Baihaqi — authenticated",
-      "audio_file": "dua-arafat.mp3",
+      "audio_file": null,
       "notes": "Follow this with personal du'a for yourself, your family, and the ummah."
     },
     {
@@ -140,7 +140,7 @@
       "translation": "Allah is the Greatest.",
       "when_to_recite": "With each of the 7 pebbles thrown at the Jamarat",
       "source": "Sahih Bukhari 1750",
-      "audio_file": "dua-rami.mp3",
+      "audio_file": null,
       "notes": "After stoning the Jamarat al-Sughra and al-Wusta, face the Qiblah and raise your hands in du'a. No du'a after the Aqabah."
     },
     {
@@ -166,7 +166,7 @@
       "translation": "O Allah, this House is Your House, and I am Your servant, son of Your servant, son of Your female servant. You carried me on what You have placed in service for me of Your creation, until You made me travel through Your lands and conveyed me through Your blessing until You helped me complete the rituals. If You are pleased with me, increase Your pleasure in me; otherwise, from now, before my home grows distant from Your House.",
       "when_to_recite": "During the Farewell Tawaf",
       "source": "Ibn Majah — Hasan",
-      "audio_file": "dua-farewell-tawaf.mp3",
+      "audio_file": null,
       "notes": "This is a deeply moving du'a. Many pilgrims weep during the Farewell Tawaf."
     },
     {
@@ -179,7 +179,7 @@
       "translation": "O Allah, I ask You for beneficial knowledge, abundant provision, and cure from every illness.",
       "when_to_recite": "When drinking Zamzam water",
       "source": "Mustadrak al-Hakim — Authenticated",
-      "audio_file": "dua-zamzam.mp3",
+      "audio_file": null,
       "notes": "Drink Zamzam while standing, facing the Qiblah, with three breaths."
     },
     {
@@ -259,6 +259,253 @@
       "source": "Sahih Muslim 2695",
       "audio_file": null,
       "notes": "The Prophet ﷺ said these four words are the most beloved speech to Allah."
+    },
+    {
+      "id": "sayyid_istighfar",
+      "category": "forgiveness",
+      "title": "Sayyid al-Istighfar (Master of Forgiveness)",
+      "title_ar": "سيد الاستغفار",
+      "arabic": "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",
+      "transliteration": "Allāhumma anta rabbī lā ilāha illā ant, khalaqtanī wa anā 'abduk, wa anā 'alā 'ahdika wa wa'dika mastata't, a'ūdhu bika min sharri mā ṣana't, abū'u laka bini'matika 'alayy, wa abū'u bidhanbī faghfir lī, fa'innahu lā yaghfirudhdhunūba illā ant.",
+      "translation": "O Allah, You are my Lord, there is no god but You. You created me and I am Your servant. I abide by Your covenant and promise as best I can. I seek refuge in You from the evil of what I have done. I acknowledge Your blessing upon me and I acknowledge my sin, so forgive me — for indeed no one forgives sins except You.",
+      "when_to_recite": "Morning and evening — especially at Arafat, Mina, and Muzdalifah. The Prophet ﷺ called this the greatest prayer of forgiveness.",
+      "source": "Sahih Bukhari 6306",
+      "audio_file": null,
+      "notes": "The Prophet ﷺ said: 'Whoever recites this with certainty in the morning and dies that day before evening will enter Paradise. Likewise for evening.'"
+    },
+    {
+      "id": "dua_complete_forgiveness",
+      "category": "forgiveness",
+      "title": "Du'a for Complete Forgiveness",
+      "title_ar": "دعاء المغفرة الشاملة",
+      "arabic": "اللَّهُمَّ اغْفِرْ لِي مَا قَدَّمْتُ وَمَا أَخَّرْتُ وَمَا أَسْرَرْتُ وَمَا أَعْلَنْتُ وَمَا أَنْتَ أَعْلَمُ بِهِ مِنِّي، أَنْتَ الْمُقَدِّمُ وَأَنْتَ الْمُؤَخِّرُ وَأَنْتَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "transliteration": "Allāhummaghfir lī mā qaddamtu wa mā akhkhartu wa mā asrartu wa mā a'lantu wa mā anta a'lamu bihi minnī, antal-muqaddimu wa antal-mu'akhkhiru wa anta 'alā kulli shay'in qadīr.",
+      "translation": "O Allah, forgive me for what I have done before and what I have left for later, what I have hidden and what I have made public, and what You know better than I do. You are the One who advances and the One who delays, and You have power over all things.",
+      "when_to_recite": "In the night prayer (Tahajjud) and at Arafat — covers all categories of sins",
+      "source": "Sahih Muslim 771",
+      "audio_file": null,
+      "notes": "The Prophet ﷺ recited this in his night prayer (Qiyam al-Layl). An all-encompassing prayer for forgiveness."
+    },
+    {
+      "id": "dua_tawbah_sins",
+      "category": "forgiveness",
+      "title": "Du'a of Sincere Repentance",
+      "title_ar": "دعاء التوبة الصادقة",
+      "arabic": "اللَّهُمَّ اغْفِرْ لِي خَطِيئَتِي وَجَهْلِي، وَإِسْرَافِي فِي أَمْرِي، وَمَا أَنْتَ أَعْلَمُ بِهِ مِنِّي. اللَّهُمَّ اغْفِرْ لِي جِدِّي وَهَزْلِي، وَخَطَئِي وَعَمْدِي، وَكُلُّ ذَلِكَ عِنْدِي",
+      "transliteration": "Allāhummaghfir lī khaṭī'atī wa jahlī, wa isrāfī fī amrī, wa mā anta a'lamu bihi minnī. Allāhummaghfir lī jiddī wa hazlī, wa khaṭa'ī wa 'amdī, wa kullu dhālika 'indī.",
+      "translation": "O Allah, forgive me my error, my ignorance, my immoderation in my affairs, and what You know better than I. O Allah, forgive me my earnest and my jest, my mistake and my intentional wrongdoing — all of that is within me.",
+      "when_to_recite": "During Hajj, especially after committing any error or lapse in worship",
+      "source": "Sahih Bukhari 6398",
+      "audio_file": null,
+      "notes": "Covers both intentional and unintentional sins, serious and trivial. Hajj is a time for true repentance."
+    },
+    {
+      "id": "dua_husnul_khatimah",
+      "category": "forgiveness",
+      "title": "Du'a for a Good Ending (Husnul Khatimah)",
+      "title_ar": "دعاء حسن الخاتمة",
+      "arabic": "اللَّهُمَّ اجْعَلْ خَيْرَ عُمُرِي آخِرَهُ، وَخَيْرَ عَمَلِي خَوَاتِمَهُ، وَخَيْرَ أَيَّامِي يَوْمَ أَلْقَاكَ",
+      "transliteration": "Allāhumma ij'al khayra 'umurī ākhirah, wa khayra 'amalī khawātimahu, wa khayra ayyāmī yawma alqāk.",
+      "translation": "O Allah, make the best of my life its last part, make the best of my deeds their conclusion, and make the best of my days the day I meet You.",
+      "when_to_recite": "At Arafat, during Tawaf, and in personal supplication throughout Hajj",
+      "source": "Tabarani — authenticated",
+      "audio_file": null,
+      "notes": "Ask Allah that your Hajj be the final act that seals your life with goodness and that your faith grows until death."
+    },
+    {
+      "id": "dua_shifa",
+      "category": "health",
+      "title": "Du'a for Healing (Shifa)",
+      "title_ar": "دعاء الشفاء",
+      "arabic": "اللَّهُمَّ رَبَّ النَّاسِ، أَذْهِبِ الْبَأْسَ، وَاشْفِ، أَنْتَ الشَّافِي، لَا شِفَاءَ إِلَّا شِفَاؤُكَ، شِفَاءً لَا يُغَادِرُ سَقَمًا",
+      "transliteration": "Allāhumma rabban-nās, adhhibilba's, washfi, antash-shāfī, lā shifā'a illā shifā'uk, shifā'an lā yughādiru saqamā.",
+      "translation": "O Allah, Lord of mankind, remove the affliction and heal — You are the Healer. There is no healing except Your healing, a healing that leaves no illness behind.",
+      "when_to_recite": "During Hajj when sick or in discomfort — also recite over Zamzam water before drinking",
+      "source": "Sahih Bukhari 5743",
+      "audio_file": null,
+      "notes": "The Prophet ﷺ recited this when visiting the sick. Zamzam water with this du'a is a Sunnah remedy."
+    },
+    {
+      "id": "dua_aafiya",
+      "category": "health",
+      "title": "Du'a for Full Bodily Health (Aafiya)",
+      "title_ar": "دعاء العافية",
+      "arabic": "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَهَ إِلَّا أَنْتَ",
+      "transliteration": "Allāhumma 'āfinī fī badanī. Allāhumma 'āfinī fī sam'ī. Allāhumma 'āfinī fī baṣarī. Lā ilāha illā ant.",
+      "translation": "O Allah, grant me health in my body. O Allah, grant me health in my hearing. O Allah, grant me health in my sight. There is no god but You.",
+      "when_to_recite": "Morning and evening — and during Hajj when fatigued or unwell",
+      "source": "Sunan Abu Dawud 5090 — Hasan",
+      "audio_file": null,
+      "notes": "A companion asked the Prophet ﷺ what du'a to make — he was taught to ask for 'aafiya (comprehensive well-being) above all else."
+    },
+    {
+      "id": "dua_protection_disease",
+      "category": "health",
+      "title": "Du'a for Protection from Disease",
+      "title_ar": "دعاء الحماية من الأمراض",
+      "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْبَرَصِ وَالْجُنُونِ وَالْجُذَامِ وَمِنْ سَيِّئِ الْأَسْقَامِ",
+      "transliteration": "Allāhumma innī a'ūdhu bika minal-barasi wal-junūni wal-judhāmi wa min sayyi'il-asqām.",
+      "translation": "O Allah, I seek refuge in You from skin disease, insanity, leprosy, and from all evil illnesses.",
+      "when_to_recite": "During the Hajj season when in crowded places — morning and evening for protection",
+      "source": "Sunan Abu Dawud 1554 — Authenticated",
+      "audio_file": null,
+      "notes": "Hajj involves large crowds in heat. Seek Allah's protection from illness every morning and evening."
+    },
+    {
+      "id": "dua_heat_endurance",
+      "category": "health",
+      "title": "Du'a for Patience and Endurance",
+      "title_ar": "دعاء الصبر والتحمل",
+      "arabic": "اللَّهُمَّ لَا تُكَلِّفْنِي مَا لَا طَاقَةَ لِي بِهِ، وَاجْعَلْ فِيمَا ابْتَلَيْتَنِي بِهِ خَيْرًا لِي، وَاجْعَلْ لِي مِنْهُ فَرَجًا وَمَخْرَجًا",
+      "transliteration": "Allāhumma lā tukallifnī mā lā ṭāqata lī bih, waj'al fīmabtalaytan bihi khayran lī, waj'al lī minhu farajan wa makhrajā.",
+      "translation": "O Allah, do not burden me with what I cannot bear. Make that which You have tested me with a source of good for me, and grant me relief and a way out from it.",
+      "when_to_recite": "During the physical hardships of Hajj — extreme heat, crowds, long walks, fatigue",
+      "source": "Derived from Quran 2:286 and 65:2-3",
+      "audio_file": null,
+      "notes": "Hajj is physically demanding. Ask Allah to make the hardship a means of purification and reward."
+    },
+    {
+      "id": "dua_righteous_offspring",
+      "category": "family",
+      "title": "Du'a for Righteous Children",
+      "title_ar": "دعاء الذرية الصالحة",
+      "arabic": "رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ",
+      "transliteration": "Rabbi hab lī minaṣ-ṣāliḥīn.",
+      "translation": "My Lord, grant me [a child] from among the righteous.",
+      "when_to_recite": "Throughout Hajj — especially at Arafat, during Tawaf, and when drinking Zamzam",
+      "source": "Quran 37:100 — Du'a of Prophet Ibrahim ﷺ",
+      "audio_file": null,
+      "notes": "Prophet Ibrahim ﷺ made this du'a and was blessed with Ismail ﷺ. Hajj connects us to this blessed lineage."
+    },
+    {
+      "id": "dua_family_coolness_eyes",
+      "category": "family",
+      "title": "Du'a for a Righteous Family",
+      "title_ar": "دعاء قرة العين",
+      "arabic": "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا",
+      "transliteration": "Rabbanā hab lanā min azwājinā wa dhurriyyātinā qurrata a'yunin waj'alnā lil-muttaqīna imāmā.",
+      "translation": "Our Lord, grant us from our spouses and offspring the coolness of our eyes, and make us leaders for the righteous.",
+      "when_to_recite": "Especially at Arafat and during Sa'i — ask for a righteous spouse and children who are coolness to your eyes",
+      "source": "Quran 25:74",
+      "audio_file": null,
+      "notes": "One of the most beautiful Quranic du'as. Ask Allah to make your family the joy and peace of your heart."
+    },
+    {
+      "id": "dua_for_parents",
+      "category": "family",
+      "title": "Du'a for Parents and Believers",
+      "title_ar": "دعاء للوالدين والمؤمنين",
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِمَن دَخَلَ بَيْتِيَ مُؤْمِنًا وَلِلْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ",
+      "transliteration": "Rabbi ighfir lī wa liwālidayya wa liman dakhala baytī mu'minan wa lil-mu'minīna wal-mu'mināt.",
+      "translation": "My Lord, forgive me and my parents and whoever enters my home as a believer, and all believing men and believing women.",
+      "when_to_recite": "Every day during Hajj — parents often cannot make Hajj themselves; make du'a for them",
+      "source": "Quran 71:28 — Du'a of Prophet Nuh ﷺ",
+      "audio_file": null,
+      "notes": "If your parents are alive, Hajj is the perfect time to ask Allah to forgive them and bless them. If they have passed, their du'a continues to reach them."
+    },
+    {
+      "id": "dua_children_prayer",
+      "category": "family",
+      "title": "Du'a for Children Who Pray",
+      "title_ar": "دعاء إقامة الصلاة في الذرية",
+      "arabic": "رَبِّ اجْعَلْنِي مُقِيمَ الصَّلَاةِ وَمِن ذُرِّيَّتِي ۚ رَبَّنَا وَتَقَبَّلْ دُعَاءِ",
+      "transliteration": "Rabbi ij'alnī muqīmaṣ-ṣalāti wa min dhurriyyatī. Rabbanā wa taqabbal du'ā'.",
+      "translation": "My Lord, make me an establisher of prayer, and [many] from my descendants. Our Lord, and accept my supplication.",
+      "when_to_recite": "Ask at every Salah during Hajj — pray that your children and grandchildren are constant in their prayers",
+      "source": "Quran 14:40 — Du'a of Prophet Ibrahim ﷺ",
+      "audio_file": null,
+      "notes": "Standing near the Maqam Ibrahim during Hajj is a powerful moment to ask Allah to make your offspring people of prayer."
+    },
+    {
+      "id": "dua_gratitude_family",
+      "category": "family",
+      "title": "Du'a for Gratitude and Righteous Deeds for Family",
+      "title_ar": "دعاء الشكر والعمل الصالح للذرية",
+      "arabic": "رَبِّ أَوْزِعْنِي أَنْ أَشْكُرَ نِعْمَتَكَ الَّتِي أَنْعَمْتَ عَلَيَّ وَعَلَى وَالِدَيَّ وَأَنْ أَعْمَلَ صَالِحًا تَرْضَاهُ وَأَصْلِحْ لِي فِي ذُرِّيَّتِي",
+      "transliteration": "Rabbi awzi'nī an ashkura ni'matakallātī an'amta 'alayya wa 'alā wālidayya wa an a'mala ṣāliḥan tarḍāhu wa aṣliḥ lī fī dhurriyyatī.",
+      "translation": "My Lord, enable me to be grateful for Your favor which You have bestowed upon me and upon my parents, and to do good deeds that please You, and make righteous for me my offspring.",
+      "when_to_recite": "At Arafat and throughout Hajj — especially if you have children or are expecting",
+      "source": "Quran 46:15",
+      "audio_file": null,
+      "notes": "This du'a encompasses gratitude, righteous action, and a prayer for your children all in one. A comprehensive family supplication."
+    },
+    {
+      "id": "dua_rizq_sufficiency",
+      "category": "success",
+      "title": "Du'a for Lawful Provision and Sufficiency",
+      "title_ar": "دعاء الرزق الحلال والاكتفاء",
+      "arabic": "اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ",
+      "transliteration": "Allāhumma akfinī biḥalālika 'an ḥarāmika, wa aghnini bifaḍlika 'amman siwāk.",
+      "translation": "O Allah, suffice me with what You have made lawful against what You have made forbidden, and enrich me by Your grace to the exclusion of all others.",
+      "when_to_recite": "During Hajj and as a daily du'a — especially when asking for business success or financial stability",
+      "source": "Tirmidhi 3563 — Hasan",
+      "audio_file": null,
+      "notes": "Ask Allah to make halal sustenance your source of wealth and to free you from dependence on anyone other than Him."
+    },
+    {
+      "id": "dua_guidance_taqwa",
+      "category": "success",
+      "title": "Du'a for Guidance, Piety, and Contentment",
+      "title_ar": "دعاء الهدى والتقى والغنى",
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْهُدَى وَالتُّقَى وَالْعَفَافَ وَالْغِنَى",
+      "transliteration": "Allāhumma innī as'alukal-hudā wat-tuqā wal-'afāfa wal-ghinā.",
+      "translation": "O Allah, I ask You for guidance, piety, chastity, and contentment.",
+      "when_to_recite": "Abundantly at Arafat and in Mina — a simple yet powerful supplication taught by the Prophet ﷺ",
+      "source": "Sahih Muslim 2721",
+      "audio_file": null,
+      "notes": "The Prophet ﷺ taught this supplication as a comprehensive request covering all spiritual and worldly needs."
+    },
+    {
+      "id": "dua_relief_hardship",
+      "category": "success",
+      "title": "Du'a for Relief from Difficulty",
+      "title_ar": "دعاء تيسير الأمور",
+      "arabic": "اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا، وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلًا",
+      "transliteration": "Allāhumma lā sahla illā mā ja'altahu sahlā, wa anta taj'alul-ḥazna idhā shi'ta sahlā.",
+      "translation": "O Allah, nothing is easy except what You make easy, and You can make the difficult easy if You will.",
+      "when_to_recite": "Whenever facing any difficulty during Hajj — logistical, physical, or emotional",
+      "source": "Ibn Hibban — Authenticated by Al-Albani",
+      "audio_file": null,
+      "notes": "Repeat this during any difficult moment of Hajj — crowds, fatigue, confusion. Allah makes all things easy."
+    },
+    {
+      "id": "dua_tawfiq",
+      "category": "success",
+      "title": "Du'a for Divine Guidance and Success (Tawfiq)",
+      "title_ar": "دعاء التوفيق والسداد",
+      "arabic": "اللَّهُمَّ أَلْهِمْنِي رُشْدِي، وَأَعِذْنِي مِنْ شَرِّ نَفْسِي",
+      "transliteration": "Allāhumma alhimnī rushdī, wa a'idhnī min sharri nafsī.",
+      "translation": "O Allah, inspire me with right guidance and protect me from the evil of my own soul.",
+      "when_to_recite": "When making important decisions — career, marriage, business, studies — ask this at Arafat",
+      "source": "Tirmidhi 3483 — Hasan",
+      "audio_file": null,
+      "notes": "Our own ego and desires are often the greatest obstacles to success. Ask Allah to guide you and protect you from yourself."
+    },
+    {
+      "id": "dua_barakah_wealth",
+      "category": "success",
+      "title": "Du'a for Barakah in Wealth and Sustenance",
+      "title_ar": "دعاء البركة في الرزق",
+      "arabic": "اللَّهُمَّ بَارِكْ لَنَا فِيمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Allāhumma bārik lanā fīmā razaqtanā wa qinā 'adhāban-nār.",
+      "translation": "O Allah, bless us in what You have provided us and protect us from the punishment of the Fire.",
+      "when_to_recite": "After every meal and when asking for barakah in income, projects, and work",
+      "source": "Authenticated du'a after meals",
+      "audio_file": null,
+      "notes": "Barakah (divine blessing) in wealth means small amounts go far and bring happiness. Ask for this rather than just more money."
+    },
+    {
+      "id": "dua_anxiety_worry",
+      "category": "success",
+      "title": "Du'a for Relief from Anxiety and Debt",
+      "title_ar": "دعاء الكرب والغم والدَّين",
+      "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْجُبْنِ، وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ",
+      "transliteration": "Allāhumma innī a'ūdhu bika minal-hammi wal-ḥazan, wal-'ajzi wal-kasal, wal-bukhli wal-jubn, wa ḍala'id-dayni wa ghalabatir-rijāl.",
+      "translation": "O Allah, I seek refuge in You from worry and grief, from helplessness and laziness, from miserliness and cowardice, and from the burden of debt and the oppression of people.",
+      "when_to_recite": "If burdened by debt, financial stress, anxiety, or worry — repeat abundantly at Arafat",
+      "source": "Sahih Bukhari 2893",
+      "audio_file": null,
+      "notes": "The Prophet ﷺ recited this regularly. Hajj is the perfect occasion to ask Allah to lift these burdens from your life."
     }
   ],
   "categories": [
@@ -309,6 +556,30 @@
       "label": "General",
       "label_ar": "عام",
       "icon": "✨"
+    },
+    {
+      "id": "forgiveness",
+      "label": "Forgiveness",
+      "label_ar": "المغفرة",
+      "icon": "🤲"
+    },
+    {
+      "id": "health",
+      "label": "Health",
+      "label_ar": "الصحة",
+      "icon": "💚"
+    },
+    {
+      "id": "family",
+      "label": "Family & Kids",
+      "label_ar": "الأسرة",
+      "icon": "👨‍👩‍👧‍👦"
+    },
+    {
+      "id": "success",
+      "label": "Success & Rizq",
+      "label_ar": "النجاح والرزق",
+      "icon": "🌟"
     }
   ]
 }

@@ -1,11 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, BookmarkCheck, X, ChevronLeft, ChevronRight, Volume2, Square, Bookmark, Navigation, Plus, Pencil, Trash2, Tag } from 'lucide-react';
+import {
+  Search, BookmarkCheck, X, ChevronLeft, ChevronRight,
+  Volume2, Square, Bookmark, Navigation, Plus, Pencil,
+  Trash2, Tag, Layers,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
 import { useSettings } from '../hooks/useSettings';
 import { useAudio } from '../hooks/useAudio';
-import { toggleBookmark, getBookmarkedDuaIds, addPersonalDua, updatePersonalDua, deletePersonalDua, getAllPersonalDuas } from '../utils/db';
+import {
+  toggleBookmark, getBookmarkedDuaIds,
+  addPersonalDua, updatePersonalDua, deletePersonalDua, getAllPersonalDuas,
+} from '../utils/db';
 import { PrayerTimeCard } from '../components/PrayerTimeCard';
 import { Badge } from '../components/ui/Badge';
 import duasData from '../data/duas.json';
@@ -15,27 +22,104 @@ const PRAYER_NAMES = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 const CATEGORY_BADGE = {
   ihram: 'teal', tawaf: 'gold', sai: 'sage', arafat: 'teal',
   rami: 'red', sacrifice: 'gold', farewell: 'gray', general: 'gray',
+  forgiveness: 'teal', health: 'sage', family: 'gold', success: 'gold',
 };
 
-/* ── Full-screen Dua Modal (Hajj Duas) ─────────────────────────── */
-function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBookmark, onPlay, onSpeak, isAudioPlaying }) {
+/* ─────────────────────────────────────────────────────────────────────────
+   DuaSwiper — unified swipeable card viewer for Hajj duas + personal duas
+   ───────────────────────────────────────────────────────────────────────── */
+function DuaSwiper({
+  duas,
+  startIdx = 0,
+  type = 'hajj',       // 'hajj' | 'personal'
+  onClose,
+  bookmarkedIds,
+  onBookmark,
+  onPlay,
+  isPlaying,
+  currentSrc,
+}) {
   const { t } = useTranslation();
+  const [idx, setIdx] = useState(Math.max(0, Math.min(startIdx, duas.length - 1)));
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [offsetX, setOffsetX] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
 
+  const total = duas.length;
+  const dua = duas[idx];
+  const idxRef = useRef(idx);
+  useEffect(() => { idxRef.current = idx; }, [idx]);
+
+  // Keyboard navigation
   useEffect(() => {
-    const onKey = e => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose();
+      else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+      else if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigate(-1);
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, [onClose]); // eslint-disable-line
+
+  const navigate = (dir) => {
+    const cur = idxRef.current;
+    const newIdx = cur + dir;
+    if (newIdx < 0 || newIdx >= total || isAnimating) return;
+    setIsAnimating(true);
+    // Slide current card off screen
+    setOffsetX(dir > 0 ? -window.innerWidth : window.innerWidth);
+    setTimeout(() => {
+      setIdx(newIdx);
+      setOffsetX(0);
+      setIsAnimating(false);
+    }, 200);
+  };
+
+  /* Touch swipe handlers */
+  const handleTouchStart = (e) => {
+    if (isAnimating) return;
+    setTouchStartX(e.touches[0].clientX);
+  };
+  const handleTouchMove = (e) => {
+    if (touchStartX === null || isAnimating) return;
+    setOffsetX(e.touches[0].clientX - touchStartX);
+  };
+  const handleTouchEnd = () => {
+    if (touchStartX === null) return;
+    const dx = offsetX;
+    setTouchStartX(null);
+    if (Math.abs(dx) > 70) {
+      const dir = dx < 0 ? 1 : -1;
+      const cur = idxRef.current;
+      if ((dir === 1 && cur < total - 1) || (dir === -1 && cur > 0)) {
+        setIsAnimating(true);
+        setOffsetX(dx < 0 ? -window.innerWidth : window.innerWidth);
+        setTimeout(() => {
+          setIdx(i => i + dir);
+          setOffsetX(0);
+          setIsAnimating(false);
+        }, 200);
+        return;
+      }
+    }
+    setOffsetX(0); // snap back
+  };
+
+  if (!dua) return null;
+
+  const isHajj = type === 'hajj';
+  const isBookmarked = isHajj && bookmarkedIds?.has(dua.id);
+  const audioActive = isPlaying && currentSrc === `/audio/${dua.audio_file}`;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)] animate-page-enter"
+      className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)] overflow-hidden"
       role="dialog"
       aria-modal="true"
       aria-label={dua.title}
     >
-      {/* ── Top bar ── */}
-      <div className="flex items-center justify-between px-4 pt-safe pt-4 pb-3 border-b border-[var(--color-border-soft)]">
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-[var(--color-border-soft)] flex-shrink-0">
         <button
           onClick={onClose}
           className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 active:scale-95 transition-all"
@@ -44,89 +128,181 @@ function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBo
           <X size={18} />
         </button>
 
-        <span className="text-xs font-semibold text-gray-400">{idx + 1} / {total}</span>
+        <div className="text-center select-none">
+          <p className="text-sm font-bold text-gray-700 dark:text-gray-200">
+            {idx + 1}
+            <span className="text-gray-400 font-normal"> / {total}</span>
+          </p>
+          <p className="text-[10px] text-gray-400 dark:text-gray-600">← swipe →</p>
+        </div>
 
         <div className="flex items-center gap-2">
-          {/* Audio: always available — prefers MP3 file, falls back to device TTS */}
-          <button
-            onClick={() => {
-              // Always call onPlay; useAudio hook falls back to TTS if MP3 missing
-              onPlay?.(`/audio/${dua.audio_file || ''}`, dua.arabic);
-            }}
-            title={dua.audio_file ? 'Play recitation' : 'Read aloud (device voice)'}
-            aria-label={isAudioPlaying ? t('prayers.stop_audio') : t('prayers.play_audio')}
-            className={[
-              'w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95',
-              isAudioPlaying ? 'bg-[#0D7377] text-white' : 'bg-teal-50 dark:bg-teal-900/30 text-[#0D7377]',
-            ].join(' ')}
-          >
-            {isAudioPlaying ? <Square size={14} fill="white" /> : <Volume2 size={16} />}
-          </button>
-          <button
-            onClick={() => onBookmark?.(dua.id)}
-            aria-label={isBookmarked ? t('prayers.bookmarked') : t('prayers.bookmark')}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 active:scale-95 transition-all"
-          >
-            {isBookmarked
-              ? <BookmarkCheck size={18} className="text-[#C9A84C]" />
-              : <Bookmark size={18} className="text-gray-400" />}
-          </button>
+          {isHajj && onPlay && (
+            <button
+              onClick={() => onPlay(`/audio/${dua.audio_file || ''}`, dua.arabic)}
+              className={[
+                'w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95',
+                audioActive
+                  ? 'bg-[#0D7377] text-white'
+                  : 'bg-teal-50 dark:bg-teal-900/30 text-[#0D7377]',
+              ].join(' ')}
+              aria-label={audioActive ? t('prayers.stop_audio') : t('prayers.play_audio')}
+            >
+              {audioActive ? <Square size={14} fill="white" /> : <Volume2 size={16} />}
+            </button>
+          )}
+          {isHajj && onBookmark && (
+            <button
+              onClick={() => onBookmark(dua.id)}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 active:scale-95 transition-all"
+              aria-label={isBookmarked ? t('prayers.bookmarked') : t('prayers.bookmark')}
+            >
+              {isBookmarked
+                ? <BookmarkCheck size={18} className="text-[#C9A84C]" />
+                : <Bookmark size={18} className="text-gray-400" />}
+            </button>
+          )}
+          {!isHajj && <div className="w-10 h-10" />}
         </div>
       </div>
 
-      {/* ── Scrollable content ── */}
-      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
-        <div>
-          <Badge variant={CATEGORY_BADGE[dua.category] ?? 'gray'} className="mb-2">{dua.category}</Badge>
-          <h2 className="text-xl font-black text-gray-900 dark:text-white leading-snug">{dua.title}</h2>
-          {dua.when_to_recite && (
-            <p className="text-sm text-[#0D7377] mt-1 leading-relaxed">⏱ {dua.when_to_recite}</p>
+      {/* ── Progress bar ── */}
+      <div className="h-1 bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+        <div
+          className="h-full bg-gradient-to-r from-[#0D7377] to-[#2D6A4F] transition-all duration-300 ease-out"
+          style={{ width: `${((idx + 1) / total) * 100}%` }}
+        />
+      </div>
+
+      {/* ── Swipeable card content ── */}
+      <div
+        className="flex-1 overflow-y-auto"
+        style={{
+          transform: `translateX(${offsetX}px)`,
+          transition: touchStartX !== null ? 'none' : 'transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          willChange: 'transform',
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div className="px-5 py-5 space-y-4 max-w-lg mx-auto pb-10">
+
+          {/* ── Hajj Dua Layout ── */}
+          {isHajj ? (
+            <>
+              <div>
+                <Badge variant={CATEGORY_BADGE[dua.category] ?? 'gray'} className="mb-2">
+                  {dua.category}
+                </Badge>
+                <h2 className="text-xl font-black text-gray-900 dark:text-white leading-snug">
+                  {dua.title}
+                </h2>
+                {dua.when_to_recite && (
+                  <p className="text-sm text-[#0D7377] mt-1.5 leading-relaxed">
+                    ⏱ {dua.when_to_recite}
+                  </p>
+                )}
+              </div>
+
+              <div className="rounded-2xl bg-[#0D7377]/5 dark:bg-[#0D7377]/10 border border-[#0D7377]/15 p-5">
+                <p
+                  className="font-arabic text-gray-900 dark:text-white leading-loose text-right"
+                  dir="rtl"
+                  style={{ fontSize: '1.7rem', lineHeight: '2.6' }}
+                >
+                  {dua.arabic}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+                  {t('prayers.transliteration')}
+                </p>
+                <p className="text-base italic text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {dua.transliteration}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#0D7377] mb-2">
+                  {t('prayers.translation')}
+                </p>
+                <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {dua.translation}
+                </p>
+              </div>
+
+              {dua.notes && (
+                <div className="rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800 p-4">
+                  <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
+                    💡 {dua.notes}
+                  </p>
+                </div>
+              )}
+
+              {dua.source && (
+                <p className="text-xs text-gray-400 text-right pb-2">📚 {dua.source}</p>
+              )}
+            </>
+          ) : (
+            /* ── Personal Dua Layout ── */
+            <>
+              <h2 className="text-xl font-black text-gray-900 dark:text-white leading-snug">
+                {dua.title}
+              </h2>
+
+              {dua.tags?.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {dua.tags.map(tag => (
+                    <span
+                      key={tag}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#C9A84C]/10 text-[#A8873A] dark:text-[#C9A84C] text-xs font-semibold border border-[#C9A84C]/20"
+                    >
+                      <Tag size={10} /> {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {dua.arabic && (
+                <div className="rounded-2xl bg-[#0D7377]/5 dark:bg-[#0D7377]/10 border border-[#0D7377]/15 p-5">
+                  <p
+                    className="font-arabic text-gray-900 dark:text-white leading-loose text-right"
+                    dir="rtl"
+                    style={{ fontSize: '1.5rem', lineHeight: '2.4' }}
+                  >
+                    {dua.arabic}
+                  </p>
+                </div>
+              )}
+
+              <div className="rounded-2xl bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 p-4">
+                <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                  {dua.body}
+                </p>
+              </div>
+
+              <p className="text-xs text-gray-400 text-right pb-2">
+                Saved {new Date(dua.createdAt).toLocaleDateString()}
+              </p>
+            </>
           )}
         </div>
-
-        <div className="rounded-2xl bg-[#0D7377]/5 dark:bg-[#0D7377]/10 border border-[#0D7377]/15 p-5">
-          <p
-            className="font-arabic text-gray-900 dark:text-white leading-loose text-right"
-            dir="rtl"
-            style={{ fontSize: '1.7rem', lineHeight: '2.6' }}
-          >
-            {dua.arabic}
-          </p>
-        </div>
-
-        <div className="rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 p-4">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">{t('prayers.transliteration')}</p>
-          <p className="text-base italic text-gray-700 dark:text-gray-300 leading-relaxed">{dua.transliteration}</p>
-        </div>
-
-        <div className="rounded-2xl bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 p-4">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#0D7377] mb-2">{t('prayers.translation')}</p>
-          <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">{dua.translation}</p>
-        </div>
-
-        {dua.notes && (
-          <div className="rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800 p-4">
-            <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">💡 {dua.notes}</p>
-          </div>
-        )}
-
-        {dua.source && (
-          <p className="text-xs text-gray-400 text-right pb-2">📚 {dua.source}</p>
-        )}
       </div>
 
       {/* ── Prev / Next navigation ── */}
-      <div className="flex items-center gap-3 px-4 py-4 border-t border-[var(--color-border-soft)] bg-[var(--color-bg)]">
+      <div className="flex items-center gap-3 px-4 py-4 border-t border-[var(--color-border-soft)] bg-[var(--color-bg)] flex-shrink-0">
         <button
-          onClick={onPrev}
-          disabled={idx === 0}
+          onClick={() => navigate(-1)}
+          disabled={idx === 0 || isAnimating}
           className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98] transition-all"
         >
           <ChevronLeft size={18} /> {t('prayers.previous')}
         </button>
         <button
-          onClick={onNext}
-          disabled={idx === total - 1}
+          onClick={() => navigate(1)}
+          disabled={idx === total - 1 || isAnimating}
           className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#0D7377] text-white font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98] transition-all"
         >
           {t('common.next')} <ChevronRight size={18} />
@@ -136,29 +312,26 @@ function DuaModal({ dua, idx, total, onClose, onPrev, onNext, isBookmarked, onBo
   );
 }
 
-/* ── Personal Dua Form Modal ────────────────────────────────────── */
-// NATIVE MIGRATION NOTE: Replace fixed/backdrop with React Native Modal
+/* ─────────────────────────────────────────────────────────────────────────
+   PersonalDuaForm — add / edit a personal dua
+   ───────────────────────────────────────────────────────────────────────── */
 function PersonalDuaForm({ existing, onSave, onCancel }) {
   const { t } = useTranslation();
-  const [title,   setTitle]   = useState(existing?.title   ?? '');
-  const [body,    setBody]    = useState(existing?.body    ?? '');
-  const [arabic,  setArabic]  = useState(existing?.arabic  ?? '');
+  const [title,    setTitle]    = useState(existing?.title    ?? '');
+  const [body,     setBody]     = useState(existing?.body     ?? '');
+  const [arabic,   setArabic]   = useState(existing?.arabic   ?? '');
   const [tagInput, setTagInput] = useState((existing?.tags ?? []).join(', '));
 
   const isValid = title.trim().length > 0 && body.trim().length > 0;
 
   function handleSave() {
     if (!isValid) return;
-    const tags = tagInput
-      .split(',')
-      .map(t => t.trim())
-      .filter(Boolean);
+    const tags = tagInput.split(',').map(t => t.trim()).filter(Boolean);
     onSave({ title, body, arabic, tags });
   }
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)] overflow-y-auto">
-      {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-[var(--color-border-soft)]">
         <button
           onClick={onCancel}
@@ -179,7 +352,6 @@ function PersonalDuaForm({ existing, onSave, onCancel }) {
       </div>
 
       <div className="px-4 py-5 space-y-4 max-w-lg mx-auto w-full">
-        {/* Title */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5">
             {t('personal_duas.title_label')} *
@@ -193,7 +365,6 @@ function PersonalDuaForm({ existing, onSave, onCancel }) {
           />
         </div>
 
-        {/* Body */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5">
             {t('personal_duas.body_label')} *
@@ -207,7 +378,6 @@ function PersonalDuaForm({ existing, onSave, onCancel }) {
           />
         </div>
 
-        {/* Arabic (optional) */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5">
             {t('personal_duas.arabic_label')}
@@ -222,7 +392,6 @@ function PersonalDuaForm({ existing, onSave, onCancel }) {
           />
         </div>
 
-        {/* Tags */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1.5">
             {t('personal_duas.tags_label')}
@@ -241,14 +410,15 @@ function PersonalDuaForm({ existing, onSave, onCancel }) {
   );
 }
 
-/* ── Personal Dua Detail Modal ─────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────
+   PersonalDuaDetail — read / edit / delete a single personal dua
+   ───────────────────────────────────────────────────────────────────────── */
 function PersonalDuaDetail({ dua, onClose, onEdit, onDelete }) {
   const { t } = useTranslation();
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)] animate-page-enter">
-      {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-[var(--color-border-soft)]">
         <button
           onClick={onClose}
@@ -267,15 +437,12 @@ function PersonalDuaDetail({ dua, onClose, onEdit, onDelete }) {
             <Pencil size={16} />
           </button>
           <button
-            onClick={() => {
-              if (confirmDelete) onDelete(dua.id);
-              else setConfirmDelete(true);
-            }}
+            onClick={() => { if (confirmDelete) onDelete(dua.id); else setConfirmDelete(true); }}
             className={[
               'w-10 h-10 flex items-center justify-center rounded-full transition-all',
               confirmDelete ? 'bg-red-500 text-white' : 'bg-red-50 dark:bg-red-900/20 text-red-500',
             ].join(' ')}
-            title={confirmDelete ? t('personal_duas.delete_confirm') : t('common.delete', { defaultValue: 'Delete' })}
+            title={confirmDelete ? t('personal_duas.delete_confirm') : 'Delete'}
           >
             <Trash2 size={16} />
           </button>
@@ -283,7 +450,6 @@ function PersonalDuaDetail({ dua, onClose, onEdit, onDelete }) {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
-        {/* Tags */}
         {dua.tags?.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {dua.tags.map(tag => (
@@ -291,14 +457,12 @@ function PersonalDuaDetail({ dua, onClose, onEdit, onDelete }) {
                 key={tag}
                 className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#C9A84C]/10 text-[#A8873A] dark:text-[#C9A84C] text-xs font-semibold border border-[#C9A84C]/20"
               >
-                <Tag size={10} />
-                {tag}
+                <Tag size={10} /> {tag}
               </span>
             ))}
           </div>
         )}
 
-        {/* Arabic */}
         {dua.arabic && (
           <div className="rounded-2xl bg-[#0D7377]/5 dark:bg-[#0D7377]/10 border border-[#0D7377]/15 p-5">
             <p
@@ -311,7 +475,6 @@ function PersonalDuaDetail({ dua, onClose, onEdit, onDelete }) {
           </div>
         )}
 
-        {/* Body */}
         <div className="rounded-2xl bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 p-4">
           <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
             {dua.body}
@@ -332,24 +495,25 @@ function PersonalDuaDetail({ dua, onClose, onEdit, onDelete }) {
   );
 }
 
-/* ── Personal Duas Tab ─────────────────────────────────────────── */
-// NATIVE MIGRATION NOTE: This entire tab is pure React logic + JSX.
-// Replace Tailwind classes with React Native StyleSheet / NativeWind.
+/* ─────────────────────────────────────────────────────────────────────────
+   PersonalDuasTab
+   ───────────────────────────────────────────────────────────────────────── */
 function PersonalDuasTab() {
   const { t } = useTranslation();
-  const [duas,        setDuas]        = useState([]);
-  const [search,      setSearch]      = useState('');
-  const [showForm,    setShowForm]    = useState(false);
-  const [editDua,     setEditDua]     = useState(null);
-  const [detailDua,   setDetailDua]   = useState(null);
-  const [editingDetail, setEditingDetail] = useState(false);
+  const [duas,           setDuas]          = useState([]);
+  const [search,         setSearch]        = useState('');
+  const [showForm,       setShowForm]      = useState(false);
+  const [editDua,        setEditDua]       = useState(null);
+  const [detailDua,      setDetailDua]     = useState(null);
+  const [editingDetail,  setEditingDetail] = useState(false);
+  const [activeTag,      setActiveTag]     = useState(null);
+  const [swiperOpen,     setSwiperOpen]    = useState(false);
+  const [swiperStartIdx, setSwiperStartIdx] = useState(0);
 
-  // Load from IndexedDB
   async function reload() {
     const all = await getAllPersonalDuas();
     setDuas(all);
   }
-
   useEffect(() => { reload(); }, []);
 
   async function handleSave({ title, body, arabic, tags }) {
@@ -381,14 +545,30 @@ function PersonalDuasTab() {
     );
   });
 
-  // Collect all unique tags for quick filter chips
-  const allTags = [...new Set(duas.flatMap(d => d.tags ?? []))].slice(0, 8);
-  const [activeTag, setActiveTag] = useState(null);
+  const allTags = [...new Set(duas.flatMap(d => d.tags ?? []))].slice(0, 10);
+
   const tagFiltered = activeTag
     ? filtered.filter(d => (d.tags ?? []).includes(activeTag))
     : filtered;
 
-  // Portals ensure fixed modals cover the full screen (including bottom nav)
+  function openSwiper(startIdx = 0) {
+    setSwiperStartIdx(startIdx);
+    setSwiperOpen(true);
+  }
+
+  // Portals
+  const swiperPortal = swiperOpen && tagFiltered.length > 0
+    ? createPortal(
+        <DuaSwiper
+          duas={tagFiltered}
+          startIdx={swiperStartIdx}
+          type="personal"
+          onClose={() => setSwiperOpen(false)}
+        />,
+        document.body
+      )
+    : null;
+
   const formPortal = (showForm || editingDetail)
     ? createPortal(
         <PersonalDuaForm
@@ -405,10 +585,7 @@ function PersonalDuasTab() {
         <PersonalDuaDetail
           dua={detailDua}
           onClose={() => setDetailDua(null)}
-          onEdit={() => {
-            setEditDua(detailDua);
-            setEditingDetail(true);
-          }}
+          onEdit={() => { setEditDua(detailDua); setEditingDetail(true); }}
           onDelete={handleDelete}
         />,
         document.body
@@ -417,11 +594,11 @@ function PersonalDuasTab() {
 
   return (
     <div>
-      {/* Portals for full-screen modals — rendered over entire viewport */}
+      {swiperPortal}
       {formPortal}
       {detailPortal}
 
-      {/* Add button + search row */}
+      {/* Search + Add + Swipe row */}
       <div className="flex gap-2 mb-3">
         <div className="relative flex-1">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -433,6 +610,20 @@ function PersonalDuasTab() {
             className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0D7377]/30 text-gray-900 dark:text-white"
           />
         </div>
+        {/* Swipe mode button */}
+        {duas.length > 0 && (
+          <button
+            onClick={() => openSwiper(0)}
+            title={activeTag ? `Swipe "${activeTag}" duas` : 'Swipe through all duas'}
+            className={[
+              'w-11 h-11 flex items-center justify-center rounded-xl border transition-colors flex-shrink-0',
+              'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-[#0D7377]',
+            ].join(' ')}
+            aria-label="Swipe mode"
+          >
+            <Layers size={18} />
+          </button>
+        )}
         <button
           onClick={() => { setEditDua(null); setShowForm(true); }}
           className="w-11 h-11 flex items-center justify-center rounded-xl bg-[#0D7377] text-white flex-shrink-0 active:scale-95 transition-all"
@@ -463,11 +654,24 @@ function PersonalDuasTab() {
                 activeTag === tag ? 'bg-[#C9A84C] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500',
               ].join(' ')}
             >
-              <Tag size={10} />
-              {tag}
+              <Tag size={10} /> {tag}
             </button>
           ))}
         </div>
+      )}
+
+      {/* Swipe banner when a tag is active */}
+      {activeTag && tagFiltered.length > 0 && (
+        <button
+          onClick={() => openSwiper(0)}
+          className="w-full flex items-center justify-between px-4 py-3 mb-3 rounded-2xl bg-[#C9A84C]/10 border border-[#C9A84C]/25 text-[#A8873A] dark:text-[#C9A84C] active:scale-[0.99] transition-all"
+        >
+          <div className="flex items-center gap-2 text-sm font-semibold">
+            <Layers size={16} />
+            Swipe through {tagFiltered.length} "{activeTag}" duas
+          </div>
+          <ChevronRight size={16} />
+        </button>
       )}
 
       {/* Empty state */}
@@ -484,8 +688,7 @@ function PersonalDuasTab() {
             onClick={() => { setEditDua(null); setShowForm(true); }}
             className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#0D7377] text-white font-semibold text-sm"
           >
-            <Plus size={16} />
-            {t('personal_duas.add')}
+            <Plus size={16} /> {t('personal_duas.add')}
           </button>
         </div>
       ) : tagFiltered.length === 0 ? (
@@ -495,7 +698,7 @@ function PersonalDuasTab() {
         </div>
       ) : (
         <div className="space-y-3">
-          {tagFiltered.map(dua => (
+          {tagFiltered.map((dua, duaIdx) => (
             <button
               key={dua.id}
               onClick={() => setDetailDua(dua)}
@@ -519,7 +722,6 @@ function PersonalDuasTab() {
                   </p>
                 )}
               </div>
-              {/* Tags row */}
               {dua.tags?.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-2.5">
                   {dua.tags.map(tag => (
@@ -540,31 +742,35 @@ function PersonalDuasTab() {
   );
 }
 
-/* ── Main Prayers page ─────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────
+   Main Prayers page
+   ───────────────────────────────────────────────────────────────────────── */
 export default function Prayers() {
   const { t } = useTranslation();
   const { settings, detectLocation } = useSettings();
-  const [activeTab, setActiveTab]         = useState('duas');
-  const [locating, setLocating]           = useState(false);
+  const [activeTab, setActiveTab]               = useState('duas');
+  const [locating,  setLocating]                = useState(false);
+  const [search,    setSearch]                  = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [bookmarkedIds,    setBookmarkedIds]     = useState(new Set());
+  const [showBookmarks,    setShowBookmarks]     = useState(false);
+  // Swiper state (Hajj duas)
+  const [swiperOpen,    setSwiperOpen]    = useState(false);
+  const [swiperStartIdx, setSwiperStartIdx] = useState(0);
+
+  const { prayerTimes, currentNext, countdown } = usePrayerTimes(
+    settings.latitude, settings.longitude
+  );
+  const { play, isPlaying, currentSrc } = useAudio();
+
+  useEffect(() => {
+    getBookmarkedDuaIds().then(setBookmarkedIds);
+  }, []);
 
   async function handleDetectLocation() {
     setLocating(true);
     try { await detectLocation(); } catch { /* ignore */ } finally { setLocating(false); }
   }
-  const [search, setSearch]               = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [bookmarkedIds, setBookmarkedIds] = useState(new Set());
-  const [showBookmarks, setShowBookmarks] = useState(false);
-  const [selectedIdx, setSelectedIdx]     = useState(null);
-
-  const { prayerTimes, currentNext, countdown } = usePrayerTimes(
-    settings.latitude, settings.longitude
-  );
-  const { play, speak, isPlaying, currentSrc, mode } = useAudio();
-
-  useEffect(() => {
-    getBookmarkedDuaIds().then(setBookmarkedIds);
-  }, []);
 
   async function handleBookmark(duaId) {
     const isNowBookmarked = await toggleBookmark(duaId);
@@ -579,41 +785,40 @@ export default function Prayers() {
     const matchesSearch = !search ||
       dua.title.toLowerCase().includes(search.toLowerCase()) ||
       dua.translation.toLowerCase().includes(search.toLowerCase());
-    const matchesCat    = selectedCategory === 'all' || dua.category === selectedCategory;
-    const matchesBm     = !showBookmarks || bookmarkedIds.has(dua.id);
+    const matchesCat = selectedCategory === 'all' || dua.category === selectedCategory;
+    const matchesBm  = !showBookmarks || bookmarkedIds.has(dua.id);
     return matchesSearch && matchesCat && matchesBm;
   });
 
-  const selectedDua = selectedIdx !== null ? filteredDuas[selectedIdx] : null;
-
   const TABS = [
-    { id: 'duas',    label: t('prayers.hajj_duas')    },
+    { id: 'duas',    label: t('prayers.hajj_duas')     },
     { id: 'prayers', label: t('prayers.daily_prayers') },
-    { id: 'mine',    label: t('personal_duas.tab')    },
+    { id: 'mine',    label: t('personal_duas.tab')     },
   ];
 
   return (
     <>
-      {/* ── Full-screen Hajj dua modal ── */}
-      {selectedDua && (
-        <DuaModal
-          dua={selectedDua}
-          idx={selectedIdx}
-          total={filteredDuas.length}
-          onClose={() => setSelectedIdx(null)}
-          onPrev={() => setSelectedIdx(i => Math.max(0, i - 1))}
-          onNext={() => setSelectedIdx(i => Math.min(filteredDuas.length - 1, i + 1))}
-          isBookmarked={bookmarkedIds.has(selectedDua.id)}
+      {/* ── Hajj Dua swipe viewer (portal) ── */}
+      {swiperOpen && filteredDuas.length > 0 && createPortal(
+        <DuaSwiper
+          duas={filteredDuas}
+          startIdx={swiperStartIdx}
+          type="hajj"
+          onClose={() => setSwiperOpen(false)}
+          bookmarkedIds={bookmarkedIds}
           onBookmark={handleBookmark}
-          onPlay={(src, arabic) => play(src, { arabic: arabic ?? selectedDua.arabic, lang: 'ar-SA' })}
-          onSpeak={() => speak({ text: selectedDua.arabic, lang: 'ar-SA' })}
-          isAudioPlaying={isPlaying && (currentSrc === `/audio/${selectedDua.audio_file}` || mode === 'speech')}
-        />
+          onPlay={(src, arabic) => play(src, { arabic: arabic, lang: 'ar-SA' })}
+          isPlaying={isPlaying}
+          currentSrc={currentSrc}
+        />,
+        document.body
       )}
 
-      {/* ── List view ── */}
+      {/* ── List / grid view ── */}
       <div className="px-4 pt-4 pb-6 fade-in max-w-lg mx-auto">
-        <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-4">{t('prayers.title')}</h1>
+        <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
+          {t('prayers.title')}
+        </h1>
 
         {/* 3-tab bar */}
         <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 mb-4 gap-0.5">
@@ -636,6 +841,7 @@ export default function Prayers() {
         {/* ── Hajj Du'as tab ── */}
         {activeTab === 'duas' && (
           <>
+            {/* Search + bookmark toggle */}
             <div className="flex gap-2 mb-3">
               <div className="relative flex-1">
                 <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -662,7 +868,7 @@ export default function Prayers() {
             </div>
 
             {/* Category filter chips */}
-            <div className="flex gap-2 overflow-x-auto pb-2 mb-4 -mx-1 px-1 scrollbar-hide">
+            <div className="flex gap-2 overflow-x-auto pb-2 mb-3 -mx-1 px-1 scrollbar-hide">
               {[{ id: 'all', icon: '📿', label: t('prayers.all_categories') }, ...duasData.categories].map(cat => (
                 <button
                   key={cat.id}
@@ -688,14 +894,24 @@ export default function Prayers() {
               </div>
             ) : (
               <>
-                <p className="text-xs text-gray-400 mb-3 px-1">
-                  {filteredDuas.length} {t('prayers.dua_count_suffix')} — {t('prayers.tap_to_read')}
-                </p>
+                {/* Swipe mode banner */}
+                <button
+                  onClick={() => { setSwiperStartIdx(0); setSwiperOpen(true); }}
+                  className="w-full flex items-center justify-between px-4 py-3 mb-4 rounded-2xl bg-[#0D7377]/8 dark:bg-[#0D7377]/15 border border-[#0D7377]/20 text-[#0D7377] active:scale-[0.99] transition-all"
+                >
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <Layers size={16} />
+                    Swipe through {filteredDuas.length} {selectedCategory !== 'all' ? `"${selectedCategory}"` : ''} duas
+                  </div>
+                  <ChevronRight size={16} />
+                </button>
+
+                {/* Grid */}
                 <div className="grid grid-cols-2 gap-3">
                   {filteredDuas.map((dua, idx) => (
                     <button
                       key={dua.id}
-                      onClick={() => setSelectedIdx(idx)}
+                      onClick={() => { setSwiperStartIdx(idx); setSwiperOpen(true); }}
                       className="text-left bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-card p-4 active:scale-[0.97] transition-all hover:border-[#0D7377]/30 hover:shadow-card-hover"
                     >
                       <Badge variant={CATEGORY_BADGE[dua.category] ?? 'gray'} className="mb-2 text-[10px]">
