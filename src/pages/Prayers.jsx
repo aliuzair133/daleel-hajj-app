@@ -16,6 +16,7 @@ import {
 import { PrayerTimeCard } from '../components/PrayerTimeCard';
 import { Badge } from '../components/ui/Badge';
 import duasData from '../data/duas.json';
+import supplicationsData from '../data/supplications.json';
 
 const PRAYER_NAMES = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 
@@ -790,6 +791,12 @@ export default function Prayers() {
   // Swiper state (Hajj duas)
   const [swiperOpen,    setSwiperOpen]    = useState(false);
   const [swiperStartIdx, setSwiperStartIdx] = useState(0);
+  // Du'a Library tab state
+  const [libSearch,       setLibSearch]       = useState('');
+  const [libCategory,     setLibCategory]     = useState('all');
+  const [libShowBookmarks, setLibShowBookmarks] = useState(false);
+  const [libSwiperOpen,   setLibSwiperOpen]   = useState(false);
+  const [libSwiperIdx,    setLibSwiperIdx]    = useState(0);
 
   const { prayerTimes, currentNext, countdown } = usePrayerTimes(
     settings.latitude, settings.longitude
@@ -823,9 +830,20 @@ export default function Prayers() {
     return matchesSearch && matchesCat && matchesBm;
   });
 
+  const filteredLib = supplicationsData.supplications.filter(s => {
+    const matchesSearch = !libSearch ||
+      s.title.toLowerCase().includes(libSearch.toLowerCase()) ||
+      s.translation.toLowerCase().includes(libSearch.toLowerCase()) ||
+      (s.when_to_recite || '').toLowerCase().includes(libSearch.toLowerCase());
+    const matchesCat = libCategory === 'all' || s.category === libCategory;
+    const matchesBm  = !libShowBookmarks || bookmarkedIds.has(s.id);
+    return matchesSearch && matchesCat && matchesBm;
+  });
+
   const TABS = [
     { id: 'duas',    label: t('prayers.hajj_duas')     },
     { id: 'prayers', label: t('prayers.daily_prayers') },
+    { id: 'library', label: "Du'a Library"             },
     { id: 'mine',    label: t('personal_duas.tab')     },
   ];
 
@@ -847,20 +865,33 @@ export default function Prayers() {
         document.body
       )}
 
+      {/* ── Du'a Library swipe viewer (portal) ── */}
+      {libSwiperOpen && filteredLib.length > 0 && createPortal(
+        <DuaSwiper
+          duas={filteredLib}
+          startIdx={libSwiperIdx}
+          type="hajj"
+          onClose={() => setLibSwiperOpen(false)}
+          bookmarkedIds={bookmarkedIds}
+          onBookmark={handleBookmark}
+        />,
+        document.body
+      )}
+
       {/* ── List / grid view ── */}
       <div className="px-4 pt-4 pb-6 fade-in max-w-lg mx-auto">
         <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
           {t('prayers.title')}
         </h1>
 
-        {/* 3-tab bar */}
+        {/* Tab bar */}
         <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 mb-4 gap-0.5">
           {TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={[
-                'flex-1 py-2.5 rounded-lg text-xs font-bold transition-all leading-snug',
+                'flex-1 py-2.5 rounded-lg text-[10px] font-bold transition-all leading-snug',
                 activeTab === tab.id
                   ? 'bg-white dark:bg-gray-700 text-[#0D7377] shadow-sm'
                   : 'text-gray-500 dark:text-gray-400',
@@ -1008,6 +1039,108 @@ export default function Prayers() {
               />
             ))}
           </div>
+        )}
+
+        {/* ── Du'a Library tab ── */}
+        {activeTab === 'library' && (
+          <>
+            {/* Search + bookmark toggle */}
+            <div className="flex gap-2 mb-3">
+              <div className="relative flex-1">
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="search"
+                  placeholder="Search 600+ supplications…"
+                  value={libSearch}
+                  onChange={e => setLibSearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0D7377]/30 text-gray-900 dark:text-white"
+                />
+              </div>
+              <button
+                onClick={() => setLibShowBookmarks(b => !b)}
+                aria-label="Show bookmarked supplications"
+                className={[
+                  'w-11 h-11 flex items-center justify-center rounded-xl border transition-colors flex-shrink-0',
+                  libShowBookmarks
+                    ? 'bg-[#C9A84C] border-[#C9A84C] text-white'
+                    : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400',
+                ].join(' ')}
+              >
+                <BookmarkCheck size={16} />
+              </button>
+            </div>
+
+            {/* Category filter chips */}
+            <div className="flex gap-2 overflow-x-auto pb-2 mb-3 -mx-1 px-1 scrollbar-hide">
+              {[{ id: 'all', label: 'All' }, ...supplicationsData.categories].map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setLibCategory(cat.id)}
+                  className={[
+                    'flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all',
+                    libCategory === cat.id
+                      ? 'bg-[#0D7377] text-white'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400',
+                  ].join(' ')}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            {filteredLib.length === 0 ? (
+              <div className="text-center py-16 text-gray-400">
+                <p className="text-4xl mb-3">🔍</p>
+                <p className="text-sm font-medium">
+                  {libShowBookmarks ? 'No bookmarked supplications yet' : 'No supplications found'}
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Swipe mode banner */}
+                <button
+                  onClick={() => { setLibSwiperIdx(0); setLibSwiperOpen(true); }}
+                  className="w-full flex items-center justify-between px-4 py-3 mb-4 rounded-2xl bg-[#0D7377]/8 dark:bg-[#0D7377]/15 border border-[#0D7377]/20 text-[#0D7377] active:scale-[0.99] transition-all"
+                >
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <Layers size={16} />
+                    Swipe through {filteredLib.length} {libCategory !== 'all' ? `"${libCategory}"` : ''} supplications
+                  </div>
+                  <ChevronRight size={16} />
+                </button>
+
+                {/* Grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  {filteredLib.map((supp, i) => (
+                    <button
+                      key={supp.id}
+                      onClick={() => { setLibSwiperIdx(i); setLibSwiperOpen(true); }}
+                      className="text-left bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-card p-4 active:scale-[0.97] transition-all hover:border-[#0D7377]/30 hover:shadow-card-hover"
+                    >
+                      <span className="inline-block px-2 py-0.5 rounded-full bg-[#0D7377]/10 text-[#0D7377] text-[10px] font-bold mb-2 capitalize">
+                        {supplicationsData.categories.find(c => c.id === supp.category)?.label ?? supp.category}
+                      </span>
+                      <h3 className="font-bold text-sm text-gray-900 dark:text-white leading-snug mb-2">
+                        {supp.title}
+                      </h3>
+                      <p
+                        className="font-arabic text-gray-400 dark:text-gray-500 text-right leading-relaxed line-clamp-2"
+                        dir="rtl"
+                        style={{ fontSize: '1rem' }}
+                      >
+                        {supp.arabic}
+                      </p>
+                      <div className="flex items-center justify-end mt-2">
+                        {bookmarkedIds.has(supp.id)
+                          ? <BookmarkCheck size={13} className="text-[#C9A84C]" />
+                          : null}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </>
         )}
 
         {/* ── My Du'as tab ── */}
