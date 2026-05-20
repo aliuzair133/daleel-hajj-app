@@ -1,33 +1,36 @@
 /**
  * ReceiveDua.jsx — The pilgrim's import page
  *
- * Route: /receive?d=<base64-encoded-payload>
+ * Route: /receive
  *
- * The pilgrim opens this URL (sent by a family member / friend via WhatsApp).
- * The dua data is decoded from the URL param and saved directly to the
- * pilgrim's own IndexedDB under the tag the link was generated for.
+ * Handles two URL formats:
  *
- * Deduplication: each submission has a stable `sourceId` (same person +
- * same tag = same sourceId). Re-importing updates the existing dua rather
- * than creating a duplicate.
+ *  NEW (server-stored):  /receive?id=abc1234
+ *    → fetches the payload from /api/load-dua?id=abc1234
+ *    → works for any payload size; link is always short
+ *
+ *  LEGACY (URL-encoded): /receive?d=<base64-payload>
+ *    → decodes payload directly from the URL param
+ *    → kept for backward compatibility with old links already in the wild
+ *
+ * Once the payload is loaded, the pilgrim can save it to IndexedDB
+ * (My Du'as) with one tap.
  */
 
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Check, Tag, ChevronRight, AlertCircle } from 'lucide-react';
+import { Check, Tag, ChevronRight, AlertCircle, Loader2 } from 'lucide-react';
 import { addPersonalDua, updatePersonalDua, getPersonalDuaBySourceId } from '../utils/db';
 
-/* ── Decode helper — handles both compact keys {s,t,n,b} and old full keys ── */
-function decodePayload(encoded) {
+/* ── Legacy base64 decoder — handles old ?d= links ─────────────── */
+function decodeLegacyPayload(encoded) {
   try {
     const raw = JSON.parse(decodeURIComponent(escape(atob(encoded))));
-    // Normalise compact keys → full keys (backwards compatible)
     return {
       sourceId:   raw.s   ?? raw.sourceId,
       tag:        raw.t   ?? raw.tag,
       senderName: raw.n   ?? raw.senderName,
       body:       raw.b   ?? raw.body,
-      // legacy fields kept for any old links still in the wild
       title:      raw.title,
       arabic:     raw.arabic,
     };
@@ -39,13 +42,65 @@ function decodePayload(encoded) {
 /* ── Component ─────────────────────────────────────────────────── */
 export default function ReceiveDua() {
   const [searchParams] = useSearchParams();
-  const encoded = searchParams.get('d');
-  const payload = encoded ? decodePayload(encoded) : null;
+  const serverId = searchParams.get('id');    // new server-based link
+  const legacyD  = searchParams.get('d');     // old URL-encoded link
 
-  const [status, setStatus] = useState('idle'); // idle | saving | saved | updated | error
-  const [isUpdate, setIsUpdate] = useState(false);
+  const [payload,    setPayload]    = useState(null);
+  const [loadStatus, setLoadStatus] = useState('loading'); // loading | ready | error
+  const [loadError,  setLoadError]  = useState('');
 
-  /* Auto-check if this is a duplicate (same sourceId already imported) */
+  const [saveStatus, setSaveStatus] = useState('idle'); // idle | saving | saved | updated | error
+  const [isUpdate,   setIsUpdate]   = useState(false);
+
+  /* ── Load payload on mount ──────────────────────────────────────── */
+  useEffect(() => {
+    async function loadPayload() {
+      // ── New server-stored link ─────────────────────────────────
+      if (serverId) {
+        try {
+          const res = await fetch(`/api/load-dua?id=${encodeURIComponent(serverId)}`);
+          if (res.status === 404) {
+            setLoadError('This link has expired or doesn\'t exist. Ask the sender to share a new one.');
+            setLoadStatus('error');
+            return;
+          }
+          if (!res.ok) {
+            setLoadError('Could not load this du\'a. Please check your internet connection and try again.');
+            setLoadStatus('error');
+            return;
+          }
+          const data = await res.json();
+          setPayload(data);
+          setLoadStatus('ready');
+        } catch {
+          setLoadError('Could not load this du\'a. Please check your internet connection and try again.');
+          setLoadStatus('error');
+        }
+        return;
+      }
+
+      // ── Legacy URL-encoded link ────────────────────────────────
+      if (legacyD) {
+        const decoded = decodeLegacyPayload(legacyD);
+        if (!decoded) {
+          setLoadError('This link appears to be broken. Ask the sender to share a new one.');
+          setLoadStatus('error');
+          return;
+        }
+        setPayload(decoded);
+        setLoadStatus('ready');
+        return;
+      }
+
+      // ── No recognised param ────────────────────────────────────
+      setLoadError('No du\'a data found in this link.');
+      setLoadStatus('error');
+    }
+
+    loadPayload();
+  }, [serverId, legacyD]);
+
+  /* ── Check for existing duplicate once payload is loaded ─────── */
   useEffect(() => {
     if (!payload?.sourceId) return;
     getPersonalDuaBySourceId(payload.sourceId).then(existing => {
@@ -53,16 +108,16 @@ export default function ReceiveDua() {
     });
   }, [payload?.sourceId]);
 
+  /* ── Save to IndexedDB ──────────────────────────────────────────── */
   async function handleAdd() {
     if (!payload) return;
-    setStatus('saving');
+    setSaveStatus('saving');
     try {
       const existing = payload.sourceId
         ? await getPersonalDuaBySourceId(payload.sourceId)
         : null;
 
-      const tags = payload.tag ? [payload.tag] : [];
-      // Title is always the sender's name (backward compat: fall back to payload.title)
+      const tags  = payload.tag ? [payload.tag] : [];
       const title = payload.senderName?.trim() || payload.title?.trim() || 'Prayer Request';
 
       if (existing) {
@@ -72,7 +127,7 @@ export default function ReceiveDua() {
           arabic: payload.arabic ?? '',
           tags,
         });
-        setStatus('updated');
+        setSaveStatus('updated');
       } else {
         await addPersonalDua({
           title,
@@ -81,21 +136,31 @@ export default function ReceiveDua() {
           tags,
           sourceId: payload.sourceId ?? null,
         });
-        setStatus('saved');
+        setSaveStatus('saved');
       }
     } catch {
-      setStatus('error');
+      setSaveStatus('error');
     }
   }
 
-  /* ── Bad / missing payload ── */
-  if (!payload) {
+  /* ── Loading screen ─────────────────────────────────────────────── */
+  if (loadStatus === 'loading') {
+    return (
+      <div className="min-h-screen bg-[var(--color-bg)] flex flex-col items-center justify-center px-6 text-center gap-4">
+        <Loader2 size={36} className="text-[#0D7377] animate-spin" />
+        <p className="text-sm text-gray-500 dark:text-gray-400">Loading du'a…</p>
+      </div>
+    );
+  }
+
+  /* ── Error screen ───────────────────────────────────────────────── */
+  if (loadStatus === 'error') {
     return (
       <div className="min-h-screen bg-[var(--color-bg)] flex flex-col items-center justify-center px-6 text-center">
         <AlertCircle size={40} className="text-amber-500 mb-4" />
-        <h1 className="text-lg font-black text-gray-900 dark:text-white mb-2">Invalid Link</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
-          This link appears to be broken or has expired. Ask the sender to share a new link.
+        <h1 className="text-lg font-black text-gray-900 dark:text-white mb-2">Link Unavailable</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed max-w-xs">
+          {loadError}
         </p>
         <Link
           to="/"
@@ -107,15 +172,15 @@ export default function ReceiveDua() {
     );
   }
 
-  /* ── Saved / Updated confirmation ── */
-  if (status === 'saved' || status === 'updated') {
+  /* ── Saved / Updated confirmation ─────────────────────────────── */
+  if (saveStatus === 'saved' || saveStatus === 'updated') {
     return (
       <div className="min-h-screen bg-[var(--color-bg)] flex flex-col items-center justify-center px-6 text-center">
         <div className="w-16 h-16 rounded-full bg-[#2D6A4F]/15 flex items-center justify-center mb-5">
           <Check size={32} className="text-[#2D6A4F]" />
         </div>
         <h1 className="text-xl font-black text-gray-900 dark:text-white mb-2">
-          {status === 'updated' ? 'Du\'a Updated' : 'Du\'a Added'}
+          {saveStatus === 'updated' ? 'Du\'a Updated' : 'Du\'a Added'}
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-1">
           Prayers from <strong className="text-[#0D7377]">{payload.senderName || payload.title || 'your loved one'}</strong>
@@ -135,7 +200,7 @@ export default function ReceiveDua() {
     );
   }
 
-  /* ── Preview + add button ── */
+  /* ── Preview + add button ───────────────────────────────────────── */
   return (
     <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
       {/* Header */}
@@ -152,6 +217,7 @@ export default function ReceiveDua() {
       </div>
 
       <div className="flex-1 px-4 py-5 space-y-4 max-w-lg mx-auto w-full">
+
         {/* Update notice */}
         {isUpdate && (
           <div className="rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 px-4 py-3">
@@ -169,7 +235,7 @@ export default function ReceiveDua() {
           </span>
         </div>
 
-        {/* Dua preview card — title = sender name, body = bullet list */}
+        {/* Dua preview card */}
         <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-card p-5 space-y-4">
           {/* Sender name as title with avatar */}
           <div className="flex items-center gap-3">
@@ -211,17 +277,17 @@ export default function ReceiveDua() {
         {/* Add button */}
         <button
           onClick={handleAdd}
-          disabled={status === 'saving'}
+          disabled={saveStatus === 'saving'}
           className="w-full flex items-center justify-center gap-2 bg-[#0D7377] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#095C5F] transition-all active:scale-[0.98] disabled:opacity-50 shadow-sm"
         >
-          {status === 'saving'
-            ? 'Saving…'
+          {saveStatus === 'saving'
+            ? <><Loader2 size={17} className="animate-spin" /> Saving…</>
             : isUpdate
             ? <><Check size={17} /> Update in My Du'as</>
             : <><Check size={17} /> Add to My Du'as</>}
         </button>
 
-        {status === 'error' && (
+        {saveStatus === 'error' && (
           <p className="text-sm text-red-500 text-center">
             Something went wrong. Please try again.
           </p>
