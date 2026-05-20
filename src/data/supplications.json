@@ -3524,7 +3524,7 @@
       "source": "Sahih Muslim 597"
     },
     {
-      "id": "after_salah_ayat_kursi",
+      "id": "after_salah_ayat_kursi_full",
       "category": "after_salah",
       "title": "Ayat al-Kursi After Prayer",
       "arabic": "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ",
@@ -4176,7 +4176,7 @@
       "source": "Sahih Bukhari 6115"
     },
     {
-      "id": "family_newborn",
+      "id": "family_newborn_protection",
       "category": "family",
       "title": "Du'a for a Newborn Baby",
       "arabic": "اللَّهُمَّ إِنِّي أُعِيذُهُ بِكَ وَذُرِّيَّتَهُ مِنَ الشَّيْطَانِ الرَّجِيمِ",
@@ -4314,7 +4314,7 @@
       "when_to_recite": "Said to someone when they complete a purchase or business deal"
     },
     {
-      "id": "knowledge_before_study",
+      "id": "knowledge_rabbi_zidni_ilma",
       "category": "knowledge",
       "title": "Before Studying or Learning",
       "arabic": "رَبِّ زِدْنِي عِلْمًا",
@@ -4324,7 +4324,7 @@
       "source": "Quran 20:114"
     },
     {
-      "id": "knowledge_understanding",
+      "id": "knowledge_fiqh_deen",
       "category": "knowledge",
       "title": "Prayer for Understanding",
       "arabic": "اللَّهُمَّ فَقِّهْنِي فِي الدِّينِ وَعَلِّمْنِي التَّأْوِيلَ",
@@ -4364,7 +4364,7 @@
       "source": "Quran 2:32"
     },
     {
-      "id": "spiritual_sincerity",
+      "id": "spiritual_sincerity_inner",
       "category": "spiritual",
       "title": "Du'a for Sincerity (Ikhlas)",
       "arabic": "اللَّهُمَّ اجْعَلْ سَرِيرَتِي خَيْرًا مِنْ عَلَانِيَتِي وَاجْعَلْ عَلَانِيَتِي صَالِحَةً",
@@ -5028,7 +5028,7 @@
       "source": "Sunan Abu Dawud 1517"
     },
     {
-      "id": "acceptance_dua_accepted",
+      "id": "acceptance_taqabbal_minna",
       "category": "acceptance",
       "title": "Signs That Du'a Is Accepted",
       "arabic": "اللَّهُمَّ تَقَبَّلْ مِنَّا إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ",
