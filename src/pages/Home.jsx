@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Volume2, VolumeX, Phone, BookOpen, Shield, MapPin, CheckSquare, Scroll, Navigation } from 'lucide-react';
+import { ChevronRight, Volume2, VolumeX, Phone, BookOpen, Shield, MapPin, CheckSquare, Scroll, Navigation, Sparkles, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
 import { useProgress } from '../hooks/useProgress';
@@ -185,15 +185,49 @@ export default function Home() {
 
       {/* ── Today in Hajj / Countdown ── */}
       {hajjDay ? (
-        <div className="rounded-2xl bg-gradient-to-br from-[#0D7377] to-[#095C5F] text-white p-5 shadow-md">
-          <p className="text-teal-200 text-xs font-semibold uppercase tracking-widest mb-1">{t('home.today_in_hajj')}</p>
-          <h2 className="text-lg font-black leading-tight mb-0.5">{hajjDay.title}</h2>
-          <p className="text-teal-200 text-sm">{hajjDay.hijri_date} · 📍 {hajjDay.location}</p>
+        <div className="rounded-2xl overflow-hidden shadow-md">
+          {/* Header */}
+          <div className="bg-gradient-to-br from-[#0D7377] to-[#095C5F] text-white px-5 pt-5 pb-4">
+            <p className="text-teal-200 text-[10px] font-bold uppercase tracking-widest mb-1">{t('home.today_in_hajj')}</p>
+            <h2 className="text-lg font-black leading-tight mb-0.5">{hajjDay.title}</h2>
+            <p className="text-teal-200 text-sm">{hajjDay.hijri_date} · 📍 {hajjDay.location}</p>
+          </div>
+
+          {/* Day description */}
+          {hajjDay.description && (
+            <div className="bg-teal-50 dark:bg-teal-900/20 px-5 py-3 border-b border-teal-100 dark:border-teal-800">
+              <p className="text-xs text-teal-800 dark:text-teal-300 leading-relaxed">{hajjDay.description}</p>
+            </div>
+          )}
+
+          {/* Steps preview */}
+          <div className="bg-white dark:bg-gray-900 px-5 py-3 space-y-3">
+            {hajjDay.steps.slice(0, 3).map((step, i) => (
+              <div key={step.id} className="flex gap-3 items-start">
+                <div className="w-6 h-6 rounded-full bg-[#0D7377]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-[10px] font-black text-[#0D7377]">{i + 1}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{step.title}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed line-clamp-2">{step.description}</p>
+                  {step.tip && (
+                    <p className="text-[11px] text-[#C9A84C] mt-1 flex items-start gap-1">
+                      <span className="flex-shrink-0">💡</span>
+                      <span>{step.tip}</span>
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Footer link */}
           <Link
             to="/rituals"
-            className="mt-3 inline-flex items-center text-sm text-teal-100 hover:text-white transition-colors font-medium"
+            className="flex items-center justify-between px-5 py-3 bg-gray-50 dark:bg-gray-800 no-underline border-t border-gray-100 dark:border-gray-700 active:bg-gray-100 dark:active:bg-gray-700 transition-colors"
           >
-            {t('home.view_today_rituals')} <ChevronRight size={16} className="ml-0.5" />
+            <span className="text-sm font-semibold text-[#0D7377]">{t('home.view_today_rituals')}</span>
+            <ChevronRight size={16} className="text-[#0D7377]" />
           </Link>
         </div>
       ) : (
@@ -209,6 +243,24 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* ── Dil Se Dua Card ── */}
+      <Link
+        to="/ai-guide"
+        className="no-underline block rounded-2xl overflow-hidden shadow-sm active:scale-[0.98] transition-all"
+      >
+        <div className="bg-gradient-to-r from-[#C9A84C]/20 to-[#0D7377]/20 dark:from-[#C9A84C]/10 dark:to-[#0D7377]/10 border border-[#C9A84C]/30 rounded-2xl px-5 py-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#C9A84C] to-[#A8873A] flex items-center justify-center flex-shrink-0 shadow-sm">
+            <Sparkles size={22} className="text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#A8873A] dark:text-[#C9A84C] mb-0.5">New</p>
+            <h3 className="text-sm font-black text-gray-900 dark:text-white leading-tight">Dil Se Dua</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Write a personalised dua for this moment</p>
+          </div>
+          <ChevronRight size={18} className="text-[#C9A84C] flex-shrink-0" />
+        </div>
+      </Link>
 
       {/* ── Progress (only during Hajj) ── */}
       {hajjDay && totalSteps > 0 && (
