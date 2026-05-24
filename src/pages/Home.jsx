@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Volume2, VolumeX, Phone, BookOpen, Shield, MapPin, CheckSquare, Scroll, Navigation, Sparkles } from 'lucide-react';
+import { ChevronRight, Volume2, VolumeX, Phone, BookOpen, BookMarked, Shield, MapPin, Scroll, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
 import { useProgress } from '../hooks/useProgress';
@@ -122,7 +122,8 @@ export default function Home() {
       <div>
         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">{t('home.quick_actions')}</h3>
         <div className="grid grid-cols-3 gap-3">
-          {/* Talbiyah audio */}
+
+          {/* 1. Talbiyah */}
           <button
             onClick={toggleTalbiyah}
             className={[
@@ -133,56 +134,41 @@ export default function Home() {
             {playing
               ? <VolumeX size={22} className="text-white" />
               : <Volume2 size={22} className="text-[#0D7377]" />}
-            <span className={['text-xs font-semibold text-center', playing ? 'text-white' : 'text-gray-700 dark:text-gray-300'].join(' ')}>
+            <span className={['text-xs font-semibold text-center leading-tight', playing ? 'text-white' : 'text-gray-700 dark:text-gray-300'].join(' ')}>
               {playing ? t('home.stop') : t('home.talbiyah')}
             </span>
           </button>
 
-          {/* Emergency */}
-          <Link
-            to="/contacts"
-            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
-          >
-            <Phone size={22} className="text-red-500" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">{t('home.emergency')}</span>
+          {/* 2. Hajj Rituals */}
+          <Link to="/rituals" className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline">
+            <BookOpen size={22} className="text-[#0D7377]" />
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">Hajj Rituals</span>
           </Link>
 
-          {/* Duas */}
-          <Link
-            to="/prayers"
-            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
-          >
-            <BookOpen size={22} className="text-[#C9A84C]" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center">{t('home.duas')}</span>
+          {/* 3. Du'as */}
+          <Link to="/prayers" className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline">
+            <BookMarked size={22} className="text-[#C9A84C]" />
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.duas')}</span>
           </Link>
-        </div>
-      </div>
 
-      {/* ── Essential Resources ── */}
-      <div>
-        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">{t('home.essential_resources')}</h3>
-        <div className="grid grid-cols-3 gap-3">
-          <Link
-            to="/ihram-rules"
-            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
-          >
-            <Scroll size={22} className="text-[#0D7377]" />
+          {/* 4. Ihram Rules */}
+          <Link to="/ihram-rules" className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline">
+            <Scroll size={22} className="text-[#2D6A4F]" />
             <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.ihram_rules')}</span>
           </Link>
-          <Link
-            to="/map"
-            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
-          >
+
+          {/* 5. Emergency */}
+          <Link to="/contacts" className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline">
+            <Phone size={22} className="text-red-500" />
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.emergency')}</span>
+          </Link>
+
+          {/* 6. Holy Sites */}
+          <Link to="/map" className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline">
             <MapPin size={22} className="text-[#C9A84C]" />
             <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.holy_sites')}</span>
           </Link>
-          <Link
-            to="/checklist"
-            className="card flex flex-col items-center gap-2 py-4 active:scale-95 transition-all no-underline"
-          >
-            <CheckSquare size={22} className="text-[#2D6A4F]" />
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center leading-tight">{t('home.checklist')}</span>
-          </Link>
+
         </div>
       </div>
 
