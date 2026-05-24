@@ -1,14 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Volume2, VolumeX, Phone, BookOpen, Shield, MapPin, CheckSquare, Scroll, Navigation, Sparkles, AlertTriangle } from 'lucide-react';
+import { ChevronRight, Volume2, VolumeX, Phone, BookOpen, Shield, MapPin, CheckSquare, Scroll, Navigation, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
 import { useProgress } from '../hooks/useProgress';
 import { useSettings } from '../hooks/useSettings';
 import { PrayerTimeCard } from '../components/PrayerTimeCard';
+import { RitualStep } from '../components/RitualStep';
 import { getHijriDate } from '../utils/formatters';
 import ritualsData from '../data/rituals.json';
 import duasData from '../data/duas.json';
+
+const duaMap = Object.fromEntries(duasData.duas.map(d => [d.id, d]));
 
 // Hajj 2026: 8 Dhul Hijjah 1447 ≈ May 25 2026 (subject to moon sighting)
 const HAJJ_START = new Date('2026-05-25T00:00:00');
@@ -61,7 +64,7 @@ export default function Home() {
       setLocating(false);
     }
   }
-  const { completedCount, totalSteps } = useProgress();
+  const { completedCount, totalSteps, completedIds, toggleStep } = useProgress();
   const hajjDay   = getCurrentHajjDay();
   const daysUntil = getDaysUntilHajj();
   const hijriDate = getHijriDate();
@@ -185,49 +188,35 @@ export default function Home() {
 
       {/* ── Today in Hajj / Countdown ── */}
       {hajjDay ? (
-        <div className="rounded-2xl overflow-hidden shadow-md">
-          {/* Header */}
-          <div className="bg-gradient-to-br from-[#0D7377] to-[#095C5F] text-white px-5 pt-5 pb-4">
+        <div className="space-y-3">
+          {/* Day header */}
+          <div className="bg-gradient-to-br from-[#0D7377] to-[#095C5F] text-white rounded-2xl px-5 pt-5 pb-4 shadow-md">
             <p className="text-teal-200 text-[10px] font-bold uppercase tracking-widest mb-1">{t('home.today_in_hajj')}</p>
             <h2 className="text-lg font-black leading-tight mb-0.5">{hajjDay.title}</h2>
-            <p className="text-teal-200 text-sm">{hajjDay.hijri_date} · 📍 {hajjDay.location}</p>
+            <p className="text-teal-200 text-sm mb-3">{hajjDay.hijri_date} · 📍 {hajjDay.location}</p>
+            {hajjDay.description && (
+              <p className="text-teal-100 text-xs leading-relaxed border-t border-white/20 pt-3">{hajjDay.description}</p>
+            )}
           </div>
 
-          {/* Day description */}
-          {hajjDay.description && (
-            <div className="bg-teal-50 dark:bg-teal-900/20 px-5 py-3 border-b border-teal-100 dark:border-teal-800">
-              <p className="text-xs text-teal-800 dark:text-teal-300 leading-relaxed">{hajjDay.description}</p>
-            </div>
-          )}
-
-          {/* Steps preview */}
-          <div className="bg-white dark:bg-gray-900 px-5 py-3 space-y-3">
-            {hajjDay.steps.slice(0, 3).map((step, i) => (
-              <div key={step.id} className="flex gap-3 items-start">
-                <div className="w-6 h-6 rounded-full bg-[#0D7377]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-[10px] font-black text-[#0D7377]">{i + 1}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{step.title}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed line-clamp-2">{step.description}</p>
-                  {step.tip && (
-                    <p className="text-[11px] text-[#C9A84C] mt-1 flex items-start gap-1">
-                      <span className="flex-shrink-0">💡</span>
-                      <span>{step.tip}</span>
-                    </p>
-                  )}
-                </div>
-              </div>
+          {/* Full ritual steps — same as Rituals page */}
+          <div className="space-y-2">
+            {hajjDay.steps.map(step => (
+              <RitualStep
+                key={step.id}
+                step={step}
+                isCompleted={completedIds.has(step.id)}
+                onToggle={toggleStep}
+                duaMap={duaMap}
+              />
             ))}
           </div>
 
-          {/* Footer link */}
           <Link
             to="/rituals"
-            className="flex items-center justify-between px-5 py-3 bg-gray-50 dark:bg-gray-800 no-underline border-t border-gray-100 dark:border-gray-700 active:bg-gray-100 dark:active:bg-gray-700 transition-colors"
+            className="flex items-center justify-center gap-2 py-3 rounded-2xl border border-[#0D7377]/30 text-sm font-semibold text-[#0D7377] no-underline active:bg-teal-50 dark:active:bg-teal-900/20 transition-colors"
           >
-            <span className="text-sm font-semibold text-[#0D7377]">{t('home.view_today_rituals')}</span>
-            <ChevronRight size={16} className="text-[#0D7377]" />
+            {t('home.view_today_rituals')} <ChevronRight size={15} />
           </Link>
         </div>
       ) : (

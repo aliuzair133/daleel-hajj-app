@@ -79,11 +79,18 @@ export default async function handler(req, res) {
     return res.status(503).json({ error: 'not_configured', message: 'ANTHROPIC_API_KEY is not set.' });
   }
 
-  // ── Parse body ──────────────────────────────────────────────────
+  // ── Parse body — accepts { prompt } or legacy { messages } ──────
   let prompt;
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    prompt = body?.prompt?.trim();
+    if (body?.prompt) {
+      // Single-prompt format (current)
+      prompt = String(body.prompt).trim();
+    } else if (Array.isArray(body?.messages) && body.messages.length > 0) {
+      // Legacy conversational format — extract last user message
+      const lastUser = [...body.messages].reverse().find(m => m.role === 'user');
+      prompt = lastUser?.content?.trim() ?? '';
+    }
     if (!prompt) throw new Error('invalid');
   } catch {
     return res.status(400).json({ error: 'Invalid request body. Expected { prompt: string }' });
