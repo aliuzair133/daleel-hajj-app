@@ -270,40 +270,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── Next Prayer ── */}
-      {prayerTimes && currentNext?.next && (
-        <div>
-          <div className="flex items-center justify-between mb-1.5 px-1">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('home.prayer_times')}</h3>
-            <button
-              onClick={handleDetectLocation}
-              disabled={locating}
-              className="flex items-center gap-1 text-[11px] font-semibold text-[#0D7377] disabled:opacity-50 active:scale-95 transition-all"
-            >
-              <Navigation size={11} className={locating ? 'animate-pulse' : ''} />
-              {locating ? t('home.detecting') : t('home.use_my_location')}
-            </button>
-          </div>
-          {settings.locationName && (
-            <p className="text-[11px] text-gray-400 dark:text-gray-500 px-1 mb-2 flex items-center gap-1">
-              <MapPin size={10} className="text-[#0D7377]" />
-              {settings.locationName}
-            </p>
-          )}
-          {locError && <p className="text-xs text-amber-600 mb-2 px-1">{locError}</p>}
-          <div className="space-y-2">
-            {prayers.map(name => (
-              <PrayerTimeCard
-                key={name}
-                name={name}
-                time={prayerTimes[name]}
-                isNext={currentNext?.next?.name === name}
-                msUntil={currentNext?.next?.name === name ? countdown : null}
-              />
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* ── Talbiyah Card ── */}
       {talbiyahDua && (
