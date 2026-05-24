@@ -9,7 +9,7 @@ export default function More() {
     { to: '/safety',     icon: ShieldAlert,   labelKey: 'more.health_safety',  descKey: 'more.health_safety_desc',  color: 'text-red-600',       bg: 'bg-red-50 dark:bg-red-900/20' },
     { to: '/checklist',  icon: CheckSquare,   labelKey: 'more.checklist',       descKey: 'more.checklist_desc',      color: 'text-teal-primary',  bg: 'bg-teal-50 dark:bg-teal-900/20' },
     { to: '/map',        icon: Map,           labelKey: 'more.holy_sites',      descKey: 'more.holy_sites_desc',     color: 'text-sage-primary',  bg: 'bg-green-50 dark:bg-green-900/20' },
-    { to: '/ai-guide',   icon: MessageCircle, labelKey: 'more.ai_guide',        descKey: 'more.ai_guide_desc',       color: 'text-purple-600',    bg: 'bg-purple-50 dark:bg-purple-900/20' },
+    { to: '/ai-guide',   icon: MessageCircle, labelKey: 'more.dil_se_dua',      descKey: 'more.dil_se_dua_desc',     color: 'text-[#C9A84C]',     bg: 'bg-amber-50 dark:bg-amber-900/20' },
     { to: '/ihram-rules',icon: BookOpen,      labelKey: 'more.ihram_rules',     descKey: 'more.ihram_rules_desc',    color: 'text-gold-dark',     bg: 'bg-amber-50 dark:bg-amber-900/20' },
     { to: '/settings',   icon: Settings,      labelKey: 'more.settings',        descKey: 'more.settings_desc',       color: 'text-gray-600',      bg: 'bg-gray-50 dark:bg-gray-800' },
   ];
